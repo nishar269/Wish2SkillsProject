@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { courseSchema, batchSchema } from "@/lib/validations";
+import { logAction } from "@/actions/audit";
 
 // --- Middleware/Helper to check admin ---
 async function checkAdmin() {
