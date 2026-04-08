@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 import { PWARegistry } from "@/components/pwa-registry";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -30,12 +31,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-          <PWARegistry />
-          {children}
-          <Toaster position="top-center" />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <PWARegistry />
+            {children}
+            <Toaster position="top-center" />
+          </ThemeProvider>
       </body>
     </html>
   );

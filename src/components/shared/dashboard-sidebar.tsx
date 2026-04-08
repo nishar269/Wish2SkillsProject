@@ -12,6 +12,8 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/comp
 import type { SidebarNavItem } from "@/config/navigation";
 import { useState, useEffect } from "react";
 
+import { useTheme } from "next-themes";
+
 interface DashboardSidebarProps {
   items: SidebarNavItem[];
   label: string;
@@ -26,25 +28,11 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ items, label, user, onLogout }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-      setIsDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
+  const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    setIsDark(!isDark);
-    if (isDark) {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    } else {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const initials = user.name
@@ -153,8 +141,8 @@ export function DashboardSidebar({ items, label, user, onLogout }: DashboardSide
             onClick={toggleTheme}
             className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
-            {isDark ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
-            {!collapsed && <span>{isDark ? "Light Mode" : "Dark Mode"}</span>}
+            {theme === "dark" ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+            {!collapsed && <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
           </button>
 
           <Separator className="my-2" />
