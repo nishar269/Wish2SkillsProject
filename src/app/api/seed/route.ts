@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const runtime = 'nodejs';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { Role } from "@prisma/client";
