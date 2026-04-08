@@ -6,6 +6,8 @@ import { loginSchema } from "@/lib/validations";
 import type { Role } from "@/generated/prisma";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-build-only",
+  trustHost: true,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
