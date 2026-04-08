@@ -139,6 +139,8 @@ model Student {
   results       Result[]
   feedbacks     Feedback[]
   leaveRequests LeaveRequest[]
+  submissions   AssignmentSubmission[]
+  applications  JobApplication[]
 
   @@map("students")
 }
@@ -154,10 +156,11 @@ model Faculty {
 
   // Relations
   user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assignments       FacultyAssignment[]
+  facultyAssignments FacultyAssignment[]
   classSessions     ClassSession[]
   uploadedMaterials Material[]
   receivedFeedback  Feedback[]          @relation("FacultyFeedback")
+  createdAssignments Assignment[]
 
   @@map("faculty")
 }
@@ -203,6 +206,7 @@ model Batch {
   tests              Test[]
   notifications      Notification[]
   facultyAssignments FacultyAssignment[]
+  assignments        Assignment[]
 
   @@map("batches")
 }
@@ -223,6 +227,7 @@ model Subject {
   materials          Material[]
   tests              Test[]
   feedbacks          Feedback[]
+  assignments        Assignment[]
 
   @@map("subjects")
 }
@@ -241,6 +246,45 @@ model FacultyAssignment {
 
   @@unique([facultyId, subjectId, batchId])
   @@map("faculty_assignments")
+}
+
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  dueDate     DateTime @map("due_date")
+  totalPoints Int      @default(100) @map("total_points")
+  fileUrl     String?  @map("file_url")
+  batchId     String   @map("batch_id")
+  subjectId   String   @map("subject_id")
+  facultyId   String   @map("faculty_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  batch       Batch                  @relation(fields: [batchId], references: [id])
+  subject     Subject                @relation(fields: [subjectId], references: [id])
+  faculty     Faculty                @relation(fields: [facultyId], references: [id])
+  submissions AssignmentSubmission[]
+
+  @@map("assignments")
+}
+
+model AssignmentSubmission {
+  id           String   @id @default(cuid())
+  assignmentId String   @map("assignment_id")
+  studentId    String   @map("student_id")
+  contentUrl   String?  @map("content_url")
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+  grade        Int?
+  feedback     String?
+  status       String   @default("SUBMITTED") // SUBMITTED, GRADED
+
+  // Relations
+  assignment Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student    Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, studentId])
+  @@map("assignment_submissions")
 }
 
 // ============================================
@@ -447,4 +491,39 @@ model SystemSetting {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("system_settings")
+}
+
+// CAREER & PLACEMENTS
+// ============================================
+
+model JobPost {
+  id           String   @id @default(cuid())
+  title        String
+  company      String
+  location     String
+  type         String   // FULL_TIME, INTERNSHIP, CONTRACT
+  salaryRange  String?  @map("salary_range")
+  description  String
+  requirements String
+  status       String   @default("OPEN") // OPEN, CLOSED
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  applications JobApplication[]
+
+  @@map("job_posts")
+}
+
+model JobApplication {
+  id        String   @id @default(cuid())
+  jobId     String   @map("job_id")
+  studentId String   @map("student_id")
+  status    String   @default("PENDING") // PENDING, REVIEWING, SELECTED, REJECTED
+  resumeUrl String?  @map("resume_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  job     JobPost @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, studentId])
+  @@map("job_applications")
 }
