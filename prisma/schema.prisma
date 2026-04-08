@@ -328,6 +328,7 @@ model Test {
   date       DateTime
   totalMarks Int      @map("total_marks")
   type       TestType @default(WEEKLY)
+  questions  Json   @default("[]")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
