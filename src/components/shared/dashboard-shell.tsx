@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { DashboardSidebar } from "@/components/shared/dashboard-sidebar";
 import { DashboardHeader } from "@/components/shared/dashboard-header";
+import { AIAssistant } from "@/components/shared/ai-assistant";
 import { getNavConfig } from "@/config/navigation";
 import { logoutAction } from "@/actions/auth";
 import { Toaster } from "@/components/ui/sonner";
@@ -49,6 +50,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
       </div>
 
       <Toaster position="top-right" richColors />
+      <AIAssistant />
     </div>
   );
 }
