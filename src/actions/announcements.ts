@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { sendNotificationEmail } from "@/lib/mail";
 
 export async function getAnnouncements() {
   return await db.announcement.findMany({
@@ -27,6 +28,20 @@ export async function createAnnouncement(data: { title: string, content: string,
 
     revalidatePath("/admin/announcements");
     revalidatePath("/dashboard");
+
+    // Async trigger email (don't await for faster response)
+    const activeUsers = await db.user.findMany({ select: { email: true }, where: { status: 'ACTIVE' } });
+    activeUsers.forEach(user => {
+        sendNotificationEmail(
+            user.email, 
+            `New Announcement: ${data.title}`, 
+            "Platform Announcement", 
+            data.content, 
+            "View Dashboard", 
+            `${process.env.NEXTAUTH_URL}/dashboard`
+        );
+    });
+
     return { success: true };
   } catch (error) {
     return { error: "Failed to post announcement." };
