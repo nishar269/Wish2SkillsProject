@@ -1,7 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Wish2Skill CampusOS - Complete Database Schema
+// PostgreSQL with Prisma ORM
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +8,442 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  STUDENT
+  FACULTY
+  COORDINATOR
+  ADMIN
+  AUTHORITY
+  RECORDS
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum BatchStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum SessionStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CourseStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum TestType {
+  WEEKLY
+  MONTHLY
+  MIDTERM
+  FINAL
+  ASSIGNMENT
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  SUCCESS
+  URGENT
+}
+
+enum MaterialType {
+  PDF
+  VIDEO
+  LINK
+  DOCUMENT
+  PRESENTATION
+  OTHER
+}
+
+// ============================================
+// USER & AUTH
+// ============================================
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  passwordHash  String     @map("password_hash")
+  phone         String?
+  role          Role       @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  avatarUrl     String?    @map("avatar_url")
+  lastLoginAt   DateTime?  @map("last_login_at")
+  emailVerified DateTime?  @map("email_verified")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  deletedAt     DateTime?  @map("deleted_at")
+
+  // Relations
+  student              Student?
+  faculty              Faculty?
+  createdNotifications Notification[] @relation("NotificationCreator")
+  auditLogs            AuditLog[]
+  reviewedLeaves       LeaveRequest[] @relation("LeaveReviewer")
+
+  @@map("users")
+}
+
+// ============================================
+// ACADEMIC PROFILES
+// ============================================
+
+model Student {
+  id           String   @id @default(cuid())
+  userId       String   @unique @map("user_id")
+  courseId     String   @map("course_id")
+  batchId      String   @map("batch_id")
+  enrollmentNo String?  @unique @map("enrollment_no")
+  joinDate     DateTime @default(now()) @map("join_date")
+  parentPhone  String?  @map("parent_phone")
+  address      String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Course         @relation(fields: [courseId], references: [id])
+  batch         Batch          @relation(fields: [batchId], references: [id])
+  attendances   Attendance[]
+  results       Result[]
+  feedbacks     Feedback[]
+  leaveRequests LeaveRequest[]
+
+  @@map("students")
+}
+
+model Faculty {
+  id             String   @id @default(cuid())
+  userId         String   @unique @map("user_id")
+  specialization String?
+  experience     Int?     @default(0) // in years
+  qualification  String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assignments       FacultyAssignment[]
+  classSessions     ClassSession[]
+  uploadedMaterials Material[]
+  receivedFeedback  Feedback[]          @relation("FacultyFeedback")
+
+  @@map("faculty")
+}
+
+// ============================================
+// ACADEMIC STRUCTURE
+// ============================================
+
+model Course {
+  id             String       @id @default(cuid())
+  name           String       @unique
+  code           String       @unique
+  description    String?
+  durationMonths Int          @map("duration_months")
+  status         CourseStatus @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  batches  Batch[]
+  subjects Subject[]
+  students Student[]
+
+  @@map("courses")
+}
+
+model Batch {
+  id        String      @id @default(cuid())
+  name      String      @unique
+  courseId  String      @map("course_id")
+  startDate DateTime    @map("start_date")
+  endDate   DateTime?   @map("end_date")
+  capacity  Int         @default(30)
+  status    BatchStatus @default(UPCOMING)
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  course             Course              @relation(fields: [courseId], references: [id])
+  students           Student[]
+  classSessions      ClassSession[]
+  materials          Material[]
+  tests              Test[]
+  notifications      Notification[]
+  facultyAssignments FacultyAssignment[]
+
+  @@map("batches")
+}
+
+model Subject {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  courseId  String   @map("course_id")
+  credits   Int      @default(3)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  course             Course              @relation(fields: [courseId], references: [id])
+  facultyAssignments FacultyAssignment[]
+  classSessions      ClassSession[]
+  materials          Material[]
+  tests              Test[]
+  feedbacks          Feedback[]
+
+  @@map("subjects")
+}
+
+model FacultyAssignment {
+  id        String   @id @default(cuid())
+  facultyId String   @map("faculty_id")
+  subjectId String   @map("subject_id")
+  batchId   String   @map("batch_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  faculty Faculty @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id])
+  batch   Batch   @relation(fields: [batchId], references: [id])
+
+  @@unique([facultyId, subjectId, batchId])
+  @@map("faculty_assignments")
+}
+
+// ============================================
+// SCHEDULING & ATTENDANCE
+// ============================================
+
+model ClassSession {
+  id        String        @id @default(cuid())
+  batchId   String        @map("batch_id")
+  subjectId String        @map("subject_id")
+  facultyId String        @map("faculty_id")
+  date      DateTime
+  startTime DateTime      @map("start_time")
+  endTime   DateTime      @map("end_time")
+  room      String?
+  meetLink  String?       @map("meet_link")
+  topic     String?
+  status    SessionStatus @default(SCHEDULED)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  batch       Batch        @relation(fields: [batchId], references: [id])
+  subject     Subject      @relation(fields: [subjectId], references: [id])
+  faculty     Faculty      @relation(fields: [facultyId], references: [id])
+  attendances Attendance[]
+
+  @@map("class_sessions")
+}
+
+model Attendance {
+  id        String           @id @default(cuid())
+  studentId String           @map("student_id")
+  sessionId String           @map("session_id")
+  status    AttendanceStatus @default(ABSENT)
+  markedAt  DateTime?        @map("marked_at")
+  latitude  Float?
+  longitude Float?
+  remarks   String?
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  student Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  session ClassSession @relation(fields: [sessionId], references: [id])
+
+  @@unique([studentId, sessionId])
+  @@map("attendance")
+}
+
+// ============================================
+// LEARNING CONTENT
+// ============================================
+
+model Material {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  fileUrl     String       @map("file_url")
+  fileType    MaterialType @default(PDF)
+  fileSize    Int?         @map("file_size") // in bytes
+  subjectId   String       @map("subject_id")
+  batchId     String       @map("batch_id")
+  uploadedBy  String       @map("uploaded_by")
+  version     Int          @default(1)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  subject  Subject @relation(fields: [subjectId], references: [id])
+  batch    Batch   @relation(fields: [batchId], references: [id])
+  uploader Faculty @relation(fields: [uploadedBy], references: [id])
+
+  @@map("materials")
+}
+
+// ============================================
+// TESTS & RESULTS
+// ============================================
+
+model Test {
+  id         String   @id @default(cuid())
+  title      String
+  subjectId  String   @map("subject_id")
+  batchId    String   @map("batch_id")
+  date       DateTime
+  totalMarks Int      @map("total_marks")
+  type       TestType @default(WEEKLY)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  subject Subject  @relation(fields: [subjectId], references: [id])
+  batch   Batch    @relation(fields: [batchId], references: [id])
+  results Result[]
+
+  @@map("tests")
+}
+
+model Result {
+  id            String   @id @default(cuid())
+  studentId     String   @map("student_id")
+  testId        String   @map("test_id")
+  marksObtained Float    @map("marks_obtained")
+  grade         String?
+  rank          Int?
+  remarks       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  test    Test    @relation(fields: [testId], references: [id])
+
+  @@unique([studentId, testId])
+  @@map("results")
+}
+
+// ============================================
+// COMMUNICATION
+// ============================================
+
+model Notification {
+  id            String           @id @default(cuid())
+  title         String
+  message       String
+  type          NotificationType @default(INFO)
+  targetRole    Role?            @map("target_role")
+  targetBatchId String?          @map("target_batch_id")
+  createdBy     String           @map("created_by")
+  readBy        String[]         @default([]) @map("read_by")
+  createdAt     DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  creator     User   @relation("NotificationCreator", fields: [createdBy], references: [id])
+  targetBatch Batch? @relation(fields: [targetBatchId], references: [id])
+
+  @@map("notifications")
+}
+
+model Feedback {
+  id          String   @id @default(cuid())
+  studentId   String   @map("student_id")
+  facultyId   String?  @map("faculty_id")
+  subjectId   String?  @map("subject_id")
+  message     String
+  rating      Int?     @default(5) // 1-5
+  isAnonymous Boolean  @default(false) @map("is_anonymous")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  student Student  @relation(fields: [studentId], references: [id])
+  faculty Faculty? @relation("FacultyFeedback", fields: [facultyId], references: [id])
+  subject Subject? @relation(fields: [subjectId], references: [id])
+
+  @@map("feedback")
+}
+
+// ============================================
+// GOVERNANCE
+// ============================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  details   String?
+  ipAddress String?  @map("ip_address")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model LeaveRequest {
+  id          String      @id @default(cuid())
+  studentId   String      @map("student_id")
+  startDate   DateTime    @map("start_date")
+  endDate     DateTime    @map("end_date")
+  reason      String
+  status      LeaveStatus @default(PENDING)
+  reviewedBy  String?     @map("reviewed_by")
+  reviewNotes String?     @map("review_notes")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  student  Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  reviewer User?   @relation("LeaveReviewer", fields: [reviewedBy], references: [id])
+
+  @@map("leave_requests")
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
 }
