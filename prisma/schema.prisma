@@ -141,6 +141,7 @@ model Student {
   leaveRequests LeaveRequest[]
   submissions   AssignmentSubmission[]
   applications  JobApplication[]
+  feeRecords    FeeRecord[]
 
   @@map("students")
 }
@@ -526,4 +527,19 @@ model JobApplication {
 
   @@unique([jobId, studentId])
   @@map("job_applications")
+}
+
+model FeeRecord {
+  id          String    @id @default(cuid())
+  studentId   String    @map("student_id")
+  title       String    // Semester 1, Lab Fee, etc.
+  amount      Float
+  dueDate     DateTime  @map("due_date")
+  status      String    @default("UNPAID") // UNPAID, PAID, OVERDUE
+  paidAt      DateTime? @map("paid_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("fee_records")
 }
