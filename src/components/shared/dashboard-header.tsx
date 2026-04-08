@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ROLE_LABELS } from "@/lib/permissions";
-import type { Role } from "@/generated/prisma";
+import type { Role } from "@prisma/client";
 
 interface DashboardHeaderProps {
   user: {

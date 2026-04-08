@@ -7,7 +7,7 @@ import { AIAssistant } from "@/components/shared/ai-assistant";
 import { getNavConfig } from "@/config/navigation";
 import { logoutAction } from "@/actions/auth";
 import { Toaster } from "@/components/ui/sonner";
-import type { Role } from "@/generated/prisma";
+import type { Role } from "@prisma/client";
 
 interface DashboardShellProps {
   children: React.ReactNode;
