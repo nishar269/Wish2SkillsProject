@@ -2,7 +2,7 @@ import { getPublicPortfolio } from "@/actions/portfolio";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Mail, GraduationCap, Briefcase, Award, TrendingUp, Globe, Link as LinkIcon, Github, Linkedin } from "lucide-react";
+import { Mail, GraduationCap, Briefcase, Award, TrendingUp, Globe, Link as LinkIcon } from "lucide-react";
 
 export default async function PublicPortfolioPage({ params }: { params: { studentId: string } }) {
   const data = await getPublicPortfolio(params.studentId);
@@ -37,8 +37,8 @@ export default async function PublicPortfolioPage({ params }: { params: { studen
                 <p className="text-cyan-600 font-bold uppercase tracking-widest text-[10px] mt-2 italic">{student.course.name} Scholar</p>
                 
                 <div className="flex justify-center gap-3 mt-8">
-                    <div className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-cyan-600 transition-colors"><Github className="h-5 w-5" /></div>
-                    <div className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-cyan-600 transition-colors"><Linkedin className="h-5 w-5" /></div>
+                    <div className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-cyan-600 transition-colors"><Globe className="h-5 w-5" /></div>
+                    <div className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-cyan-600 transition-colors"><LinkIcon className="h-5 w-5" /></div>
                     <div className="p-3 bg-slate-50 rounded-2xl text-slate-400 hover:text-cyan-600 transition-colors"><Globe className="h-5 w-5" /></div>
                 </div>
 

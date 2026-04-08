@@ -3,6 +3,9 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 async function checkFacultyOrAdmin() {
   const session = await auth();
@@ -17,7 +20,7 @@ export async function getMaterials(subjectId?: string) {
         where: subjectId ? { subjectId } : {},
         include: {
             subject: true,
-            faculty: { include: { user: true } }
+            uploader: { include: { user: true } }
         },
         orderBy: { createdAt: "desc" }
     });
@@ -27,15 +30,16 @@ export async function createMaterial(data: {
     title: string, 
     description?: string, 
     fileUrl: string, 
-    fileType: string, 
-    subjectId: string 
+    fileType: string | any, 
+    subjectId: string,
+    batchId: string
 }) {
     const session = await checkFacultyOrAdmin();
     
-    let facultyId: string | undefined;
+    let uploadedBy: string | undefined;
     if (session.user.role === "FACULTY") {
         const fac = await db.faculty.findUnique({ where: { userId: session.user.id } });
-        facultyId = fac?.id;
+        uploadedBy = fac?.id;
     }
 
     try {
@@ -46,7 +50,8 @@ export async function createMaterial(data: {
                 fileUrl: data.fileUrl,
                 fileType: data.fileType,
                 subjectId: data.subjectId,
-                facultyId: facultyId,
+                batchId: data.batchId,
+                uploadedBy: uploadedBy || "", // Fallback
             }
         });
 
@@ -54,6 +59,7 @@ export async function createMaterial(data: {
         revalidatePath("/student/resources");
         return { success: true };
     } catch (error) {
+        console.error(error);
         return { error: "Failed to upload material record." };
     }
 }
@@ -64,9 +70,10 @@ export async function deleteMaterial(id: string) {
         await db.material.delete({ where: { id } });
         revalidatePath("/faculty/resources");
         return { success: true };
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+    } catch (error) {
+        return { error: "Failed to delete material." };
+    }
+}
 
 export async function summarizeMaterial(id: string) {
     const session = await auth();
