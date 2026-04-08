@@ -2,7 +2,7 @@
 // PostgreSQL with Prisma ORM
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
 }
 
 datasource db {
