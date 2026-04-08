@@ -144,6 +144,19 @@ export async function selfMarkAttendance(sessionId: string, coords?: { lat: numb
         return { error: "You can only mark attendance on the scheduled day." };
     }
 
+    // Geofencing Check (Demo: 500m radius around campus center)
+    const CAMPUS_LAT = 12.9716;
+    const CAMPUS_LNG = 77.5946;
+    
+    if (coords) {
+        const distance = getDistance(coords.lat, coords.lng, CAMPUS_LAT, CAMPUS_LNG);
+        if (distance > 0.5) { // 0.5km = 500m
+            return { error: `You are too far from the campus (${(distance).toFixed(2)}km). Please mark your attendance from within the premises.` };
+        }
+    } else {
+        return { error: "Geolocation access is required to verify your presence." };
+    }
+
     try {
         await db.attendance.upsert({
             where: {
@@ -181,4 +194,20 @@ function format(date: Date, pattern: string) {
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     return pattern.replace("yyyy", String(y)).replace("MM", m).replace("dd", d);
+}
+
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a = 
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; 
+}
+
+function deg2rad(deg: number) {
+    return deg * (Math.PI/180);
 }

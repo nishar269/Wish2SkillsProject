@@ -14,14 +14,25 @@ export default function StudentAttendanceClientPage({ history, availableSession 
   const [isPending, startTransition] = useTransition();
 
   const handleMarkAttendance = () => {
+    if (!navigator.geolocation) {
+        toast.error("Geolocation is not supported by your browser.");
+        return;
+    }
+
     startTransition(async () => {
-        // Here we could use browser geolocation API
-        const res = await selfMarkAttendance(availableSession.id);
-        if (res?.error) {
-            toast.error(res.error);
-        } else {
-            toast.success("Attendance marked successfully!");
-        }
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const res = await selfMarkAttendance(availableSession.id, {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            });
+            if (res?.error) {
+                toast.error(res.error);
+            } else {
+                toast.success("Attendance verified and marked!");
+            }
+        }, () => {
+            toast.error("Unable to retrieve your location. Check your permission settings.");
+        });
     });
   };
 
