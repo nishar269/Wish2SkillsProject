@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getStudentDashboardData } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -6,41 +7,48 @@ import {
   Calendar,
   FileText,
   TrendingUp,
-  BookOpen,
-  Bell,
   Clock,
+  Bell,
   Target,
 } from "lucide-react";
+import { format } from "date-fns";
 
 export default async function StudentDashboardPage() {
   const session = await auth();
+  const { 
+    student,
+    attendancePercentage, 
+    upcomingClasses, 
+    notifications, 
+    latestResult 
+  } = await getStudentDashboardData();
 
   const stats = [
     {
-      title: "Attendance",
-      value: "87%",
-      detail: "12 classes this week",
+      title: "Self Attendance",
+      value: `${attendancePercentage}%`,
+      detail: attendancePercentage >= 75 ? "On track" : "Below 75%",
       icon: ClipboardCheck,
       color: "from-emerald-500 to-emerald-600",
     },
     {
       title: "Next Class",
-      value: "React",
-      detail: "Today 2:00 PM - Lab 3",
+      value: upcomingClasses[0]?.subject.name || "None",
+      detail: upcomingClasses[0] ? format(new Date(upcomingClasses[0].date), "p 'at' " + upcomingClasses[0].room) : "No classes today",
       icon: Calendar,
       color: "from-blue-500 to-blue-600",
     },
     {
       title: "Latest Score",
-      value: "92/100",
-      detail: "Weekly Test #12 - Rank #3",
+      value: latestResult ? `${latestResult.score}/${latestResult.test.totalMarks}` : "N/A",
+      detail: latestResult?.test.title || "No tests taken",
       icon: FileText,
       color: "from-purple-500 to-purple-600",
     },
     {
       title: "Performance",
-      value: "A+",
-      detail: "Top 5% of batch",
+      value: attendancePercentage > 90 ? "A+" : attendancePercentage > 80 ? "A" : "B",
+      detail: "Based on active presence",
       icon: TrendingUp,
       color: "from-amber-500 to-amber-600",
     },
@@ -48,26 +56,24 @@ export default async function StudentDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Greeting */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
           Hey, {session?.user?.name?.split(" ")[0]}! 🎓
         </h1>
         <p className="text-muted-foreground mt-1">
-          Here&apos;s your academic overview for today.
+          Here&apos;s your live academic pulse for today.
         </p>
       </div>
 
-      {/* Stats */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.title} className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card key={stat.title} className="relative overflow-hidden border-0 shadow-md hover:shadow-lg transition-transform hover:scale-[1.02] duration-300">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground font-medium">{stat.title}</p>
-                  <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
-                  <p className="text-xs text-muted-foreground">{stat.detail}</p>
+                  <p className="text-2xl font-black italic tracking-tighter">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground font-semibold">{stat.detail}</p>
                 </div>
                 <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg`}>
                   <stat.icon className="h-5 w-5 text-white" />
@@ -79,100 +85,74 @@ export default async function StudentDashboardPage() {
         ))}
       </div>
 
-      {/* Today's Schedule & Notifications */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Today's Schedule */}
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Clock className="h-5 w-5 text-cyan-600" />
-              Today&apos;s Schedule
+              Today&apos;s Live Schedule
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { time: "9:00 AM", subject: "Java Basics", faculty: "Prof. Sharma", room: "Lab 1", status: "completed" },
-                { time: "11:00 AM", subject: "SQL & Databases", faculty: "Prof. Patel", room: "Room 204", status: "completed" },
-                { time: "2:00 PM", subject: "React.js", faculty: "Prof. Kumar", room: "Lab 3", status: "upcoming" },
-                { time: "4:00 PM", subject: "DSA Practice", faculty: "Prof. Singh", room: "Lab 2", status: "upcoming" },
-              ].map((cls, i) => (
-                <div
-                  key={i}
-                  className={`flex items-center gap-4 p-3 rounded-xl border transition-colors ${
-                    cls.status === "completed"
-                      ? "border-emerald-100 bg-emerald-50/50 dark:border-emerald-900/30 dark:bg-emerald-950/20"
-                      : cls.status === "upcoming"
-                      ? "border-cyan-100 bg-cyan-50/50 dark:border-cyan-900/30 dark:bg-cyan-950/20"
-                      : "border-slate-100 dark:border-slate-800"
-                  }`}
-                >
-                  <div className="text-center w-16 shrink-0">
-                    <p className="text-xs text-muted-foreground font-medium">{cls.time}</p>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">{cls.subject}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {cls.faculty} • {cls.room}
-                    </p>
-                  </div>
-                  <Badge
-                    variant={cls.status === "completed" ? "secondary" : "default"}
-                    className={
-                      cls.status === "completed"
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
-                        : "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-400"
-                    }
+              {upcomingClasses.length === 0 ? (
+                <p className="text-sm text-muted-foreground italic">No classes scheduled for today.</p>
+              ) : (
+                upcomingClasses.map((cls, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 p-3 rounded-xl border border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/50"
                   >
-                    {cls.status === "completed" ? "Done" : "Upcoming"}
-                  </Badge>
-                </div>
-              ))}
+                    <div className="text-center w-16 shrink-0">
+                      <p className="text-xs text-muted-foreground font-bold">{format(new Date(cls.date), "p")}</p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold">{cls.subject.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {cls.faculty.user.name} • {cls.room || "Room 201"}
+                      </p>
+                    </div>
+                    <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-200 border-0">Upcoming</Badge>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
 
-        {/* Recent Notifications */}
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Bell className="h-5 w-5 text-cyan-600" />
-              Recent Notifications
+              Latest Notifications
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { title: "New material uploaded", desc: "React Hooks Guide added for MERN-B05", time: "1h ago", type: "info" },
-                { title: "Test scheduled", desc: "Weekly Test #13 on Friday", time: "3h ago", type: "warning" },
-                { title: "Results published", desc: "Weekly Test #12 - Score: 92/100", time: "1d ago", type: "success" },
-                { title: "Low attendance warning", desc: "Your attendance in SQL is 72%", time: "2d ago", type: "alert" },
-              ].map((notif, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
-                >
-                  <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
-                    notif.type === "success" ? "bg-emerald-500"
-                    : notif.type === "warning" ? "bg-amber-500"
-                    : notif.type === "alert" ? "bg-red-500"
-                    : "bg-cyan-500"
-                  }`} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold">{notif.title}</p>
-                    <p className="text-xs text-muted-foreground">{notif.desc}</p>
+              {notifications.length === 0 ? (
+                <p className="text-sm text-muted-foreground italic">Your inbox is empty.</p>
+              ) : (
+                notifications.map((notif, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+                  >
+                    <div className="mt-1 w-2 h-2 rounded-full shrink-0 bg-cyan-500 shadow-sm" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold">{notif.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1">{notif.message}</p>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      {format(new Date(notif.createdAt), "MMM dd")}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                    {notif.time}
-                  </span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Links */}
       <Card className="border-0 shadow-md">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
@@ -184,21 +164,21 @@ export default async function StudentDashboardPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {[
               { label: "Attendance", icon: "📋", href: "/student/attendance" },
-              { label: "Timetable", icon: "📅", href: "/student/timetable" },
-              { label: "Materials", icon: "📚", href: "/student/materials" },
-              { label: "Tests", icon: "📝", href: "/student/tests" },
-              { label: "Feedback", icon: "💬", href: "/student/feedback" },
-              { label: "Profile", icon: "👤", href: "/student/profile" },
+              { label: "Certificates", icon: "🥇", href: "/student/certificates" },
+              { label: "Materials", icon: "📚", href: "/student/resources" },
+              { label: "Assessments", icon: "📝", href: "/student/tests" },
+              { label: "Portfolio", icon: "🌐", href: `/portfolio/${student.id}` },
+              { label: "Finances", icon: "💰", href: "/student/fees" },
             ].map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-cyan-200 dark:hover:border-cyan-800 transition-all duration-200 group"
+                className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 hover:border-cyan-200 transition-all duration-300 group shadow-sm"
               >
-                <span className="text-2xl group-hover:scale-110 transition-transform">
+                <span className="text-2xl group-hover:scale-125 transition-transform duration-300">
                   {link.icon}
                 </span>
-                <span className="text-xs font-medium">{link.label}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{link.label}</span>
               </a>
             ))}
           </div>
