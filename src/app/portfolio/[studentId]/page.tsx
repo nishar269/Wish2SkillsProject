@@ -97,7 +97,7 @@ export default async function PublicPortfolioPage({ params }: { params: { studen
                                             <Briefcase className="h-5 w-5 text-slate-400" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-bold">{a.jobPost.role} • {a.jobPost.company}</p>
+                                            <p className="text-sm font-bold">{a.jobPost.title} • {a.jobPost.company}</p>
                                             <p className="text-[10px] text-slate-400 uppercase tracking-widest">{a.status}</p>
                                         </div>
                                     </div>

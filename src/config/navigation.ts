@@ -20,6 +20,7 @@ import {
   Eye,
   Star,
   Building,
+  Briefcase,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -46,6 +47,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Attendance", href: "/student/attendance", icon: ClipboardCheck },
           { title: "Timetable", href: "/student/timetable", icon: Calendar },
           { title: "Materials", href: "/student/materials", icon: FolderOpen },
+          { title: "Jobs", href: "/student/jobs", icon: Briefcase },
           { title: "Tests & Results", href: "/student/tests", icon: FileText },
           { title: "Performance", href: "/student/performance", icon: BarChart3 },
           { title: "Notifications", href: "/student/notifications", icon: Bell },
@@ -74,6 +76,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
         mainNav: [
           { title: "Overview", href: "/coordinator", icon: LayoutDashboard },
           { title: "Batches", href: "/coordinator/batches", icon: GraduationCap },
+          { title: "Career", href: "/admin/career", icon: Briefcase },
           { title: "Attendance", href: "/coordinator/attendance", icon: ClipboardCheck },
           { title: "Weak Students", href: "/coordinator/students", icon: AlertTriangle },
           { title: "Schedule", href: "/coordinator/schedule", icon: Calendar },
@@ -89,11 +92,13 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Students", href: "/admin/students", icon: Users },
           { title: "Faculty", href: "/admin/faculty", icon: GraduationCap },
           { title: "Courses", href: "/admin/courses", icon: BookOpen },
+          { title: "Career", href: "/admin/career", icon: Briefcase },
           { title: "Subjects", href: "/admin/subjects", icon: FileText },
           { title: "Batches", href: "/admin/batches", icon: Database },
           { title: "Schedule", href: "/admin/schedule", icon: Calendar },
           { title: "Reports", href: "/admin/reports", icon: BarChart3 },
           { title: "Notifications", href: "/admin/notifications", icon: Bell },
+          { title: "Finances", href: "/admin/fees", icon: Banknote },
           { title: "Settings", href: "/admin/settings", icon: Settings },
         ],
       };

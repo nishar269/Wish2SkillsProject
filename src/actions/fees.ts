@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 async function checkAdmin() {
   const session = await auth();
-  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "ACCOUNTANT")) {
+  if (!session || session.user.role !== "ADMIN") {
     throw new Error("Unauthorized");
   }
 }
@@ -65,5 +65,23 @@ export async function getAllFees() {
     return await db.feeRecord.findMany({
         include: { student: { include: { user: { select: { name: true } } } } },
         orderBy: { createdAt: "desc" }
+    });
+}
+
+export async function deleteFee(id: string) {
+    await checkAdmin();
+    try {
+        await db.feeRecord.delete({ where: { id } });
+        revalidatePath("/admin/fees");
+        return { success: true };
+    } catch (error) {
+        return { error: "Failed to delete fee record." };
+    }
+}
+
+export async function getStudentsForFees() {
+    await checkAdmin();
+    return await db.student.findMany({
+        select: { id: true, user: { select: { name: true } } }
     });
 }

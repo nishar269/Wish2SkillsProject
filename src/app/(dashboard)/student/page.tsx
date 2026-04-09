@@ -40,7 +40,7 @@ export default async function StudentDashboardPage() {
     },
     {
       title: "Latest Score",
-      value: latestResult ? `${latestResult.score}/${latestResult.test.totalMarks}` : "N/A",
+      value: latestResult ? `${latestResult.marksObtained}/${latestResult.test.totalMarks}` : "N/A",
       detail: latestResult?.test.title || "No tests taken",
       icon: FileText,
       color: "from-purple-500 to-purple-600",
