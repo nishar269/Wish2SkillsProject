@@ -13,8 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ROLE_LABELS } from "@/lib/permissions";
-import type { Role } from "@prisma/client";
+import { ROLE_LABELS, Role } from "@/lib/permissions";
 
 interface DashboardHeaderProps {
   user: {

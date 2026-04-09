@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Role } from "@/lib/permissions";
 import {
   LayoutDashboard,
   Users,

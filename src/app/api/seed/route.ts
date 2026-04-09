@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import { Role } from "@prisma/client";
+import { Role } from "@/lib/permissions";
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Protection: Only allow seeding in development or with a secret key in production
+  const { searchParams } = new URL(req.url);
+  const key = searchParams.get('key');
+  
+  if (process.env.NODE_ENV === 'production' && key !== process.env.SEED_KEY) {
+    return NextResponse.json({ success: false, message: 'Unauthorized. Production seeding requires a valid SEED_KEY.' }, { status: 401 });
+  }
+
   try {
     // 1. Create Admin User
     const adminEmail = 'admin@wish2skill.com';

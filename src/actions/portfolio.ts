@@ -17,7 +17,7 @@ export async function getPublicPortfolio(studentId: string) {
   if (!student) return null;
 
   // Calculate Average Score
-  const totalScore = student.results.reduce((acc, curr) => acc + (curr.score / curr.test.totalMarks), 0);
+  const totalScore = student.results.reduce((acc, curr) => acc + (curr.marksObtained / curr.test.totalMarks), 0);
   const avgPerformance = student.results.length > 0 ? Math.round((totalScore / student.results.length) * 100) : 0;
 
   return {

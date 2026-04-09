@@ -1,4 +1,12 @@
-import { Role } from "@prisma/client";
+// Redefining Role enum to avoid importing from @prisma/client in client components
+export enum Role {
+  STUDENT = "STUDENT",
+  FACULTY = "FACULTY",
+  COORDINATOR = "COORDINATOR",
+  ADMIN = "ADMIN",
+  AUTHORITY = "AUTHORITY",
+  RECORDS = "RECORDS",
+}
 
 // ============================================
 // Permission Definitions

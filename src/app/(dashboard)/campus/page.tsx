@@ -68,7 +68,7 @@ export default async function CampusMapPage() {
                             <span className="font-bold">500 Meters</span>
                         </div>
                         <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 w-[500/500 * 100%]" />
+                            <div className="h-full bg-blue-500 w-full" />
                         </div>
                     </div>
                     <p className="text-xs leading-relaxed text-slate-400 italic">

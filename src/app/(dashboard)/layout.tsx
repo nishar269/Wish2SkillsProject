@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+export const dynamic = "force-dynamic";
 import { auth } from "@/lib/auth";
 import { DashboardShell } from "@/components/shared/dashboard-shell";
 

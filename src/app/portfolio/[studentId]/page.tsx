@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Mail, GraduationCap, Briefcase, Award, TrendingUp, Globe, Link as LinkIcon } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function PublicPortfolioPage({ params }: { params: { studentId: string } }) {
   const data = await getPublicPortfolio(params.studentId);
 
@@ -77,7 +79,7 @@ export default async function PublicPortfolioPage({ params }: { params: { studen
                                         <p className="text-sm font-bold">{r.test.title}</p>
                                         <p className="text-[10px] text-slate-400">{formatDate(r.createdAt)}</p>
                                     </div>
-                                    <Badge className="bg-white text-cyan-600 shadow-sm border-0">{Math.round((r.score/r.test.totalMarks)*100)}%</Badge>
+                                    <Badge className="bg-white text-cyan-600 shadow-sm border-0">{Math.round((r.marksObtained/r.test.totalMarks)*100)}%</Badge>
                                 </div>
                             ))}
                         </div>

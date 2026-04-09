@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getRoleDashboardPath } from "@/config/navigation";
-import type { Role } from "@prisma/client";
+import { Role } from "@/lib/permissions";
 
 export default async function DashboardRedirectPage() {
   const session = await auth();
