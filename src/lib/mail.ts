@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+function getResend() {
+  if (!_resend) {
+    _resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
+  }
+  return _resend;
+}
 
 export async function sendNotificationEmail(
   to: string, 
@@ -16,7 +22,7 @@ export async function sendNotificationEmail(
   }
 
   try {
-    const data = await resend.emails.send({
+    const data = await getResend().emails.send({
       from: 'Wish2Skill CampusOS <notifications@resend.dev>', // Update with verified domain in production
       to: [to],
       subject: subject,
