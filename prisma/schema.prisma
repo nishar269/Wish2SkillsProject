@@ -3,12 +3,11 @@
 
 generator client {
   provider   = "prisma-client-js"
-  engineType = "library"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================
@@ -112,6 +111,8 @@ model User {
   createdNotifications Notification[] @relation("NotificationCreator")
   auditLogs            AuditLog[]
   reviewedLeaves       LeaveRequest[] @relation("LeaveReviewer")
+  forumPosts           ForumPost[]
+  forumComments        ForumComment[]
 
   @@map("users")
 }
@@ -543,4 +544,54 @@ model FeeRecord {
   student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("fee_records")
+}
+
+// ============================================
+// SOCIAL & COMMUNITY (Stage 19)
+// ============================================
+
+model ForumCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?  @default("MessageSquare") // Lucide icon name
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  posts ForumPost[]
+
+  @@map("forum_categories")
+}
+
+model ForumPost {
+  id         String   @id @default(cuid())
+  title      String
+  content    String   @db.Text
+  authorId   String   @map("author_id")
+  categoryId String   @map("category_id")
+  isPinned   Boolean  @default(false) @map("is_pinned")
+  isLocked   Boolean  @default(false) @map("is_locked")
+  viewCount  Int      @default(0) @map("view_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  author   User          @relation(fields: [authorId], references: [id])
+  category ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments ForumComment[]
+
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  postId    String   @map("post_id")
+  authorId  String   @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  post   ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User      @relation(fields: [authorId], references: [id])
+
+  @@map("forum_comments")
 }

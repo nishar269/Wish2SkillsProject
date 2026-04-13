@@ -4,9 +4,10 @@ import ClientPage from "./client-page";
 
 export const dynamic = "force-dynamic";
 
-export default async function TakeTestPage({ params }: { params: { testId: string } }) {
+export default async function TakeTestPage({ params }: { params: Promise<{ testId: string }> }) {
+  const { testId } = await params;
   const test = await db.test.findUnique({
-    where: { id: params.testId },
+    where: { id: testId },
     include: { subject: true }
   });
 

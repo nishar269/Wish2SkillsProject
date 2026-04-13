@@ -20,19 +20,28 @@ export default function StudentAttendanceClientPage({ history, availableSession 
     }
 
     startTransition(async () => {
-        navigator.geolocation.getCurrentPosition(async (position) => {
+        try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
+            });
+
             const res = await selfMarkAttendance(availableSession.id, {
                 lat: position.coords.latitude,
                 lng: position.coords.longitude
             });
+
             if (res?.error) {
                 toast.error(res.error);
             } else {
                 toast.success("Attendance verified and marked!");
             }
-        }, () => {
-            toast.error("Unable to retrieve your location. Check your permission settings.");
-        });
+        } catch (err) {
+            toast.error("Unable to retrieve your location. Check your permission settings and GPS.");
+        }
     });
   };
 

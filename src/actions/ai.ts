@@ -12,7 +12,8 @@ export async function chatWithCampusAI(prompt: string, history: { role: string, 
 
   if (!process.env.GEMINI_API_KEY) {
     return { 
-        text: "I'm currently in offline mode. Please configure the `GEMINI_API_KEY` in the environment variables to enable my full AI capabilities! However, as a basic reply: I am the CampusOS Assistant, here to help students and faculty manage their academic lives." 
+        text: "Neural connection offline. I am currently operating on internal protocols. Please initialize the 'GEMINI_API_KEY' node to enable full multi-modal intelligence. My local data banks are ready to manage your institutional workflows in the meantime.",
+        isOffline: true
     };
   }
 

@@ -1,17 +1,11 @@
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getStudentDashboardData } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Award, Download, ShieldCheck, Share2, Medal } from "lucide-react";
+import { Award, Download, ShieldCheck, Share2, Medal, AlertCircle } from "lucide-react";
 
 export default async function CertificatesPage() {
-  const session = await auth();
-  if (!session) return null;
-
-  const student = await db.student.findUnique({
-    where: { userId: session.user.id },
-    include: { course: true, batch: true }
-  });
+  const { student, attendancePercentage } = await getStudentDashboardData();
+  const isEligible = attendancePercentage >= 75;
 
   if (!student) return <div className="p-10 text-center italic">Institutional records not found.</div>;
 
@@ -47,12 +41,23 @@ export default async function CertificatesPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-4 pt-4">
-                    <Button className="rounded-2xl h-12 px-8 bg-cyan-600 hover:bg-cyan-700 gap-2 font-bold shadow-lg shadow-cyan-600/20">
-                        <Download className="h-4 w-4" /> Download PDF
-                    </Button>
-                    <Button variant="outline" className="rounded-2xl h-12 px-6 gap-2 font-bold border-2">
-                        <Share2 className="h-4 w-4" /> Share on LinkedIn
-                    </Button>
+                    {isEligible ? (
+                        <>
+                            <Button className="rounded-2xl h-12 px-8 bg-cyan-600 hover:bg-cyan-700 gap-2 font-bold shadow-lg shadow-cyan-600/20">
+                                <Download className="h-4 w-4" /> Download PDF
+                            </Button>
+                            <Button variant="outline" className="rounded-2xl h-12 px-6 gap-2 font-bold border-2">
+                                <Share2 className="h-4 w-4" /> Share on LinkedIn
+                            </Button>
+                        </>
+                    ) : (
+                        <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 flex-1">
+                            <AlertCircle className="h-5 w-5 shrink-0" />
+                            <p className="text-xs font-bold leading-tight uppercase tracking-tighter">
+                                Ineligible: Minimum 75% attendance required (Current: {attendancePercentage}%)
+                            </p>
+                        </div>
+                    )}
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400">
                         <ShieldCheck className="h-4 w-4 text-emerald-500" /> Verified by CampusOS Node

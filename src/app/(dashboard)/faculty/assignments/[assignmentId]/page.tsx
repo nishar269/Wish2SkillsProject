@@ -5,8 +5,8 @@ import ClientPage from "./client-page";
 
 export const dynamic = "force-dynamic";
 
-export default async function AssignmentSubmissionPage({ params }: { params: { assignmentId: string } }) {
-  const { assignmentId } = params;
+export default async function AssignmentSubmissionPage({ params }: { params: Promise<{ assignmentId: string }> }) {
+  const { assignmentId } = await params;
 
   const assignment = await db.assignment.findUnique({
     where: { id: assignmentId },

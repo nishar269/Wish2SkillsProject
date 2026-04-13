@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Wish2Skill CampusOS | AI-Powered Institute Management",
   description: "Next-generation ERP and LMS for modern educational institutions.",
   manifest: "/manifest.json",
+};
+
+export const viewport: Viewport = {
   themeColor: "#0891b2",
 };
 
@@ -34,15 +37,15 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body suppressHydrationWarning className="min-h-full flex flex-col">
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
           >
-            <PWARegistry />
             {children}
+            <PWARegistry />
             <Toaster position="top-center" />
           </ThemeProvider>
       </body>

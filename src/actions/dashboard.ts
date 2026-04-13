@@ -57,7 +57,7 @@ export async function getFacultyDashboardData() {
         take: 4
       },
       uploadedMaterials: { take: 5, orderBy: { createdAt: "desc" } },
-      assignments: true, // This is FacultyAssignment model used for workload mapping
+      facultyAssignments: true, // This is FacultyAssignment model used for workload mapping
       createdAssignments: true // This is the Assignment model used for coursework
     }
   });
@@ -68,27 +68,36 @@ export async function getFacultyDashboardData() {
     upcomingClasses: faculty.classSessions,
     totalMaterials: faculty.uploadedMaterials.length,
     activeAssignments: faculty.createdAssignments.length,
-    loadCount: faculty.assignments.length
+    loadCount: faculty.facultyAssignments.length
   };
 }
 
 export async function getAuthorityDashboardData() {
     const session = await auth();
-    if (!session || session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR") {
+    console.log('DASHBOARD_ACCESS: User =', session?.user?.email, 'Role =', session?.user?.role);
+    
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR")) {
+        console.error('DASHBOARD_ACCESS: Unauthorized access attempt detected.');
         throw new Error("Unauthorized");
     }
 
-    const [studentCount, facultyCount, courseCount, recentLogs] = await Promise.all([
-        db.student.count(),
-        db.faculty.count(),
-        db.course.count(),
-        db.auditLog.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } })
-    ]);
+    try {
+        console.log('DASHBOARD_DATA: Fetching aggregate counts...');
+        const [studentCount, facultyCount, courseCount, recentLogs] = await Promise.all([
+            db.student.count(),
+            db.faculty.count(),
+            db.course.count(),
+            db.auditLog.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } })
+        ]);
 
-    return {
-        studentCount,
-        facultyCount,
-        courseCount,
-        recentLogs
-    };
+        return {
+            studentCount,
+            facultyCount,
+            courseCount,
+            recentLogs
+        };
+    } catch (error) {
+        console.error('DASHBOARD_DATA: Database fetch failed:', error);
+        throw error;
+    }
 }

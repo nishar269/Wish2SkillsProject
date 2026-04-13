@@ -80,9 +80,10 @@ export default function BatchesPage({ initialBatches, courses }: { initialBatche
                     id="courseId" 
                     name="courseId" 
                     required 
+                    defaultValue=""
                     className="w-full bg-transparent outline-none text-sm"
                   >
-                    <option value="" disabled selected>Select a course</option>
+                    <option value="" disabled>Select a course</option>
                     {courses.map((c) => (
                       <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
                     ))}

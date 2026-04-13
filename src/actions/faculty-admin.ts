@@ -20,7 +20,7 @@ export async function getFaculty() {
     include: {
       user: true,
       _count: {
-        select: { assignments: true, classSessions: true }
+        select: { facultyAssignments: true, createdAssignments: true, classSessions: true }
       }
     }
   });

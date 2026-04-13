@@ -3,15 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { GraduationCap, LogOut, ChevronLeft, Moon, Sun } from "lucide-react";
+import { GraduationCap, LogOut, ChevronLeft, Moon, Sun, Orbit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import type { SidebarNavItem } from "@/config/navigation";
 import { useState, useEffect } from "react";
-
+import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 
 interface DashboardSidebarProps {
@@ -23,17 +22,17 @@ interface DashboardSidebarProps {
     role: string;
   };
   onLogout: () => void;
+  onLinkClick?: () => void;
 }
 
-export function DashboardSidebar({ items, label, user, onLogout }: DashboardSidebarProps) {
+export function DashboardSidebar({ items, label, user, onLogout, onLinkClick }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const { theme, setTheme } = useTheme();
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const initials = user.name
     .split(" ")
@@ -42,151 +41,113 @@ export function DashboardSidebar({ items, label, user, onLogout }: DashboardSide
     .toUpperCase()
     .slice(0, 2);
 
+  if (!mounted) return <aside className="h-screen w-72 glass border-r-0" />;
+
   return (
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "h-screen flex flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-all duration-300 ease-in-out",
-          collapsed ? "w-[72px]" : "w-[260px]"
+          "h-[calc(100vh-2rem)] m-4 glass rounded-[3rem] transition-all duration-700 flex flex-col relative z-40 overflow-hidden shadow-2xl",
+          collapsed ? "w-24" : "w-80"
         )}
       >
-        {/* Logo */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b border-slate-100 dark:border-slate-800">
-          <div className="p-1.5 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg shrink-0">
-            <GraduationCap className="h-5 w-5 text-white" />
-          </div>
-          {!collapsed && (
-            <div className="overflow-hidden">
-              <h1 className="font-bold text-sm truncate">Wish2Skill</h1>
-              <p className="text-[10px] text-cyan-600 dark:text-cyan-400 font-medium truncate">
-                {label} Panel
-              </p>
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent pointer-events-none" />
+        
+        {/* Header */}
+        <div className="h-24 flex items-center px-8 relative">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/10 rounded-2xl backdrop-blur-3xl border border-white/10 shadow-lg subtle-glow group">
+              <GraduationCap className="h-6 w-6 text-cyan-400 group-hover:rotate-12 transition-transform" />
             </div>
-          )}
+            {!collapsed && (
+              <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
+                <span className="font-black italic tracking-tighter text-lg uppercase">CampusOS</span>
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-500 leading-none mt-1">Prime Node</p>
+              </motion.div>
+            )}
+          </div>
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className={cn(
-              "ml-auto p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0",
-              collapsed && "ml-0 mt-0"
-            )}
+            className="ml-auto w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-cyan-400 hover:bg-white/10 transition-all"
           >
-            <ChevronLeft
-              className={cn("h-4 w-4 transition-transform", collapsed && "rotate-180")}
-            />
+            <ChevronLeft className={cn("h-4 w-4 transition-transform duration-700", collapsed && "rotate-180")} />
           </button>
         </div>
 
         {/* Navigation */}
-        <ScrollArea className="flex-1 py-3">
-          <nav className="px-2 space-y-1">
+        <ScrollArea className="flex-1 px-4 py-6 scrollbar-hide">
+          <nav className="space-y-3">
             {items.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== `/${label.toLowerCase()}` &&
-                  pathname.startsWith(item.href + "/"));
+              const isActive = pathname === item.href;
               const Icon = item.icon;
 
-              const linkContent = (
+              const link = (
                 <Link
                   href={item.href}
+                  onClick={onLinkClick}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group",
-                    isActive
-                      ? "bg-gradient-to-r from-cyan-500/10 to-blue-500/10 text-cyan-700 dark:text-cyan-400 shadow-sm"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+                    "relative flex items-center gap-4 px-5 py-4 rounded-[1.75rem] transition-all duration-500 group",
+                    isActive 
+                      ? "bg-white/10 text-white shadow-xl border border-white/10" 
+                      : "text-slate-400 hover:text-white hover:bg-white/5"
                   )}
                 >
-                  <Icon
-                    className={cn(
-                      "h-4.5 w-4.5 shrink-0 transition-colors",
-                      isActive
-                        ? "text-cyan-600 dark:text-cyan-400"
-                        : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
-                    )}
-                  />
-                  {!collapsed && (
-                    <span className="truncate">{item.title}</span>
+                  {isActive && (
+                    <motion.div 
+                      layoutId="sidebar-active"
+                      className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 rounded-[1.75rem] blur-sm"
+                    />
                   )}
-                  {!collapsed && item.badge && (
-                    <span className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-cyan-100 dark:bg-cyan-900/50 text-cyan-700 dark:text-cyan-400">
-                      {item.badge}
-                    </span>
+                  <Icon className={cn("h-5 w-5 relative z-10 transition-all duration-500", isActive ? "text-cyan-400 scale-110" : "group-hover:text-cyan-400")} />
+                  {!collapsed && (
+                    <span className="text-[11px] font-black uppercase tracking-[0.2em] relative z-10">{item.title}</span>
                   )}
                   {isActive && (
-                    <div className="absolute left-0 w-1 h-6 bg-gradient-to-b from-cyan-500 to-blue-500 rounded-r-full" />
+                     <div className="absolute right-4 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,1)]" />
                   )}
                 </Link>
               );
 
-              if (collapsed) {
-                return (
-                  <Tooltip key={item.href}>
-                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="right" className="font-medium">
-                      {item.title}
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
-
-              return <div key={item.href} className="relative">{linkContent}</div>;
+              return collapsed ? (
+                <Tooltip key={item.href}>
+                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipContent side="right" className="glass border-white/10 font-black italic uppercase text-[10px] tracking-widest text-cyan-400 px-4 py-2">
+                    {item.title}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <div key={item.href}>{link}</div>
+              );
             })}
           </nav>
         </ScrollArea>
 
-        {/* Footer */}
-        <div className="mt-auto border-t border-slate-100 dark:border-slate-800 p-3 space-y-2">
-          {/* Theme toggle */}
-          <button
-            onClick={toggleTheme}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
-            {!collapsed && <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>}
-          </button>
-
-          <Separator className="my-2" />
-
-          {/* User info */}
-          <div className="flex items-center gap-3 px-2">
-            <Avatar className="h-9 w-9 shrink-0 bg-gradient-to-br from-cyan-500 to-blue-600">
-              <AvatarFallback className="text-xs font-bold text-white bg-gradient-to-br from-cyan-500 to-blue-600">
-                {initials}
-              </AvatarFallback>
+        {/* User Profile */}
+        <div className="p-6 mt-auto">
+          <div className={cn(
+            "p-5 rounded-[2.5rem] bg-white/5 border border-white/5 flex items-center gap-4 transition-all duration-700 overflow-hidden",
+            collapsed && "px-3"
+          )}>
+            <Avatar className="h-10 w-10 border-2 border-cyan-500/20 shadow-2xl">
+              <AvatarFallback className="bg-slate-900 text-[10px] font-black uppercase tracking-widest text-cyan-400">{initials}</AvatarFallback>
             </Avatar>
             {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold truncate">{user.name}</p>
-                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] font-black italic uppercase text-white truncate leading-none mb-1">{user.name}</p>
+                <p className="text-[8px] font-black uppercase tracking-widest text-cyan-500 truncate leading-none">{user.role}</p>
               </div>
             )}
           </div>
-
-          {/* Logout */}
-          {collapsed ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onLogout}
-                  className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">Sign Out</TooltipContent>
-            </Tooltip>
-          ) : (
-            <Button
-              variant="ghost"
+          <button
               onClick={onLogout}
-              className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          )}
+              className={cn(
+                  "w-full mt-4 flex items-center justify-center gap-3 p-4 rounded-2xl bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-500 text-[10px] font-black uppercase tracking-widest group",
+                  collapsed && "px-2"
+              )}
+          >
+              <LogOut className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              {!collapsed && <span>Identify Terminal</span>}
+          </button>
         </div>
       </aside>
     </TooltipProvider>

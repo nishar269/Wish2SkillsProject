@@ -5,6 +5,7 @@ import { loginSchema } from "@/lib/validations";
 import { AuthError } from "next-auth";
 
 export async function loginAction(formData: FormData) {
+  console.log("LOGIN_ACTION: Attempting login for", formData.get("email"));
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 

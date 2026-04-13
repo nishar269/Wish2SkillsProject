@@ -6,8 +6,9 @@ import { Mail, GraduationCap, Briefcase, Award, TrendingUp, Globe, Link as LinkI
 
 export const dynamic = "force-dynamic";
 
-export default async function PublicPortfolioPage({ params }: { params: { studentId: string } }) {
-  const data = await getPublicPortfolio(params.studentId);
+export default async function PublicPortfolioPage({ params }: { params: Promise<{ studentId: string }> }) {
+  const { studentId } = await params;
+  const data = await getPublicPortfolio(studentId);
 
   if (!data) return <div className="min-h-screen flex items-center justify-center italic text-muted-foreground">Profile not found or is currently private.</div>;
 

@@ -145,13 +145,13 @@ export async function selfMarkAttendance(sessionId: string, coords?: { lat: numb
     }
 
     // Geofencing Check (Demo: 500m radius around campus center)
-    const CAMPUS_LAT = 12.9716;
-    const CAMPUS_LNG = 77.5946;
+    const CAMPUS_LAT = 13.0971499;
+    const CAMPUS_LNG = 77.5835994;
     
     if (coords) {
         const distance = getDistance(coords.lat, coords.lng, CAMPUS_LAT, CAMPUS_LNG);
-        if (distance > 0.5) { // 0.5km = 500m
-            return { error: `You are too far from the campus (${(distance).toFixed(2)}km). Please mark your attendance from within the premises.` };
+        if (distance > 0.15) { // 0.15km = 150m
+            return { error: `You are too far from the campus (${(distance * 1000).toFixed(0)}m). Please mark your attendance from within the premises.` };
         }
     } else {
         return { error: "Geolocation access is required to verify your presence." };

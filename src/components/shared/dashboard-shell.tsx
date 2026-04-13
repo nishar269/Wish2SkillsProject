@@ -7,7 +7,6 @@ import { DashboardHeader } from "@/components/shared/dashboard-header";
 import { AIAssistant } from "@/components/shared/ai-assistant";
 import { getNavConfig } from "@/config/navigation";
 import { logoutAction } from "@/actions/auth";
-import { Toaster } from "@/components/ui/sonner";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Role } from "@/lib/permissions";
 
@@ -51,6 +50,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
             label={navConfig.label}
             user={user}
             onLogout={handleLogout}
+            onLinkClick={() => setIsMobileMenuOpen(false)}
           />
         </SheetContent>
       </Sheet>
@@ -68,7 +68,6 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         </main>
       </div>
 
-      <Toaster position="top-right" richColors />
       <AIAssistant />
     </div>
   );

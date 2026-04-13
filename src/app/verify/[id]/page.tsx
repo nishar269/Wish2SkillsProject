@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, ShieldCheck, GraduationCap, Calendar, Award } from "lucide-react";
 
-export default async function VerificationPage({ params }: { params: { id: string } }) {
+export default async function VerificationPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const student = await db.student.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { user: { select: { name: true } }, course: true, batch: true }
   });
 
@@ -68,7 +69,7 @@ export default async function VerificationPage({ params }: { params: { id: strin
                  <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                     <div>
                         <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mb-1">Verification Hash</p>
-                        <p className="text-[10px] font-mono text-slate-600 truncate max-w-[300px]">{params.id.split('').reverse().join('').toUpperCase()}...SHA256</p>
+                        <p className="text-[10px] font-mono text-slate-600 truncate max-w-[300px]">{id.split('').reverse().join('').toUpperCase()}...SHA256</p>
                     </div>
                     <div className="flex items-center gap-2 text-[11px] font-bold text-emerald-600">
                         <ShieldCheck className="h-4 w-4" /> Blockchain Secured

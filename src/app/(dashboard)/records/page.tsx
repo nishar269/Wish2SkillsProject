@@ -1,36 +1,36 @@
-import { auth } from "@/lib/auth";
+import { getRecordsStats } from "@/actions/records";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Archive, Download, FileText, Database } from "lucide-react";
 
 export default async function RecordsDashboardPage() {
-  const session = await auth();
+  const statsData = await getRecordsStats();
 
   const stats = [
     {
-      title: "Total Records",
-      value: "45,210",
-      detail: "Students, Faculty, Staff",
+      title: "Total People",
+      value: statsData.totalPeople.toLocaleString(),
+      detail: "Students & Faculty",
       icon: Database,
       color: "from-blue-500 to-blue-600",
     },
     {
       title: "Archives",
-      value: "124",
-      detail: "Past batches & courses",
+      value: statsData.archives.toString(),
+      detail: "Completed batches",
       icon: Archive,
       color: "from-slate-500 to-slate-600",
     },
     {
-      title: "Generated Reports",
-      value: "45",
-      detail: "This month",
+      title: "System Exports",
+      value: statsData.generatedReports.toString(),
+      detail: "Admin data requests",
       icon: FileText,
       color: "from-emerald-500 to-emerald-600",
     },
     {
-      title: "Pending Exports",
-      value: "2",
-      detail: "Processing currently",
+      title: "System Performance",
+      value: "99.9%",
+      detail: "Live environment",
       icon: Download,
       color: "from-amber-500 to-amber-600",
     },

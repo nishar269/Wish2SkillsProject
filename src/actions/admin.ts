@@ -14,12 +14,19 @@ async function checkAdmin() {
   }
 }
 
+async function checkAuth() {
+  const session = await auth();
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "FACULTY" && session.user.role !== "COORDINATOR")) {
+    throw new Error("Unauthorized");
+  }
+}
+
 // ==========================================
 // COURSE MANAGEMENT ACTIONS
 // ==========================================
 
 export async function getCourses() {
-  await checkAdmin();
+  await checkAuth();
   return await db.course.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -70,7 +77,7 @@ export async function deleteCourse(id: string) {
 // ==========================================
 
 export async function getBatches() {
-  await checkAdmin();
+  await checkAuth();
   return await db.batch.findMany({
     orderBy: { createdAt: "desc" },
     include: {

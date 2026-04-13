@@ -11,8 +11,15 @@ async function checkAdmin() {
   }
 }
 
+async function checkAuth() {
+  const session = await auth();
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "FACULTY" && session.user.role !== "COORDINATOR" && session.user.role !== "STUDENT")) {
+    throw new Error("Unauthorized");
+  }
+}
+
 export async function getSubjects() {
-  await checkAdmin();
+  await checkAuth();
   return await db.subject.findMany({
     orderBy: { name: "asc" },
     include: {

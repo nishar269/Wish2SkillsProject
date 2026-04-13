@@ -78,8 +78,8 @@ export default function ScheduleClientPage({
                 <div className="space-y-2">
                   <Label>Batch</Label>
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="batchId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Select Batch</option>
+                    <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Select Batch</option>
                         {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>
@@ -87,8 +87,8 @@ export default function ScheduleClientPage({
                 <div className="space-y-2">
                   <Label>Subject</Label>
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="subjectId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Select Subject</option>
+                    <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Select Subject</option>
                         {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
                     </select>
                   </div>
@@ -98,8 +98,8 @@ export default function ScheduleClientPage({
               <div className="space-y-2">
                 <Label>Faculty Member</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="facultyId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Assign Faculty</option>
+                    <select name="facultyId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Assign Faculty</option>
                         {facultyMembers.map(f => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>
                 </div>

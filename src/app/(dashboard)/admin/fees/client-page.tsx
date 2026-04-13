@@ -66,8 +66,8 @@ export default function AdminFeesClientPage({ initialFees, students }: { initial
               <div className="space-y-2">
                 <Label>Select Student</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900">
-                    <select name="studentId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Search student...</option>
+                    <select name="studentId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Search student...</option>
                         {students.map(s => (
                             <option key={s.id} value={s.id}>{s.user.name}</option>
                         ))}

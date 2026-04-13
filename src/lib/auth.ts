@@ -1,20 +1,16 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { db } from "@/lib/db";
 import { loginSchema } from "@/lib/validations";
-import { Role } from "@/lib/permissions";
+import { authConfig } from "./auth.config";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-build-only",
   trustHost: true,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
   },
   providers: [
     Credentials({
@@ -31,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         const { email, password } = parsed.data;
+        const { db } = await import("@/lib/db");
 
         const user = await db.user.findUnique({
           where: { email, deletedAt: null },
@@ -62,37 +59,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role as Role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as Role;
-      }
-      return session;
-    },
-    async authorized({ auth, request }) {
-      const isLoggedIn = !!auth?.user;
-      const { pathname } = request.nextUrl;
-
-      // Public routes that don't need auth
-      const publicPaths = ["/", "/about", "/courses", "/services", "/contact", "/apply", "/login"];
-      const isPublicPath = publicPaths.some(
-        (path) => pathname === path || pathname.startsWith("/api/auth")
-      );
-
-      if (isPublicPath) return true;
-
-      // Dashboard routes need auth
-      if (!isLoggedIn) return false;
-
-      return true;
-    },
-  },
 });

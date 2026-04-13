@@ -12,9 +12,16 @@ async function checkAdmin() {
   return session;
 }
 
+async function checkAuth() {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+  return session;
+}
+
 export async function getJobPosts() {
-  await checkAdmin();
+  await checkAuth();
   return await db.jobPost.findMany({
+    where: { status: "OPEN" },
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { applications: true } } }
   });

@@ -74,8 +74,8 @@ export default function AdminAssignmentsClientPage({
               <div className="space-y-2">
                 <Label>Select Faculty</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="facultyId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Choose Instructor</option>
+                    <select name="facultyId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Choose Instructor</option>
                         {facultyMembers.map(f => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>
                 </div>
@@ -84,8 +84,8 @@ export default function AdminAssignmentsClientPage({
               <div className="space-y-2">
                 <Label>Specific Subject</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="subjectId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Choose Subject</option>
+                    <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Choose Subject</option>
                         {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
                     </select>
                 </div>
@@ -94,8 +94,8 @@ export default function AdminAssignmentsClientPage({
               <div className="space-y-2">
                 <Label>Target Batch</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="batchId" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="" disabled selected>Choose Batch</option>
+                    <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                        <option value="" disabled>Choose Batch</option>
                         {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                 </div>

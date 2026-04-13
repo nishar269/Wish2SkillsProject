@@ -69,8 +69,8 @@ export default function FacultyAssignmentsClientPage({
                 <div className="space-y-2">
                     <Label>Target Batch</Label>
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                        <select name="batchId" required className="w-full bg-transparent outline-none text-sm">
-                            <option value="" disabled selected>Select Batch</option>
+                        <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                            <option value="" disabled>Select Batch</option>
                             {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                         </select>
                     </div>
@@ -78,8 +78,8 @@ export default function FacultyAssignmentsClientPage({
                 <div className="space-y-2">
                     <Label>Subject</Label>
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                        <select name="subjectId" required className="w-full bg-transparent outline-none text-sm">
-                            <option value="" disabled selected>Select Subject</option>
+                        <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                            <option value="" disabled>Select Subject</option>
                             {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
                     </div>

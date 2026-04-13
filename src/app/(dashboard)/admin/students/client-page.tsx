@@ -123,9 +123,10 @@ export default function StudentClientPage({
                         name="batchId" 
                         required 
                         className="w-full bg-transparent outline-none text-sm"
+                        defaultValue=""
                         disabled={!selectedCourseId}
                     >
-                        <option value="" disabled selected>Select Batch</option>
+                        <option value="" disabled>Select Batch</option>
                         {filteredBatches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>

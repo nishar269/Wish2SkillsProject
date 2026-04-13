@@ -80,13 +80,14 @@ export default function SubjectsPage({ initialSubjects, courses }: { initialSubj
               <div className="space-y-2">
                 <Label htmlFor="courseId">Associated Course</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                  <select 
+                   <select 
                     id="courseId" 
                     name="courseId" 
                     required 
+                    defaultValue=""
                     className="w-full bg-transparent outline-none text-sm"
                   >
-                    <option value="" disabled selected>Select a course</option>
+                    <option value="" disabled>Select a course</option>
                     {courses.map((c) => (
                       <option key={c.id} value={c.id}>{c.name} ({c.code})</option>
                     ))}

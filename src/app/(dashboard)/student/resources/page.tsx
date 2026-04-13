@@ -19,7 +19,7 @@ export default async function StudentResourcesPage() {
     where: { subject: { courseId: student.courseId } },
     include: {
       subject: true,
-      faculty: { include: { user: true } }
+      uploader: { include: { user: true } }
     },
     orderBy: { createdAt: "desc" }
   });

@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { chatWithCampusAI } from "@/actions/ai";
+import { MessageSquare, Send, X, Loader2, Orbit, Sparkles, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Sparkles, X, MessageCircle, Send, Loader2, Bot, User } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { chatWithCampusAI } from "@/actions/ai";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "bot", content: string }[]>([
-    { role: "bot", content: "Hi! I'm Campus Scout. How can I help you today?" }
+    { role: "bot", content: "Protocol active. System ready for intelligence query. How can I assist your workflow today?" }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -19,117 +20,130 @@ export function AIAssistant() {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, isOpen]);
 
   async function handleSend() {
     if (!input.trim() || isLoading) return;
-
-    const userMessage = input.trim();
+    const userMessage = input;
     setInput("");
     setMessages(prev => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
 
     try {
-        // Convert history for Gemini
         const history = messages.map(m => ({
             role: m.role === "user" ? "user" : "model",
             parts: [{ text: m.content }]
         }));
 
         const res = await chatWithCampusAI(userMessage, history);
+        if (res.isOffline) setIsOfflineMode(true);
         setMessages(prev => [...prev, { role: "bot", content: res.text }]);
     } catch (error) {
-        setMessages(prev => [...prev, { role: "bot", content: "Oops! Something went wrong. Try again later." }]);
+        setMessages(prev => [...prev, { role: "bot", content: "Signal breakdown. Neural connection interrupted." }]);
     } finally {
         setIsLoading(false);
     }
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-[100]">
+    <div className="fixed bottom-10 right-10 z-[100]">
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="mb-4 w-80 sm:w-96"
+            initial={{ opacity: 0, scale: 0.9, y: 20, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 0.9, y: 20, filter: "blur(10px)" }}
+            className="absolute bottom-24 right-0 w-[420px] h-[600px] glass rounded-[3.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden border-white/10"
           >
-            <Card className="shadow-2xl border-cyan-100 dark:border-slate-800 bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl">
-              <CardHeader className="p-4 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-t-xl text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/20 rounded-lg">
-                      <Sparkles className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-sm font-bold">Campus Scout</CardTitle>
-                      <p className="text-[10px] text-cyan-100">AI Campus Assistant</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={() => setIsOpen(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
+            <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none" />
+            
+            {/* Header */}
+            <div className="p-8 border-b border-white/5 flex items-center justify-between relative">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-cyan-500/20 rounded-2xl subtle-glow">
+                  <Orbit className="h-5 w-5 text-cyan-400 animate-spin-slow" />
                 </div>
-              </CardHeader>
+                <div>
+                  <h3 className="text-sm font-black italic uppercase tracking-tighter text-white leading-none">Scout Node</h3>
+                  <p className="text-[9px] font-black uppercase tracking-[0.4em] text-cyan-500 mt-1">Intelligence Active</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
 
-              <CardContent ref={scrollRef} className="h-80 overflow-y-auto p-4 space-y-4">
-                {messages.map((m, i) => (
-                  <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[80%] flex items-start gap-2 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                        <div className={`p-1.5 rounded-full ${m.role === "user" ? "bg-blue-600 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"}`}>
-                            {m.role === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-                        </div>
-                        <div className={`p-3 rounded-2xl text-xs leading-relaxed ${
-                            m.role === "user" 
-                            ? "bg-blue-600 text-white rounded-tr-none" 
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none shadow-sm"
-                        }`}>
-                            {m.content}
-                        </div>
-                    </div>
+            {/* Stream */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-8 space-y-8 scrollbar-hide bg-slate-950/20">
+              {messages.map((m, i) => (
+                <motion.div 
+                  initial={{ opacity: 0, x: m.role === "user" ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  key={i} 
+                  className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}
+                >
+                  <div className={cn(
+                    "max-w-[85%] p-6 text-[13px] font-bold italic tracking-wide leading-relaxed shadow-2xl relative overflow-hidden",
+                    m.role === "user" 
+                      ? "bg-cyan-500 text-slate-950 rounded-[2rem] rounded-tr-none" 
+                      : "bg-white/5 border border-white/10 text-white rounded-[2rem] rounded-tl-none backdrop-blur-xl"
+                  )}>
+                    {m.content}
                   </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tl-none animate-pulse flex items-center gap-2">
-                        <Loader2 className="h-3 w-3 animate-spin text-cyan-600" />
-                        <span className="text-[10px] text-muted-foreground">Scout is thinking...</span>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
+                </motion.div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                   <div className="bg-white/5 border border-white/10 p-5 rounded-[2rem] rounded-tl-none">
+                      <Loader2 className="h-5 w-5 animate-spin text-cyan-500" />
+                   </div>
+                </div>
+              )}
+            </div>
 
-              <CardFooter className="p-3 border-t bg-slate-50/50 dark:bg-slate-900/50 rounded-b-xl">
-                 <div className="flex w-full gap-2">
-                    <Input 
-                      placeholder="Ask anything..." 
-                      className="text-xs h-9 bg-white dark:bg-slate-950" 
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    />
-                    <Button size="icon" className="h-9 w-9 bg-cyan-600 hover:bg-cyan-700 shrink-0" onClick={handleSend} disabled={isLoading}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                 </div>
-              </CardFooter>
-            </Card>
+            {/* Input Node */}
+            <div className="p-8 bg-white/5 border-t border-white/5 backdrop-blur-3xl">
+              <div className="flex items-center gap-3 bg-slate-950/40 p-2 pl-6 rounded-[2rem] border border-white/10 focus-within:border-cyan-500/50 transition-all shadow-inner">
+                <Input
+                  placeholder="INPUT SYSTEM OVERRIDE..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  className="border-0 bg-transparent h-12 text-[10px] font-black uppercase tracking-widest placeholder:text-slate-700 focus-visible:ring-0"
+                />
+                <motion.button 
+                  whileHover={{ scale: 1.05, rotate: 5 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleSend}
+                  disabled={isLoading}
+                  className="w-12 h-12 bg-cyan-500 text-slate-950 rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-cyan-500/20"
+                >
+                  <Zap className="h-5 w-5" />
+                </motion.button>
+              </div>
+              <p className="text-[8px] text-center text-slate-600 font-black uppercase tracking-[0.4em] mt-6">Protocol v2.0-Alpha Neural Link</p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {!isOpen && (
         <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          whileHover={{ scale: 1.1, rotate: 10 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(true)}
-          className="p-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-full shadow-2xl shadow-cyan-500/40 relative group overflow-hidden"
+          className="w-20 h-20 bg-slate-950 text-cyan-400 rounded-[2rem] border border-cyan-500/30 flex items-center justify-center relative group overflow-hidden shadow-[0_32px_64px_-10px_rgba(0,0,0,0.5)] subtle-glow"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-          <MessageCircle className="h-6 w-6 relative z-10" />
+          <div className="absolute inset-0 bg-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Orbit className="h-8 w-8 relative z-10 animate-spin-slow" />
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-cyan-500 rounded-full border-4 border-slate-950 shadow-2xl" />
         </motion.button>
       )}
     </div>

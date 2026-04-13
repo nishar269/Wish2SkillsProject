@@ -21,6 +21,8 @@ import {
   Star,
   Building,
   Briefcase,
+  Banknote,
+  Home,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -43,15 +45,16 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Student",
         mainNav: [
-          { title: "Overview", href: "/student", icon: LayoutDashboard },
+          { title: "Home", href: "/student", icon: Home },
           { title: "Attendance", href: "/student/attendance", icon: ClipboardCheck },
           { title: "Timetable", href: "/student/timetable", icon: Calendar },
-          { title: "Materials", href: "/student/materials", icon: FolderOpen },
+          { title: "Materials", href: "/student/resources", icon: FolderOpen },
           { title: "Jobs", href: "/student/jobs", icon: Briefcase },
-          { title: "Tests & Results", href: "/student/tests", icon: FileText },
+          { title: "Tests", href: "/student/tests", icon: FileText },
+          { title: "Assignments", href: "/student/assignments", icon: FileText },
           { title: "Performance", href: "/student/performance", icon: BarChart3 },
           { title: "Notifications", href: "/student/notifications", icon: Bell },
-          { title: "Feedback", href: "/student/feedback", icon: MessageSquare },
+          { title: "Community", href: "/community", icon: MessageSquare },
           { title: "Profile", href: "/student/profile", icon: UserCheck },
         ],
       };
@@ -60,13 +63,14 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Faculty",
         mainNav: [
-          { title: "Overview", href: "/faculty", icon: LayoutDashboard },
+          { title: "Home", href: "/faculty", icon: Home },
           { title: "My Classes", href: "/faculty/classes", icon: Calendar },
           { title: "Attendance", href: "/faculty/attendance", icon: ClipboardCheck },
-          { title: "Materials", href: "/faculty/materials", icon: FolderOpen },
+          { title: "Materials", href: "/faculty/resources", icon: FolderOpen },
           { title: "Tests", href: "/faculty/tests", icon: FileText },
+          { title: "Assignments", href: "/faculty/assignments", icon: FileText },
           { title: "Students", href: "/faculty/students", icon: Users },
-          { title: "Notifications", href: "/faculty/notifications", icon: Bell },
+          { title: "Community", href: "/community", icon: MessageSquare },
         ],
       };
 
@@ -74,13 +78,14 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Coordinator",
         mainNav: [
-          { title: "Overview", href: "/coordinator", icon: LayoutDashboard },
+          { title: "Home", href: "/coordinator", icon: Home },
           { title: "Batches", href: "/coordinator/batches", icon: GraduationCap },
           { title: "Career", href: "/admin/career", icon: Briefcase },
           { title: "Attendance", href: "/coordinator/attendance", icon: ClipboardCheck },
           { title: "Weak Students", href: "/coordinator/students", icon: AlertTriangle },
           { title: "Schedule", href: "/coordinator/schedule", icon: Calendar },
           { title: "Notifications", href: "/coordinator/notifications", icon: Bell },
+          { title: "Community", href: "/community", icon: MessageSquare },
         ],
       };
 
@@ -88,7 +93,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Admin",
         mainNav: [
-          { title: "Overview", href: "/admin", icon: LayoutDashboard },
+          { title: "Home", href: "/admin", icon: Home },
           { title: "Students", href: "/admin/students", icon: Users },
           { title: "Faculty", href: "/admin/faculty", icon: GraduationCap },
           { title: "Courses", href: "/admin/courses", icon: BookOpen },
@@ -98,6 +103,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Schedule", href: "/admin/schedule", icon: Calendar },
           { title: "Reports", href: "/admin/reports", icon: BarChart3 },
           { title: "Notifications", href: "/admin/notifications", icon: Bell },
+          { title: "Community", href: "/community", icon: MessageSquare },
           { title: "Finances", href: "/admin/fees", icon: Banknote },
           { title: "Settings", href: "/admin/settings", icon: Settings },
         ],
@@ -107,7 +113,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Authority",
         mainNav: [
-          { title: "Overview", href: "/authority", icon: LayoutDashboard },
+          { title: "Home", href: "/authority", icon: Home },
           { title: "Feedback Insights", href: "/authority/feedback", icon: Star },
           { title: "Analytics", href: "/authority/analytics", icon: BarChart3 },
           { title: "Institute Overview", href: "/authority/overview", icon: Building },
@@ -118,7 +124,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
       return {
         label: "Records",
         mainNav: [
-          { title: "Overview", href: "/records", icon: LayoutDashboard },
+          { title: "Home", href: "/records", icon: Home },
           { title: "Export Data", href: "/records/export", icon: Download },
           { title: "Reports", href: "/records/reports", icon: BarChart3 },
           { title: "Archives", href: "/records/archives", icon: Archive },

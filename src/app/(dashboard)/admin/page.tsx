@@ -1,165 +1,152 @@
-import { auth } from "@/lib/auth";
+"use client";
+
+import { useEffect, useState } from "react";
 import { getAuthorityDashboardData } from "@/actions/dashboard";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Users,
-  GraduationCap,
-  BookOpen,
-  Calendar,
+import { Button } from "@/components/ui/button";
+import { 
+  Users, 
+  GraduationCap, 
+  BookOpen, 
+  Shield, 
+  Layout, 
+  Activity, 
+  ArrowRight, 
+  Settings,
   BarChart3,
   TrendingUp,
-  Clock,
-  Fingerprint,
+  Fingerprint
 } from "lucide-react";
 import { format } from "date-fns";
 
-export default async function AdminDashboardPage() {
-  const session = await auth();
-  const { studentCount, facultyCount, courseCount, recentLogs } = await getAuthorityDashboardData();
+export default function AdminDashboardPage() {
+  const [data, setData] = useState<any>(null);
 
-  const stats = [
-    {
-      title: "Total Students",
-      value: studentCount.toString(),
-      change: "Active Enrollment",
-      icon: Users,
-      color: "from-blue-500 to-blue-600",
-    },
-    {
-      title: "Active Faculty",
-      value: facultyCount.toString(),
-      change: "Certified Instructors",
-      icon: GraduationCap,
-      color: "from-emerald-500 to-emerald-600",
-    },
-    {
-      title: "Academic Courses",
-      value: courseCount.toString(),
-      change: "Live Curriculums",
-      icon: BookOpen,
-      color: "from-purple-500 to-purple-600",
-    },
-    {
-      title: "System Logs",
-      value: recentLogs.length.toString(),
-      change: "Recent Operations",
-      icon: Calendar,
-      color: "from-amber-500 to-amber-600",
-    },
-  ];
+  useEffect(() => {
+    getAuthorityDashboardData().then(setData);
+  }, []);
+
+  if (!data) return (
+    <div className="p-8 space-y-8 animate-pulse max-w-7xl mx-auto">
+        <div className="h-12 w-64 bg-muted rounded-xl" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[1,2,3,4].map(i => <div key={i} className="h-32 bg-muted rounded-xl" />)}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 h-96 bg-muted rounded-xl" />
+            <div className="h-96 bg-muted rounded-xl" />
+        </div>
+    </div>
+  );
+
+  const { studentCount, facultyCount, courseCount, recentLogs } = data;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Welcome back, {session?.user?.name?.split(" ")[0]}! 👋
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm italic">
-          Live institutional command center. Everything is synchronized with the database.
-        </p>
+    <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
+      {/* Header Info */}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest">
+            <Shield className="h-3 w-3" /> Institutional Headquarters
+        </div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Master Terminal</h1>
+        <p className="text-muted-foreground text-sm font-medium">Synchronizing cross-sector operational telemetry in real-time.</p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title} className="relative overflow-hidden border-0 shadow-md hover:shadow-xl transition-all hover:scale-[1.02] duration-300">
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">{stat.title}</p>
-                  <p className="text-4xl font-black italic tracking-tighter text-slate-900 dark:text-white">{stat.value}</p>
-                  <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{stat.change}</p>
-                </div>
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${stat.color} shadow-lg shadow-cyan-500/20`}>
-                  <stat.icon className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${stat.color}`} />
-            </CardContent>
-          </Card>
+      {/* Metadata Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {[
+          { label: "Student Nodes", value: studentCount, icon: Users, sub: "Enrollment Density" },
+          { label: "Instructional Load", value: facultyCount, icon: GraduationCap, sub: "Certified Mentors" },
+          { label: "Knowledge Assets", value: courseCount, icon: BookOpen, sub: "Live Curriculums" },
+          { label: "Operational Logs", value: recentLogs.length, icon: Activity, sub: "Signal Volume" },
+        ].map((stat, i) => (
+          <div key={i} className="premium-card p-6 flex items-center justify-between group cursor-default transition-all hover:border-primary/20 bg-card">
+            <div>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+              <h2 className="text-2xl font-bold mt-1 text-foreground tracking-tight">{stat.value}</h2>
+              <p className="text-[10px] text-muted-foreground mt-1 font-medium italic">{stat.sub}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-primary/5 text-primary group-hover:scale-110 transition-transform">
+              <stat.icon className="h-5 w-5" />
+            </div>
+          </div>
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-2 border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2 font-black uppercase tracking-tighter">
-              <BarChart3 className="h-5 w-5 text-cyan-600" />
-              Quick Console
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Add Student", icon: "👨‍🎓", href: "/admin/students" },
-              { label: "Add Faculty", icon: "👨‍🏫", href: "/admin/faculty" },
-              { label: "Create Batch", icon: "📦", href: "/admin/batches" },
-              { label: "Global Schedule", icon: "📅", href: "/calendar" },
-              { label: "Broadcast", icon: "📢", href: "/admin/notifications" },
-              { label: "Security Logs", icon: "🛡️", href: "/admin/audit" },
-            ].map((action) => (
-              <a
-                key={action.label}
-                href={action.href}
-                className="flex flex-col items-center gap-2 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all duration-300 group shadow-sm"
-              >
-                <span className="text-3xl group-hover:scale-125 transition-transform duration-300">
-                  {action.icon}
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-widest">{action.label}</span>
-              </a>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-3 border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2 font-black uppercase tracking-tighter">
-              <Clock className="h-5 w-5 text-cyan-600" />
-              Recent System Activity
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content: Audit Log */}
+        <div className="lg:col-span-2 space-y-6">
+           <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Forensic Signal Log</h3>
+              <Button variant="ghost" size="sm" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary">Open Audit Portal</Button>
+           </div>
+           
+           <div className="space-y-4">
               {recentLogs.length === 0 ? (
-                <p className="text-sm text-muted-foreground italic p-10 text-center">No system activity logged today.</p>
+                <div className="premium-card p-20 text-center text-muted-foreground text-xs font-medium italic border-dashed border-2 flex flex-col items-center gap-4">
+                  <Fingerprint className="h-10 w-10 opacity-10 text-primary" />
+                  No operational signals detected in current block.
+                </div>
               ) : (
-                recentLogs.map((log, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-4 p-4 rounded-3xl border border-slate-50 hover:bg-slate-100/50 dark:border-slate-900 dark:hover:bg-slate-900/50 transition-colors"
-                  >
-                    <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-                      <Fingerprint className="h-5 w-5 text-slate-500" />
+                recentLogs.slice(0, 10).map((log: any, i: number) => (
+                  <div key={i} className="premium-card p-4 flex items-center gap-5 group hover:border-primary/20 bg-card">
+                    <div className="p-3 bg-muted rounded-xl text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                       <Activity className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-black">{log.action}: {log.entity}</p>
-                      <p className="text-[10px] text-muted-foreground font-bold uppercase">{log.user.name} • {log.user.role}</p>
+                      <p className="text-[13px] font-bold text-foreground lead-tight truncate">{log.action}: {log.entity}</p>
+                      <p className="text-[10px] text-muted-foreground font-semibold uppercase mt-0.5 tracking-wider">
+                        {log.user.name} • <span className="text-primary/70">{log.user.role}</span>
+                      </p>
                     </div>
                     <div className="text-right">
-                       <p className="text-[10px] text-muted-foreground font-mono">{format(new Date(log.createdAt), "HH:mm")}</p>
-                       <Badge className="bg-cyan-100 text-cyan-700 hover:bg-cyan-100 border-0 text-[8px] h-4">Verified</Badge>
+                       <p className="text-[9px] font-bold text-muted-foreground uppercase">{format(new Date(log.createdAt), "HH:mm:ss")}</p>
+                       <Badge className="bg-primary/5 text-primary border-none text-[8px] font-bold px-1.5 h-4 mt-1 rounded-sm uppercase">Secure</Badge>
                     </div>
                   </div>
                 ))
               )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+           </div>
+        </div>
 
-      <Card className="border-0 shadow-md bg-slate-900 dark:bg-white text-white dark:text-slate-900 p-8 rounded-[2rem] flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-        <div className="relative z-10 space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500 text-white text-[10px] font-black tracking-widest uppercase mb-2">
-                System Health
-            </div>
-            <h3 className="text-3xl font-black italic tracking-tighter">Institute Intelligence Active</h3>
-            <p className="opacity-70 text-sm max-w-md italic">CampusOS is monitoring attendance integrity, financial velocity, and academic throughput in real-time.</p>
+        {/* Sidebar: Institutional Modules */}
+        <div className="space-y-6">
+           <div className="premium-card p-6 space-y-6 bg-card">
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground border-b pb-4">Operational Nodes</h3>
+              <div className="grid grid-cols-2 gap-3">
+                 {[
+                   { label: "Students", icon: "👨‍🎓", href: "/admin/students" },
+                   { label: "Faculty", icon: "👨‍🏫", href: "/admin/faculty" },
+                   { label: "Batches", icon: "📦", href: "/admin/batches" },
+                   { label: "Schedule", icon: "📅", href: "/admin/schedule" },
+                   { label: "Broadcast", icon: "📢", href: "/admin/notifications" },
+                   { label: "Analytics", icon: "📊", href: "/admin/audit" },
+                 ].map((action, i) => (
+                   <a 
+                     key={i} 
+                     href={action.href}
+                     className="flex flex-col items-center justify-center p-6 rounded-2xl border border-border/50 bg-muted/20 hover:bg-primary/[0.03] hover:border-primary/30 transition-all group text-center"
+                   >
+                     <span className="text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 mb-3">{action.icon}</span>
+                     <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">{action.label}</span>
+                   </a>
+                 ))}
+              </div>
+           </div>
+
+           <div className="premium-card p-8 bg-zinc-900 dark:bg-zinc-800 text-white relative overflow-hidden group cursor-pointer shadow-xl transition-all hover:scale-[1.02]">
+              <div className="relative z-10 flex flex-col gap-4">
+                 <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-60">Security Protocol</p>
+                    <Shield className="h-5 w-5 opacity-40 animate-pulse text-cyan-400" />
+                 </div>
+                 <h4 className="text-xl font-bold tracking-tight">Master Guard Protocol</h4>
+                 <p className="text-[10px] font-medium uppercase tracking-widest opacity-50">Active Institutional Over-watch</p>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700" />
+           </div>
         </div>
-        <div className="relative z-10">
-            <TrendingUp className="h-16 w-16 opacity-30 rotate-12" />
-        </div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl -mr-20 -mt-20" />
-      </Card>
+      </div>
     </div>
   );
 }
