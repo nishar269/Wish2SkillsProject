@@ -9,4 +9,3 @@
   NEXT_USE_NETLIFY_EDGE = "false"
   NODE_VERSION = "20"
   AUTH_TRUST_HOST = "true"
-  NEXTAUTH_URL = "https://your-netlify-site.netlify.app"
