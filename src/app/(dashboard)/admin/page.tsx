@@ -8,14 +8,12 @@ import {
   Users, 
   GraduationCap, 
   BookOpen, 
-  Shield, 
-  Layout, 
+  ShieldCheck, 
   Activity, 
-  ArrowRight, 
-  Settings,
-  BarChart3,
-  TrendingUp,
-  Fingerprint
+  Briefcase,
+  PieChart,
+  ArrowRight,
+  UserCircle2
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -28,13 +26,13 @@ export default function AdminDashboardPage() {
 
   if (!data) return (
     <div className="p-8 space-y-8 animate-pulse max-w-7xl mx-auto">
-        <div className="h-12 w-64 bg-muted rounded-xl" />
+        <div className="h-10 w-48 bg-slate-100 rounded-lg" />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {[1,2,3,4].map(i => <div key={i} className="h-32 bg-muted rounded-xl" />)}
+            {[1,2,3,4].map(i => <div key={i} className="h-28 bg-slate-100 rounded-2xl" />)}
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 h-96 bg-muted rounded-xl" />
-            <div className="h-96 bg-muted rounded-xl" />
+            <div className="lg:col-span-2 h-96 bg-slate-100 rounded-2xl" />
+            <div className="h-96 bg-slate-100 rounded-2xl" />
         </div>
     </div>
   );
@@ -42,67 +40,73 @@ export default function AdminDashboardPage() {
   const { studentCount, facultyCount, courseCount, recentLogs } = data;
 
   return (
-    <div className="p-8 space-y-8 max-w-7xl mx-auto pb-20">
+    <div className="p-8 space-y-10 max-w-7xl mx-auto pb-20">
       {/* Header Info */}
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest">
-            <Shield className="h-3 w-3" /> Institutional Headquarters
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+        <div>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-3">
+                <ShieldCheck className="h-3.5 w-3.5" /> Institution Management
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Overview Dashboard</h1>
+            <p className="text-slate-500 text-sm font-medium mt-1">Real-time snapshots of institutional academic performance.</p>
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Master Terminal</h1>
-        <p className="text-muted-foreground text-sm font-medium">Synchronizing cross-sector operational telemetry in real-time.</p>
+        <div className="flex gap-3">
+            <Button variant="outline" className="text-xs font-bold rounded-xl border-slate-200 hover:bg-slate-50">Generate Report</Button>
+            <Button className="text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700">Add Student</Button>
+        </div>
       </div>
 
-      {/* Metadata Metrics */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Student Nodes", value: studentCount, icon: Users, sub: "Enrollment Density", color: "text-cyan-400" },
-          { label: "Instructional Load", value: facultyCount, icon: GraduationCap, sub: "Certified Mentors", color: "text-indigo-400" },
-          { label: "Knowledge Assets", value: courseCount, icon: BookOpen, sub: "Live Curriculums", color: "text-purple-400" },
-          { label: "Operational Logs", value: recentLogs.length, icon: Activity, sub: "Signal Volume", color: "text-emerald-400" },
+          { label: "Total Students", value: studentCount, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Active Faculty", value: facultyCount, icon: GraduationCap, color: "text-indigo-600", bg: "bg-indigo-50" },
+          { label: "Course Modules", value: courseCount, icon: BookOpen, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Activity Index", value: "High", icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50" },
         ].map((stat, i) => (
-          <div key={i} className="premium-card p-6 flex items-center justify-between group cursor-default relative overflow-hidden">
-             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-            <div className="relative z-10">
-              <p className="text-[9px] font-black italic text-slate-500 uppercase tracking-widest leading-none mb-2">{stat.label}</p>
-              <h2 className="text-3xl font-black italic mt-1 text-white tracking-tighter">{stat.value}</h2>
-              <p className="text-[8px] text-slate-600 mt-2 font-black uppercase tracking-[0.2em]">{stat.sub}</p>
+          <div key={i} className="pleasant-card p-6 flex items-center justify-between border-slate-100 group">
+            <div>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</p>
+              <h2 className="text-2xl font-extrabold mt-1 text-slate-900">{stat.value}</h2>
             </div>
-            <div className={cn("p-4 rounded-2xl bg-white/5 border border-white/10 relative z-10 group-hover:scale-110 transition-transform shadow-2xl", stat.color)}>
-              <stat.icon className="h-6 w-6" />
+            <div className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110`}>
+              <stat.icon className="h-5 w-5" />
             </div>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content: Audit Log */}
+        {/* Main Content: Activity Logs */}
         <div className="lg:col-span-2 space-y-6">
            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Forensic Signal Log</h3>
-              <Button variant="ghost" size="sm" className="text-[10px] font-bold uppercase tracking-widest hover:text-primary">Open Audit Portal</Button>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">System Activity Feed</h3>
+              <Button variant="ghost" size="sm" className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:bg-transparent p-0">View all activity</Button>
            </div>
            
            <div className="space-y-4">
               {recentLogs.length === 0 ? (
-                <div className="premium-card p-20 text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.4em] italic border-dashed border-white/5 flex flex-col items-center gap-6">
-                  <Fingerprint className="h-12 w-12 opacity-10 text-cyan-400" />
-                  No operational signals detected in current block.
+                <div className="pleasant-card p-20 text-center border-dashed border-slate-200 bg-transparent flex flex-col items-center gap-4 text-slate-400">
+                  <Activity className="h-10 w-10 opacity-20" />
+                  <p className="text-sm font-medium">No system activity recorded in this session.</p>
                 </div>
               ) : (
                 recentLogs.slice(0, 10).map((log: any, i: number) => (
-                  <div key={i} className="premium-card p-5 flex items-center gap-6 group">
-                    <div className="p-3.5 bg-white/5 rounded-2xl text-slate-400 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-all duration-500 border border-white/5 shadow-inner">
-                       <Activity className="h-4 w-4" />
+                  <div key={i} className="pleasant-card p-5 flex items-center gap-5 border-slate-100">
+                    <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                       <UserCircle2 className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-black italic text-white leading-none mb-2 tracking-tight">{log.action}: {log.entity}</p>
-                      <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">
-                        {log.user.name} <span className="text-cyan-500/50 italic px-2">node::</span><span className="text-cyan-500">{log.user.role}</span>
-                      </p>
+                      <p className="text-sm font-bold text-slate-900 leading-none mb-1.5">{log.action}: <span className="text-slate-500 font-medium">{log.entity}</span></p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{log.user.name}</span>
+                        <span className="text-[10px] text-slate-300">•</span>
+                        <span className="text-[10px] font-medium text-slate-400 capitalize">{log.user.role.toLowerCase()}</span>
+                      </div>
                     </div>
-                    <div className="text-right">
-                       <p className="text-[9px] font-black italic text-slate-400 uppercase tracking-widest mb-1">{format(new Date(log.createdAt), "HH:mm:ss")}</p>
-                       <div className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[8px] font-black text-cyan-500 uppercase tracking-widest">Secure</div>
+                    <div className="text-right shrink-0">
+                       <p className="text-[10px] font-bold text-slate-400 mb-1">{format(new Date(log.createdAt), "MMM d, HH:mm")}</p>
+                       <Badge variant="outline" className="border-green-100 bg-green-50 text-green-700 text-[10px] font-bold px-1.5 py-0 h-4 uppercase">Verified</Badge>
                     </div>
                   </div>
                 ))
@@ -110,44 +114,51 @@ export default function AdminDashboardPage() {
            </div>
         </div>
 
-        {/* Sidebar: Institutional Modules */}
+        {/* Sidebar: Module Navigation */}
         <div className="space-y-6">
-           <div className="premium-card p-6 space-y-6 bg-card">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground border-b pb-4">Operational Nodes</h3>
+           <div className="pleasant-card p-6 border-slate-100 shadow-sm relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-8 transform translate-x-12 -translate-y-8 opacity-[0.03] text-blue-600 rotate-12">
+                   <PieChart className="h-24 w-24" />
+               </div>
+              <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-4 mb-6">Management Nodes</h3>
               <div className="grid grid-cols-2 gap-3">
                  {[
-                   { label: "Students", icon: "👨‍🎓", href: "/admin/students" },
-                   { label: "Faculty", icon: "👨‍🏫", href: "/admin/faculty" },
-                   { label: "Batches", icon: "📦", href: "/admin/batches" },
-                   { label: "Schedule", icon: "📅", href: "/admin/schedule" },
-                   { label: "Broadcast", icon: "📢", href: "/admin/notifications" },
-                   { label: "Analytics", icon: "📊", href: "/admin/audit" },
-                 ].map((action, i) => (
-                   <a 
-                     key={i} 
-                     href={action.href}
-                     className="flex flex-col items-center justify-center p-6 rounded-2xl border border-border/50 bg-muted/20 hover:bg-primary/[0.03] hover:border-primary/30 transition-all group text-center"
-                   >
-                     <span className="text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 mb-3">{action.icon}</span>
-                     <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground group-hover:text-foreground">{action.label}</span>
-                   </a>
+                   { label: "Students", icon: Users, href: "/admin/students", color: "text-blue-600" },
+                   { label: "Faculty", icon: GraduationCap, href: "/admin/faculty", color: "text-indigo-600" },
+                   { label: "Classes", icon: CalendarDays, href: "/admin/schedule", color: "text-purple-600" },
+                   { label: "Career", icon: Briefcase, href: "/admin/career", color: "text-emerald-600" },
+                 ].map((link, i) => (
+                    <Button 
+                      key={i} 
+                      variant="outline"
+                      className="h-24 flex flex-col items-center justify-center gap-2 rounded-2xl border-slate-100 hover:bg-slate-50 hover:border-slate-200 group transition-all"
+                      asChild
+                    >
+                      <a href={link.href}>
+                        <link.icon className={`h-5 w-5 ${link.color} transition-transform group-hover:scale-110`} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-600">{link.label}</span>
+                      </a>
+                    </Button>
                  ))}
               </div>
            </div>
 
-           <div className="premium-card p-8 bg-zinc-900 dark:bg-zinc-800 text-white relative overflow-hidden group cursor-pointer shadow-xl transition-all hover:scale-[1.02]">
-              <div className="relative z-10 flex flex-col gap-4">
+           <div className="pleasant-card p-6 bg-blue-600 text-white shadow-xl relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent pointer-events-none" />
+              <div className="relative z-10 space-y-4">
                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-60">Security Protocol</p>
-                    <Shield className="h-5 w-5 opacity-40 animate-pulse text-cyan-400" />
+                    <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-200">Institutional Notice</p>
+                    <BellRing className="h-4 w-4 text-blue-200 animate-tada" />
                  </div>
-                 <h4 className="text-xl font-bold tracking-tight">Master Guard Protocol</h4>
-                 <p className="text-[10px] font-medium uppercase tracking-widest opacity-50">Active Institutional Over-watch</p>
+                 <h4 className="text-lg font-bold leading-snug">Spring Semester <br/> Enrollment Active</h4>
+                 <Button variant="secondary" size="sm" className="w-full text-xs font-bold text-blue-700 bg-white hover:bg-blue-50 rounded-xl">Review Details</Button>
               </div>
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-cyan-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700" />
            </div>
         </div>
       </div>
     </div>
   );
 }
+
+// Missing imports fix
+import { CalendarDays } from "lucide-react";

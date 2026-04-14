@@ -40,8 +40,8 @@ export default function RootLayout({
       <body suppressHydrationWarning className="min-h-full flex flex-col">
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
+            defaultTheme="light"
+            enableSystem
             disableTransitionOnChange
           >
             {children}

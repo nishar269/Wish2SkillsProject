@@ -1,76 +1,62 @@
 @import "tailwindcss";
 
 @theme {
-  --radius-lg: 2.5rem;
-  --radius-md: 2rem;
-  --radius-sm: 1rem;
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
+  
+  --color-primary: #2563eb; /* Clean Blue */
+  --color-primary-foreground: #ffffff;
 }
 
 :root {
-  --background: 2:6:23;
-  --foreground: 210 40% 98%;
-  --primary: 191 91% 60%;
-  --primary-foreground: 222 47% 11%;
-  --card: 222 47% 4%;
-  --card-foreground: 210 40% 98%;
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --border: 214 32% 91%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 47%;
 }
 
 @layer base {
   body {
-    background-color: #020617;
-    color: white;
+    background-color: #f8fafc; /* Very light slate */
+    color: #0f172a;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.15) 0px, transparent 50%);
-    background-attachment: fixed;
   }
 
-  h1, h2, h3, h4, .font-futuristic {
-    font-weight: 900;
-    font-style: italic;
-    letter-spacing: -0.05em;
-    text-transform: uppercase;
-  }
-
-  * {
-    border-color: rgba(255, 255, 255, 0.1);
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
-  .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  .pleasant-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
   }
   
-  .subtle-glow {
-    box-shadow: 0 0 20px -5px rgba(6, 182, 212, 0.3);
+  .pleasant-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
   }
 
-  .premium-card {
-    background: rgba(255, 255, 255, 0.03);
+  .nav-blur {
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2.5rem;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .premium-card:hover {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(-5px) scale(1.02);
-  }
-
-  .bg-glow-cyan {
-    box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+    border-bottom: 1px solid #e2e8f0;
   }
 }
 
@@ -80,13 +66,4 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
-
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
 }
