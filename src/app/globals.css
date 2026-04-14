@@ -45,20 +45,20 @@
 @layer components {
   .glass {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
   
   .subtle-glow {
-    box-shadow: 0 0 40px -10px rgba(6, 182, 212, 0.4);
+    box-shadow: 0 0 20px -5px rgba(6, 182, 212, 0.3);
   }
 
   .premium-card {
     background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 2.5rem;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);

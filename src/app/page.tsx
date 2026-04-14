@@ -87,8 +87,8 @@ export default function Home() {
               <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-[3.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
               <div className="relative aspect-square bg-slate-950 rounded-[3.5rem] border border-white/10 overflow-hidden shadow-2xl p-2 bg-grid-white/[0.02]">
                 <div className="w-full h-full rounded-[3rem] overflow-hidden relative">
-                   <img 
-                    src="/modern_ai_campus_hero_1776106757648.png" 
+                  <img 
+                    src="/hero_campus.png" 
                     alt="CampusOS Visualization" 
                     className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700 scale-110"
                   />
