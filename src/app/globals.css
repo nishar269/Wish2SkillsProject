@@ -15,12 +15,12 @@
     -webkit-font-smoothing: antialiased;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
   }
 }
 
 @layer components {
-  /* Simple components to avoid confusion */
-  .btn-primary {
-    @apply bg-blue-600 text-white font-bold rounded-lg px-6 py-3 hover:bg-blue-700 transition-all;
+  .pleasant-card {
+    @apply bg-white border border-slate-100 rounded-[2rem] shadow-sm;
   }
 }
