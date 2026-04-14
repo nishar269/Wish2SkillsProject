@@ -1,169 +1,178 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, ArrowRight, ShieldCheck, Sparkles, BookOpen } from "lucide-react";
+import { GraduationCap, ArrowRight, ShieldCheck, Sparkles, BookOpen, Zap, Globe, Cpu } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex flex-col font-sans selection:bg-cyan-500/30">
+    <div className="min-h-screen flex flex-col bg-[#020617] text-white font-sans selection:bg-cyan-500/30 overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, #fff 1px, transparent 0)', backgroundSize: '40px 40px' }} />
+      </div>
+
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg">
-              <GraduationCap className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-xl tracking-tight">Wish2Skill</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600 dark:text-slate-300">
-            <Link href="#features" className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Features</Link>
-            <Link href="#courses" className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">Courses</Link>
-            <Link href="#about" className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors">About Us</Link>
-          </div>
+      <nav className="fixed top-0 w-full z-50 border-b border-white/5 bg-slate-950/20 backdrop-blur-2xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link href="/login">Sign In</Link>
+            <div className="p-2.5 bg-white/5 rounded-2xl border border-white/10 shadow-2xl subtle-glow">
+              <GraduationCap className="h-6 w-6 text-cyan-400" />
+            </div>
+            <div className="flex flex-col">
+              <span className="font-black text-xl italic tracking-tighter uppercase leading-none">Wish2Skill</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-500 mt-1">CampusOS Node</span>
+            </div>
+          </div>
+          
+          <div className="hidden md:flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <Link href="#features" className="hover:text-cyan-400 transition-colors">Architecture</Link>
+            <Link href="#intel" className="hover:text-cyan-400 transition-colors">AI Intelligence</Link>
+            <Link href="#nodes" className="hover:text-cyan-400 transition-colors">Global Nodes</Link>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild className="hidden sm:inline-flex text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-white hover:bg-white/5 rounded-xl">
+              <Link href="/login">Auth Access</Link>
             </Button>
-            <Button asChild className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 shadow-md shadow-cyan-500/20 text-white">
-              <Link href="/login">Explore Platform</Link>
+            <Button asChild className="h-11 px-6 bg-white text-slate-950 hover:bg-cyan-400 rounded-xl font-black italic uppercase tracking-widest text-xs transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+              <Link href="/login">Initiate Session</Link>
             </Button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="flex-1 pt-16">
-        <div className="relative overflow-hidden bg-slate-50 dark:bg-slate-950">
-          {/* Background decoration */}
-          <div className="absolute inset-0 z-0">
-            <div className="absolute top-20 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-20 left-1/4 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-          </div>
-
-          <div className="max-w-7xl mx-auto px-6 pt-24 pb-32 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="flex flex-col items-start text-left max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-300 text-sm font-medium mb-8 border border-cyan-200 dark:border-cyan-800/50">
-                  <Sparkles className="h-4 w-4" />
-                  <span>Next Generation Education Platform</span>
-                </div>
-                
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
-                  Empowering the future of <br/>
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">
-                    learning & teaching
-                  </span>
-                </h1>
-                
-                <p className="text-xl text-slate-600 dark:text-slate-400 mb-10 leading-relaxed">
-                  A highly secure, role-based, AI-powered institute management platform built for modern educational ecosystems. Join us to experience seamless academic operations.
-                </p>
-                
-                <div className="flex flex-wrap items-center gap-4">
-                  <Button size="lg" className="h-14 px-8 text-base bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white shadow-xl shadow-cyan-500/25 transition-all hover:scale-105" asChild>
-                    <Link href="/login">
-                      Start Your Journey
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  <Button size="lg" variant="outline" className="h-14 px-8 text-base border-2 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all font-semibold" asChild>
-                    <Link href="#features">Explore Features</Link>
-                  </Button>
+      <main className="flex-1 relative z-10">
+        <section className="pt-40 pb-20 px-6">
+          <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+            <div className="flex flex-col items-start space-y-10">
+              <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                <div className="w-2 h-2 rounded-full bg-cyan-500 animate-ping" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-cyan-400">Protocol 2.4 Active</span>
+              </div>
+              
+              <h1 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.85]">
+                Smart Institute<br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-indigo-400">
+                  Management
+                </span>
+              </h1>
+              
+              <p className="text-slate-400 text-lg font-bold italic tracking-wide max-w-xl border-l-2 border-cyan-500/30 pl-8">
+                Establish total operational control with next-generation AI institutional intelligence. Designed for the futuristic educational ecosystem.
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-6 pt-4">
+                <Button size="lg" className="h-16 px-10 bg-white text-slate-950 hover:bg-cyan-400 rounded-2xl font-black italic uppercase tracking-widest text-sm shadow-[0_0_40px_rgba(6,182,212,0.2)] transition-all group" asChild>
+                  <Link href="/login">
+                    Deploy Platform
+                    <Zap className="ml-3 h-5 w-5 group-hover:scale-125 transition-transform" />
+                  </Link>
+                </Button>
+                <div className="flex -space-x-3">
+                    {[1,2,3,4].map(i => (
+                        <div key={i} className="w-10 h-10 rounded-full border-2 border-[#020617] bg-slate-800 flex items-center justify-center overflow-hidden">
+                            <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
+                        </div>
+                    ))}
+                    <div className="w-10 h-10 rounded-full border-2 border-[#020617] bg-cyan-500/20 backdrop-blur-md flex items-center justify-center text-[10px] font-black">
+                        +2k
+                    </div>
                 </div>
               </div>
+            </div>
 
-              <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-[3rem] blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
-                <div className="relative bg-white dark:bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 transform group-hover:scale-[1.02] transition-all duration-500">
-                  <img 
+            <div className="relative group lg:block hidden">
+              <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-indigo-500 rounded-[3.5rem] blur-2xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="relative aspect-square bg-slate-950 rounded-[3.5rem] border border-white/10 overflow-hidden shadow-2xl p-2 bg-grid-white/[0.02]">
+                <div className="w-full h-full rounded-[3rem] overflow-hidden relative">
+                   <img 
                     src="/modern_ai_campus_hero_1776106757648.png" 
-                    alt="CampusOS Visual" 
-                    className="w-full h-full object-cover"
+                    alt="CampusOS Visualization" 
+                    className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700 scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex flex-col justify-end p-8 text-white">
-                      <div className="p-4 backdrop-blur-md bg-white/10 rounded-2xl border border-white/20">
-                          <p className="text-xs font-black uppercase tracking-widest mb-1 opacity-80">Live Environment</p>
-                          <p className="text-lg font-bold">Wish2Skill Campus Center, Yelahanka</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent" />
+                  
+                  {/* Overlay Data */}
+                  <div className="absolute bottom-10 left-10 right-10 flex justify-between items-end">
+                      <div className="space-y-4">
+                          <div className="px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl inline-block">
+                              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-cyan-400">Node Location</p>
+                              <p className="text-xs font-bold uppercase italic">Global Mainnet</p>
+                          </div>
+                          <div className="h-1 w-32 bg-white/10 rounded-full overflow-hidden">
+                              <div className="h-full w-2/3 bg-cyan-500 animate-shimmer" />
+                          </div>
+                      </div>
+                      <div className="p-4 bg-cyan-500 text-slate-950 rounded-2xl rotate-3 shadow-2xl">
+                          <Globe className="h-8 w-8" />
                       </div>
                   </div>
                 </div>
-                {/* Float elements */}
-                <div className="absolute -top-6 -right-6 h-24 w-24 bg-white dark:bg-slate-800 rounded-3xl shadow-xl flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700 animate-bounce">
-                    <p className="text-xl font-black italic text-cyan-600">98%</p>
-                    <p className="text-[8px] font-black uppercase text-slate-400">Success Rate</p>
-                </div>
-                <div className="absolute -bottom-8 -left-8 p-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl flex items-center gap-4 border-4 border-white dark:border-slate-800">
-                    <div className="w-10 h-10 rounded-xl bg-cyan-500 flex items-center justify-center">
-                        <Sparkles className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                        <p className="text-xs font-bold leading-tight">AI Integrated</p>
-                        <p className="text-[10px] opacity-60">Real-time assistance</p>
-                    </div>
-                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Feature Highlights */}
-        <div id="features" className="py-24 bg-white dark:bg-slate-900">
+        {/* Feature Grid */}
+        <section id="features" className="py-32 relative">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Everything an institute needs</h2>
-              <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                Comprehensive tools to manage attendance, track performance, and unify communication for students, faculty, and admins.
-              </p>
+            <div className="flex flex-col items-center text-center mb-24 space-y-4">
+               <div className="w-12 h-1 bg-cyan-500 rounded-full shadow-[0_0_15px_rgba(6,182,212,1)]" />
+               <h2 className="text-4xl font-black italic tracking-tighter uppercase">Protocol Architecture</h2>
+               <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.4em]">Engineered for Institutional Supremacy</p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-10">
               {[
                 {
-                  icon: ShieldCheck,
-                  title: "Role-Based Security",
-                  desc: "Granular access control tailored for Admins, Faculty, Students, Coordinators, and Records Managers.",
-                  color: "text-blue-500",
-                  bg: "bg-blue-500/10"
+                  icon: Cpu,
+                  title: "Neural Governance",
+                  desc: "Advanced RBAC engine managing Admin, Faculty, and Student sub-nodes with 100% security parity.",
+                  accent: "border-cyan-500/50"
                 },
                 {
                   icon: Sparkles,
-                  title: "AI-Powered Assistance",
-                  desc: "Leverage Google Gemini AI for instant support, queries, and predictive student success analytics.",
-                  color: "text-cyan-500",
-                  bg: "bg-cyan-500/10"
+                  title: "Gemini Intelligence",
+                  desc: "Localized AI agents for each role. Automated feedback sentiment and dynamic resource insights.",
+                  accent: "border-indigo-500/50"
                 },
                 {
-                  icon: BookOpen,
-                  title: "Unified Academics",
-                  desc: "One place to manage schedules, attendance, assignments, and grades without switching tools.",
-                  color: "text-indigo-500",
-                  bg: "bg-indigo-500/10"
+                  icon: Globe,
+                  title: "Geo-Fenced Sync",
+                  desc: "Precision location-verified attendance protocol preventing institutional proxy breaches.",
+                  accent: "border-purple-500/50"
                 }
               ].map((feature, i) => (
-                <div key={i} className="p-8 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 hover:shadow-xl transition-all group">
-                  <div className={`w-14 h-14 rounded-xl ${feature.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <feature.icon className={`h-7 w-7 ${feature.color}`} />
+                <div key={i} className={`p-10 rounded-[2.5rem] bg-white/[0.02] border-t-2 ${feature.accent} backdrop-blur-sm hover:bg-white/[0.05] transition-all group cursor-pointer relative overflow-hidden`}>
+                  <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-cyan-500/10 transition-colors" />
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform shadow-2xl">
+                    <feature.icon className="h-8 w-8 text-white group-hover:text-cyan-400 transition-colors" />
                   </div>
-                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <h3 className="text-xl font-black italic uppercase tracking-tight mb-4">{feature.title}</h3>
+                  <p className="text-slate-500 text-sm font-bold leading-relaxed">
                     {feature.desc}
                   </p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-12">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 opacity-80">
-            <GraduationCap className="h-5 w-5" />
-            <span className="font-semibold">Wish2Skill CampusOS</span>
+      <footer className="relative z-10 py-16 px-6 border-t border-white/5 bg-slate-950/50">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 opacity-60 hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-4">
+             <GraduationCap className="h-6 w-6 text-cyan-400" />
+             <span className="font-black italic uppercase tracking-tighter text-lg">Wish2Skill</span>
           </div>
-          <p className="text-sm text-slate-500">
-            &copy; {new Date().getFullYear()} Wish2Skill. built for excellence.
-          </p>
+          <div className="flex items-center gap-8 text-[10px] font-black uppercase tracking-widest text-slate-500">
+              <span className="text-cyan-500">Node Status: Operational</span>
+              <span>Sync Rate: 99.9%</span>
+          </div>
+          <p className="text-[10px] font-black uppercase tracking-[0.4em]">© 2026 Node System. All rights reserved.</p>
         </div>
       </footer>
     </div>
