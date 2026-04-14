@@ -3,13 +3,7 @@
   publish = ".next"
 
 [[plugins]]
-  package        const result = await loginAction(formData);
-        if (result?.error) {
-          setError(result.error);
-        } else {
-          // Explicitly redirect to avoid 404 ghosting
-          window.location.href = "/dashboard";
-        }
+  package = "@netlify/plugin-nextjs"
 
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "false"
