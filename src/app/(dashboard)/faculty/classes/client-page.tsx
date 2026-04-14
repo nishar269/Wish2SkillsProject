@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, Video, Plus, CalendarDays } from "lucide-react";
+import { Calendar, Clock, Users, Video, Plus, CalendarDays, DownloadCloud } from "lucide-react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -20,7 +20,12 @@ export default function FacultyClassesClientPage({ initialSessions }: { initialS
         <div className="space-y-8 p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-4xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase text-edge-cap">Teaching Schedule</h1>
+                    <h1 className="text-4xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase flex items-center gap-4">
+                        Teaching Schedule
+                        <a href="/api/schedule/export" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-cyan-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-colors shadow-lg active:scale-95">
+                            <DownloadCloud className="h-4 w-4" /> <span>Sync .ics</span>
+                        </a>
+                    </h1>
                     <p className="text-slate-500 font-medium italic">Manage your active lecture sessions and student engagement.</p>
                 </div>
                 <div className="bg-white dark:bg-slate-950 p-1.5 rounded-[1.5rem] shadow-xl border border-slate-100 dark:border-slate-800 flex gap-1">

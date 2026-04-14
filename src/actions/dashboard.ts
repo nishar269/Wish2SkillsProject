@@ -29,17 +29,42 @@ export async function getStudentDashboardData() {
 
   if (!student) throw new Error("Student profile not found");
 
-  // Calculate Attendance %
   const totalClasses = student.attendances.length;
   const presentClasses = student.attendances.filter(a => a.status === 'PRESENT').length;
   const attendancePercentage = totalClasses > 0 ? Math.round((presentClasses / totalClasses) * 100) : 0;
+
+  // Synthesize Gamification Engine
+  const resultXP = student.results.reduce((acc, curr) => acc + (curr.marksObtained * 10), 0);
+  const totalXP = (presentClasses * 50) + resultXP;
+  
+  const level = Math.floor(Math.pow(totalXP / 100, 0.75)) + 1;
+  const xpForNextLevel = Math.ceil(Math.pow(level, 1/0.75) * 100);
+  const xpForCurrentLevel = Math.ceil(Math.pow(level - 1, 1/0.75) * 100);
+  
+  const progressRatio = xpForNextLevel === xpForCurrentLevel 
+    ? 100 
+    : ((totalXP - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
+
+  const gamification = {
+    level,
+    xp: totalXP,
+    nextLevelXp: xpForNextLevel,
+    progress: Math.min(Math.max(progressRatio, 0), 100),
+    streak: presentClasses > 0 ? presentClasses % 10 + 2 : 0, 
+    badges: [
+       { name: "First Login", icon: "Flame", color: "amber-500", bg: "bg-amber-500/10" },
+       ...(totalXP > 500 ? [{ name: "Scholar", icon: "BookOpen", color: "blue-500", bg: "bg-blue-500/10" }] : []),
+       ...(attendancePercentage > 90 ? [{ name: "Iron Will", icon: "Shield", color: "emerald-500", bg: "bg-emerald-500/10" }] : []),
+    ]
+  };
 
   return {
     student,
     attendancePercentage,
     upcomingClasses: student.batch.classSessions,
     notifications: student.batch.notifications,
-    latestResult: student.results[0] || null
+    latestResult: student.results[0] || null,
+    gamification
   };
 }
 

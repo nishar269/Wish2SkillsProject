@@ -12,6 +12,11 @@ import {
   Target,
   ArrowUpRight,
   Zap,
+  Flame,
+  BookOpen,
+  Shield,
+  Star,
+  Swords,
 } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -35,7 +40,7 @@ export default function StudentDashboardPage() {
     </div>
   );
 
-  const { student, attendancePercentage, upcomingClasses, notifications, latestResult } = data;
+  const { student, attendancePercentage, upcomingClasses, notifications, latestResult, gamification } = data;
 
   const stats = [
     {
@@ -110,6 +115,59 @@ export default function StudentDashboardPage() {
         </div>
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px] -mr-48 -mt-24 pointer-events-none" />
       </motion.div>
+
+      {/* Gamification Banner */}
+      {gamification && (
+      <motion.div variants={item} className="glass rounded-[3rem] p-10 relative overflow-hidden flex flex-col md:flex-row gap-10 items-center justify-between border border-amber-500/10">
+         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-amber-500/5 to-orange-500/10 rounded-full blur-[80px] -mr-48 -mt-48 pointer-events-none" />
+         
+         <div className="flex items-center gap-6 relative z-10">
+            <div className="h-24 w-24 rounded-[2rem] bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-[0_0_40px_rgba(245,158,11,0.3)] shadow-amber-500/40 relative">
+               <span className="text-4xl font-black italic text-white drop-shadow-md">{gamification.level}</span>
+               <div className="absolute -bottom-3 -right-3 bg-slate-900 border-4 border-slate-50 dark:border-slate-950 rounded-full p-2">
+                 <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+               </div>
+            </div>
+            <div>
+               <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-amber-500 italic mb-1">Rank {gamification.level} Node</h3>
+               <h2 className="text-3xl font-black uppercase italic tracking-tighter text-slate-900 dark:text-white">XP: {gamification.xp}</h2>
+               <div className="flex items-center gap-3 mt-3">
+                  <Flame className="h-4 w-4 text-orange-500" />
+                  <span className="text-xs font-bold text-slate-500 tracking-widest uppercase">{gamification.streak} Day Streak</span>
+               </div>
+            </div>
+         </div>
+
+         <div className="flex-1 w-full max-w-xl relative z-10 space-y-4 pt-4 md:pt-0">
+             <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
+                <span>Current Tier</span>
+                <span className="text-amber-500 tracking-[0.3em]">{gamification.nextLevelXp} XP FOR LEVEL {gamification.level + 1}</span>
+             </div>
+             <div className="relative h-4 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden shadow-inner">
+                <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${gamification.progress}%` }}
+                    transition={{ duration: 1.5, ease: "easeOut" }}
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full" 
+                />
+             </div>
+             
+             <div className="flex items-center gap-4 pt-2">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 italic">Unlocked Badges:</span>
+                <div className="flex gap-2">
+                   {gamification.badges.map((b: any, i: number) => {
+                      const Icon = b.icon === 'Flame' ? Flame : b.icon === 'Shield' ? Shield : BookOpen;
+                      return (
+                         <div key={i} className={cn("p-2 rounded-xl flex items-center justify-center border border-slate-200/50 dark:border-white/5 shadow-sm", b.bg)}>
+                            <Icon className={cn("h-4 w-4", `text-${b.color}`)} />
+                         </div>
+                      )
+                   })}
+                </div>
+             </div>
+         </div>
+      </motion.div>
+      )}
 
       {/* High-Fidelity Stats Grid */}
       <div className="grid gap-8 md:grid-cols-4">

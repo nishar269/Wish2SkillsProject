@@ -115,6 +115,10 @@ model User {
   forumPosts           ForumPost[]
   forumComments        ForumComment[]
 
+  // Direct Messages
+  sentMessages      DirectMessage[] @relation("SentMessages")
+  receivedMessages  DirectMessage[] @relation("ReceivedMessages")
+
   @@map("users")
 }
 
@@ -595,4 +599,24 @@ model ForumComment {
   author User      @relation(fields: [authorId], references: [id])
 
   @@map("forum_comments")
+}
+
+// ============================================
+// COMMUNICATION & MESSAGING (Chat)
+// ============================================
+
+model DirectMessage {
+  id         String   @id @default(cuid())
+  content    String   @db.Text
+  senderId   String   @map("sender_id")
+  receiverId String   @map("receiver_id")
+  readStatus Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, readStatus])
+  @@map("direct_messages")
 }

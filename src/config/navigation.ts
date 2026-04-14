@@ -22,6 +22,7 @@ import {
   Briefcase,
   Banknote,
   Home,
+  Radio,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -53,6 +54,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Assignments", href: "/student/assignments", icon: FileText },
           { title: "Performance", href: "/student/performance", icon: BarChart3 },
           { title: "Notifications", href: "/student/notifications", icon: Bell },
+          { title: "Live Chat", href: "/chat", icon: Radio },
           { title: "Community", href: "/community", icon: MessageSquare },
           { title: "Profile", href: "/student/profile", icon: UserCheck },
         ],
@@ -69,6 +71,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Tests", href: "/faculty/tests", icon: FileText },
           { title: "Assignments", href: "/faculty/assignments", icon: FileText },
           { title: "Students", href: "/faculty/students", icon: Users },
+          { title: "Live Chat", href: "/chat", icon: Radio },
           { title: "Community", href: "/community", icon: MessageSquare },
         ],
       };
