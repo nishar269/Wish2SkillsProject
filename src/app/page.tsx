@@ -59,7 +59,7 @@ export default function Home() {
                 </span>
               </h1>
               
-              <p className="text-slate-400 text-lg font-bold italic tracking-wide max-w-xl border-l-2 border-cyan-500/30 pl-8">
+              <p className="text-slate-400 text-sm md:text-lg font-bold italic tracking-wide max-w-sm border-l-2 border-cyan-500/30 pl-4 md:pl-8 leading-relaxed">
                 Establish total operational control with next-generation AI institutional intelligence. Designed for the futuristic educational ecosystem.
               </p>
               

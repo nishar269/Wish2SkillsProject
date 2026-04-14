@@ -3,9 +3,16 @@
   publish = ".next"
 
 [[plugins]]
-  package = "@netlify/plugin-nextjs"
+  package        const result = await loginAction(formData);
+        if (result?.error) {
+          setError(result.error);
+        } else {
+          // Explicitly redirect to avoid 404 ghosting
+          window.location.href = "/dashboard";
+        }
 
 [build.environment]
   NEXT_USE_NETLIFY_EDGE = "false"
   NODE_VERSION = "20"
   AUTH_TRUST_HOST = "true"
+  AUTH_URL = "https://wish2skill.netlify.app"

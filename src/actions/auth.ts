@@ -16,11 +16,15 @@ export async function loginAction(formData: FormData) {
   }
 
   try {
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
       redirect: false,
     });
+
+    if (result?.error) {
+       return { error: "Invalid credentials sync attempt. Please check access secret." };
+    }
 
     return { success: true };
   } catch (error) {

@@ -23,9 +23,9 @@ export default function LoginPage() {
         const result = await loginAction(formData);
         if (result?.error) {
           setError(result.error);
-        } else if (result?.success) {
-          router.push("/dashboard");
-          router.refresh();
+        } else {
+          // Explicitly redirect with hard navigation to avoid pre-fetching 404s
+          window.location.href = "/dashboard";
         }
       } catch (err) {
         setError("An unexpected error occurred. Please try again.");
