@@ -10,11 +10,9 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const key = searchParams.get('key');
   
-/*
   if (process.env.NODE_ENV === 'production' && key !== process.env.SEED_KEY) {
     return NextResponse.json({ success: false, message: 'Unauthorized. Production seeding requires a valid SEED_KEY.' }, { status: 401 });
   }
-*/
 
   try {
     // 1. Create Admin User

@@ -55,19 +55,20 @@ export default function AdminDashboardPage() {
       {/* Metadata Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { label: "Student Nodes", value: studentCount, icon: Users, sub: "Enrollment Density" },
-          { label: "Instructional Load", value: facultyCount, icon: GraduationCap, sub: "Certified Mentors" },
-          { label: "Knowledge Assets", value: courseCount, icon: BookOpen, sub: "Live Curriculums" },
-          { label: "Operational Logs", value: recentLogs.length, icon: Activity, sub: "Signal Volume" },
+          { label: "Student Nodes", value: studentCount, icon: Users, sub: "Enrollment Density", color: "text-cyan-400" },
+          { label: "Instructional Load", value: facultyCount, icon: GraduationCap, sub: "Certified Mentors", color: "text-indigo-400" },
+          { label: "Knowledge Assets", value: courseCount, icon: BookOpen, sub: "Live Curriculums", color: "text-purple-400" },
+          { label: "Operational Logs", value: recentLogs.length, icon: Activity, sub: "Signal Volume", color: "text-emerald-400" },
         ].map((stat, i) => (
-          <div key={i} className="premium-card p-6 flex items-center justify-between group cursor-default transition-all hover:border-primary/20 bg-card">
-            <div>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-              <h2 className="text-2xl font-bold mt-1 text-foreground tracking-tight">{stat.value}</h2>
-              <p className="text-[10px] text-muted-foreground mt-1 font-medium italic">{stat.sub}</p>
+          <div key={i} className="premium-card p-6 flex items-center justify-between group cursor-default relative overflow-hidden">
+             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+            <div className="relative z-10">
+              <p className="text-[9px] font-black italic text-slate-500 uppercase tracking-widest leading-none mb-2">{stat.label}</p>
+              <h2 className="text-3xl font-black italic mt-1 text-white tracking-tighter">{stat.value}</h2>
+              <p className="text-[8px] text-slate-600 mt-2 font-black uppercase tracking-[0.2em]">{stat.sub}</p>
             </div>
-            <div className="p-3 rounded-lg bg-primary/5 text-primary group-hover:scale-110 transition-transform">
-              <stat.icon className="h-5 w-5" />
+            <div className={cn("p-4 rounded-2xl bg-white/5 border border-white/10 relative z-10 group-hover:scale-110 transition-transform shadow-2xl", stat.color)}>
+              <stat.icon className="h-6 w-6" />
             </div>
           </div>
         ))}
@@ -83,25 +84,25 @@ export default function AdminDashboardPage() {
            
            <div className="space-y-4">
               {recentLogs.length === 0 ? (
-                <div className="premium-card p-20 text-center text-muted-foreground text-xs font-medium italic border-dashed border-2 flex flex-col items-center gap-4">
-                  <Fingerprint className="h-10 w-10 opacity-10 text-primary" />
+                <div className="premium-card p-20 text-center text-slate-600 text-[10px] font-black uppercase tracking-[0.4em] italic border-dashed border-white/5 flex flex-col items-center gap-6">
+                  <Fingerprint className="h-12 w-12 opacity-10 text-cyan-400" />
                   No operational signals detected in current block.
                 </div>
               ) : (
                 recentLogs.slice(0, 10).map((log: any, i: number) => (
-                  <div key={i} className="premium-card p-4 flex items-center gap-5 group hover:border-primary/20 bg-card">
-                    <div className="p-3 bg-muted rounded-xl text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
+                  <div key={i} className="premium-card p-5 flex items-center gap-6 group">
+                    <div className="p-3.5 bg-white/5 rounded-2xl text-slate-400 group-hover:bg-cyan-500/20 group-hover:text-cyan-400 transition-all duration-500 border border-white/5 shadow-inner">
                        <Activity className="h-4 w-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-bold text-foreground lead-tight truncate">{log.action}: {log.entity}</p>
-                      <p className="text-[10px] text-muted-foreground font-semibold uppercase mt-0.5 tracking-wider">
-                        {log.user.name} • <span className="text-primary/70">{log.user.role}</span>
+                      <p className="text-sm font-black italic text-white leading-none mb-2 tracking-tight">{log.action}: {log.entity}</p>
+                      <p className="text-[9px] text-slate-500 font-black uppercase tracking-[0.2em]">
+                        {log.user.name} <span className="text-cyan-500/50 italic px-2">node::</span><span className="text-cyan-500">{log.user.role}</span>
                       </p>
                     </div>
                     <div className="text-right">
-                       <p className="text-[9px] font-bold text-muted-foreground uppercase">{format(new Date(log.createdAt), "HH:mm:ss")}</p>
-                       <Badge className="bg-primary/5 text-primary border-none text-[8px] font-bold px-1.5 h-4 mt-1 rounded-sm uppercase">Secure</Badge>
+                       <p className="text-[9px] font-black italic text-slate-400 uppercase tracking-widest mb-1">{format(new Date(log.createdAt), "HH:mm:ss")}</p>
+                       <div className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[8px] font-black text-cyan-500 uppercase tracking-widest">Secure</div>
                     </div>
                   </div>
                 ))

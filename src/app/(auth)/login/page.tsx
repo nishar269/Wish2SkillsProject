@@ -102,7 +102,7 @@ export default function LoginPage() {
                     placeholder="ADMIN@NODE.PROTOCOL"
                     required 
                     disabled={isPending} 
-                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 text-xs font-bold uppercase tracking-widest focus:ring-cyan-500/50"
+                    className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 text-xs font-bold tracking-widest focus:ring-cyan-500/50"
                   />
                 </div>
                 <div className="space-y-2">
@@ -115,7 +115,7 @@ export default function LoginPage() {
                       placeholder="••••••••"
                       required 
                       disabled={isPending} 
-                      className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 text-xs font-bold uppercase tracking-widest focus:ring-cyan-500/50 pr-12"
+                      className="h-14 bg-white/5 border-white/10 rounded-2xl px-6 text-xs font-bold tracking-widest focus:ring-cyan-500/50 pr-12"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-cyan-400 transition-colors">
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

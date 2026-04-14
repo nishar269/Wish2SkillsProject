@@ -30,7 +30,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const { db } = await import("@/lib/db");
 
         const user = await db.user.findUnique({
-          where: { email, deletedAt: null },
+          where: { email: email.toLowerCase(), deletedAt: null },
         });
 
         if (!user || user.status !== "ACTIVE") {

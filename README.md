@@ -112,4 +112,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**Developed for Wish2Skill by Antigravity AI.**
+**Developed for Wish2Skill by nishar.**
