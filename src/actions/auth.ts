@@ -24,6 +24,7 @@ export async function loginAction(formData: FormData) {
 
     return { success: true };
   } catch (error) {
+    console.error("LOGIN_ACTION_ERROR:", error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
