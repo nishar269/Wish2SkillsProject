@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Clock, MapPin, ChevronLeft, ChevronRight, GraduationCap, ClipboardList } from "lucide-react";
+import { Clock, MapPin, ChevronLeft, ChevronRight, GraduationCap, ClipboardList } from "lucide-react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, startOfWeek, endOfWeek } from "date-fns";
 
 export default function CalendarClientPage({ initialEvents }: { initialEvents: any[] }) {

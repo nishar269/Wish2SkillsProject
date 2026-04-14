@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { MapPin, Info, ArrowUpRight, School, Navigation } from "lucide-react";
+import { MapPin, Info, School, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function CampusMapPage() {

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Phone, MapPin, Calendar, BookOpen, GraduationCap } from "lucide-react";
+import { User, Mail, Phone, Calendar, BookOpen, GraduationCap } from "lucide-react";
 import { format } from "date-fns";
 import { redirect } from "next/navigation";
 

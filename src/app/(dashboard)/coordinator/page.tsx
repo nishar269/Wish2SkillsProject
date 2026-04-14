@@ -1,13 +1,10 @@
 import { auth } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  Users,
   GraduationCap,
   Calendar,
   AlertTriangle,
-  ClipboardCheck,
-  Bell
+  ClipboardCheck
 } from "lucide-react";
 
 export default async function CoordinatorDashboardPage() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getStudentDashboardData } from "@/actions/dashboard";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -8,15 +8,13 @@ import {
   Calendar,
   FileText,
   TrendingUp,
-  Clock,
   Bell,
   Target,
   ArrowUpRight,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import { format } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";

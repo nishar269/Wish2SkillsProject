@@ -1,10 +1,9 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Users, TrendingDown, MessageSquare, Mail, Phone, ExternalLink, ChevronRight, User } from "lucide-react";
+import { AlertTriangle, TrendingDown, Mail, Phone, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 
 export default function CoordinatorWeakStudentsPage() {
     const riskStudents = [

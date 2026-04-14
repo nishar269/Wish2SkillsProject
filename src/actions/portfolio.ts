@@ -6,7 +6,7 @@ export async function getPublicPortfolio(studentId: string) {
   const student = await db.student.findUnique({
     where: { id: studentId },
     include: {
-      user: { select: { name: true, email: true, image: true } },
+      user: { select: { name: true, email: true, avatarUrl: true } },
       course: true,
       batch: true,
       results: { include: { test: true }, orderBy: { createdAt: "desc" } },

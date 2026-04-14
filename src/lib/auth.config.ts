@@ -10,16 +10,16 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = user.role as Role;
-        console.log('AUTH_JWT: Token initialized for', user.email, 'with role', user.role);
+        token.role = (user as any).role;
+        console.log('AUTH_JWT: Token initialized for', user.email, 'with role', (user as any).role);
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as Role;
-        console.log('AUTH_SESSION: Session ready for', session.user.email, 'with role', session.user.role);
+        (session.user as any).role = token.role;
+        console.log('AUTH_SESSION: Session ready for', session.user.email, 'with role', (session.user as any).role);
       }
       return session;
     },

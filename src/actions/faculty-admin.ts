@@ -3,7 +3,6 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import { facultySchema } from "@/lib/validations";
 import bcrypt from "bcryptjs";
 
 async function checkAdmin() {

@@ -1,4 +1,3 @@
-import { getMaterials } from "@/actions/materials";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import ClientPage from "./client-page";

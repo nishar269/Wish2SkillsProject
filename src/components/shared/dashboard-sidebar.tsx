@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { GraduationCap, LogOut, ChevronLeft, LayoutDashboard, UserSquare2, Users2, CalendarDays, BellRing, Settings2 } from "lucide-react";
+import { GraduationCap, LogOut, ChevronLeft } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import type { SidebarNavItem } from "@/config/navigation";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 
 interface DashboardSidebarProps {
   items: SidebarNavItem[];
@@ -42,7 +41,7 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
   if (!mounted) return <aside className="h-screen w-64 border-r bg-white" />;
 
   return (
-    <TooltipProvider delayDuration={0}>
+    <TooltipProvider>
       <aside
         className={cn(
           "h-screen bg-white border-r border-slate-200 transition-all duration-300 flex flex-col relative z-40 shadow-sm",
@@ -96,7 +95,7 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
               );
 
               return collapsed ? (
-                <Tooltip key={item.href}>
+                <Tooltip key={item.href} delayDuration={0}>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
                   <TooltipContent side="right" className="font-bold text-xs bg-slate-950 text-white border-none">
                     {item.title}

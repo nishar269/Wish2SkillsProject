@@ -7,7 +7,7 @@ import { DashboardHeader } from "@/components/shared/dashboard-header";
 import { AIAssistant } from "@/components/shared/ai-assistant";
 import { getNavConfig } from "@/config/navigation";
 import { logoutAction } from "@/actions/auth";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Role } from "@/lib/permissions";
 
 interface DashboardShellProps {

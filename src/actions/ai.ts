@@ -2,7 +2,6 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { auth } from "@/lib/auth";
-import { db } from "@/lib/db";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 

@@ -1,11 +1,11 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
-import { FileQuestion, CheckCircle2, PlayCircle } from "lucide-react";
+import { PlayCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

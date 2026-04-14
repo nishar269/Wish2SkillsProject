@@ -1,5 +1,5 @@
 import { getAuditLogs } from "@/actions/audit";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ShieldAlert, Fingerprint, Activity, Clock, User as UserIcon } from "lucide-react";

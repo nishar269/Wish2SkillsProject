@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Search, User, Mail, GraduationCap, Phone, MapPin, ExternalLink, Calendar } from "lucide-react";
+import { Search, Mail, GraduationCap, Phone, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function FacultyStudentsClientPage({ initialStudents }: { initialStudents: any[] }) {

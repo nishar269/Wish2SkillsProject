@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, Video, Plus, CalendarDays, ExternalLink } from "lucide-react";
+import { Calendar, Clock, Users, Video, Plus, CalendarDays } from "lucide-react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";

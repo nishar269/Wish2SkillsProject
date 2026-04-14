@@ -12,7 +12,6 @@ import {
   Activity, 
   Briefcase,
   PieChart,
-  ArrowRight,
   UserCircle2
 } from "lucide-react";
 import { format } from "date-fns";

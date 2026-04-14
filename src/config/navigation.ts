@@ -17,7 +17,6 @@ import {
   Database,
   Download,
   Archive,
-  Eye,
   Star,
   Building,
   Briefcase,

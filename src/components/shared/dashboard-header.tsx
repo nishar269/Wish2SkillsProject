@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, Menu, Command } from "lucide-react";
+import { Bell, Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
 
 interface DashboardHeaderProps {
   user: {

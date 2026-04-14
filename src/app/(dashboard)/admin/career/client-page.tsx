@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Briefcase, Plus, Trash2, Users, MapPin, DollarSign, Loader2, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Users, MapPin, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 

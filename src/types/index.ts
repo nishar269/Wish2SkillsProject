@@ -20,12 +20,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    id: string;
-    role: Role;
-  }
-}
+
 
 // API Response types
 export type ApiResponse<T = unknown> = {

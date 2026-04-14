@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MessageSquare, TrendingUp, Users, Search, Filter, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 

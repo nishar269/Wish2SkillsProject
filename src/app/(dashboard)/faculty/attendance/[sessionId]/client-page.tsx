@@ -3,10 +3,8 @@
 import { useState, useTransition } from "react";
 import { markAttendanceBulk } from "@/actions/attendance";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, Users, UserCheck, UserX } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";

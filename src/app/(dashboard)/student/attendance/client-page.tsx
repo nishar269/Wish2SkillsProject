@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Clock, MapPin, AlertCircle } from "lucide-react";
+import { Clock } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 

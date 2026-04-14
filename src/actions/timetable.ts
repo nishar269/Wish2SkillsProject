@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
-import { startOfWeek, endOfWeek, addDays, startOfDay, endOfDay } from "date-fns";
+import { startOfWeek, endOfWeek } from "date-fns";
 
 export async function getStudentTimetable() {
   const session = await auth();

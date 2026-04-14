@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, MapPin, User, Video, ExternalLink, CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, MapPin, User, Video, CalendarDays } from "lucide-react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";

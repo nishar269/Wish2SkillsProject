@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { submitTestResult } from "@/actions/tests";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Timer, ArrowRight, ArrowLeft, Send, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { Timer, ArrowRight, ArrowLeft, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

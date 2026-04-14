@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { applyForJob } from "@/actions/jobs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, Building2, MapPin, DollarSign, Send, CheckCircle2, Loader2, Building } from "lucide-react";
+import { Briefcase, Building2, MapPin, DollarSign, Send, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 

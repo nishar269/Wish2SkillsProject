@@ -1,13 +1,12 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getInstitutionalKPIs } from "@/actions/reports";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Users, BookOpen, Star, Zap, Globe, Shield, Target, Activity, ArrowUpRight, Cpu } from "lucide-react";
+import { TrendingUp, Zap, Globe, Shield, Target, Activity, ArrowUpRight, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function AuthorityAnalyticsPage() {
     const [kpis, setKpis] = useState<any>(null);

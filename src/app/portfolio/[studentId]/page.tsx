@@ -1,5 +1,5 @@
 import { getPublicPortfolio } from "@/actions/portfolio";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Mail, GraduationCap, Briefcase, Award, TrendingUp, Globe, Link as LinkIcon } from "lucide-react";
@@ -30,8 +30,8 @@ export default async function PublicPortfolioPage({ params }: { params: Promise<
             <Card className="border-0 shadow-2xl rounded-[2rem] overflow-hidden">
               <CardContent className="p-8 text-center pt-12">
                 <div className="w-40 h-40 rounded-3xl bg-slate-100 mx-auto mb-6 flex items-center justify-center border-4 border-white shadow-xl rotate-3 transition-transform hover:rotate-0 duration-500 overflow-hidden">
-                    {student.user.image ? (
-                        <img src={student.user.image} alt={student.user.name} className="w-full h-full object-cover" />
+                    {student.user.avatarUrl ? (
+                        <img src={student.user.avatarUrl} alt={student.user.name} className="w-full h-full object-cover" />
                     ) : (
                         <GraduationCap className="h-16 w-16 text-slate-300" />
                     )}
@@ -74,7 +74,7 @@ export default async function PublicPortfolioPage({ params }: { params: Promise<
                     <div>
                         <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Competency Streams</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {student.results.slice(0, 4).map((r, i) => (
+                            {student.results.slice(0, 4).map((r: any, i: number) => (
                                 <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
                                     <div>
                                         <p className="text-sm font-bold">{r.test.title}</p>
@@ -92,7 +92,7 @@ export default async function PublicPortfolioPage({ params }: { params: Promise<
                             {student.applications.length === 0 ? (
                                 <p className="text-sm italic text-slate-400">Charting the career roadmap...</p>
                             ) : (
-                                student.applications.map((a, i) => (
+                                student.applications.map((a: any, i: number) => (
                                     <div key={i} className="flex gap-4">
                                         <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
                                             <Briefcase className="h-5 w-5 text-slate-400" />
@@ -112,7 +112,7 @@ export default async function PublicPortfolioPage({ params }: { params: Promise<
             <div className="flex items-center justify-between p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
                  <div className="flex items-center gap-3">
                     <div className="p-3 bg-emerald-50 rounded-2xl">
-                        <medal className="h-6 w-6 text-emerald-600" />
+                        <Medal className="h-6 w-6 text-emerald-600" />
                     </div>
                     <div>
                         <p className="text-sm font-bold">CampusOS Certified Portfolio</p>
@@ -133,7 +133,7 @@ function formatDate(date: Date) {
     return new Date(date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 }
 
-function medal(props: any) {
+function Medal(props: any) {
     return (
         <svg
           {...props}

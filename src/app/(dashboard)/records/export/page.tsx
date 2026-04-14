@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, FileJson, FileSpreadsheet, FileArchive, ShieldCheck, Database, Trash2, Archive, History } from "lucide-react";
+import { FileJson, FileSpreadsheet, FileArchive, ShieldCheck, Archive, History } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 

@@ -3,12 +3,12 @@
 import { useState, useTransition } from "react";
 import { createAssignment, deleteAssignment } from "@/actions/faculty-assignment";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Link2, Plus, Trash2, Loader2, User, BookOpen, Users } from "lucide-react";
+import { Link2, Trash2, Loader2, User, BookOpen, Users } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminAssignmentsClientPage({ 

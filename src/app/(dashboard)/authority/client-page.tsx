@@ -7,7 +7,7 @@ import {
 } from "recharts";
 import { 
   TrendingUp, Users, GraduationCap, Award, 
-  ArrowUpRight, ArrowDownRight, Target, ShieldCheck 
+  ArrowUpRight, ArrowDownRight, ShieldCheck 
 } from "lucide-react";
 
 export default function AuthorityDashboardClient({ stats }: { stats: any }) {

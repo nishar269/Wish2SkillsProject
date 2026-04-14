@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { MessageSquare, Send, X, Loader2, Orbit, Sparkles, Zap } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, Loader2, Orbit, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { chatWithCampusAI } from "@/actions/ai";

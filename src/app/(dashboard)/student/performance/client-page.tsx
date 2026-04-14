@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, TrendingUp, Award, Calendar, ChevronRight, Zap, Target, BookOpen, Clock } from "lucide-react";
+import { BarChart3, TrendingUp, Award, Calendar, Zap, Target, BookOpen } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";

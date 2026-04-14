@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { submitFeedback } from "@/actions/feedback";
 import ClientPage from "./client-page";
 
 export const dynamic = "force-dynamic";

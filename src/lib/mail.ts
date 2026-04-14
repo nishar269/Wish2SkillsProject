@@ -22,7 +22,7 @@ export async function sendNotificationEmail(
   }
 
   try {
-    const data = await getResend().emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'Wish2Skill CampusOS <notifications@resend.dev>', // Update with verified domain in production
       to: [to],
       subject: subject,
@@ -49,9 +49,14 @@ export async function sendNotificationEmail(
       `,
     });
 
-    return { success: true, id: data.id };
+    if (error) {
+       console.error("Resend Response Error:", error);
+       return { error };
+    }
+
+    return { success: true, id: data?.id };
   } catch (error) {
-    console.error("Resend Error:", error);
+    console.error("Resend Catch Error:", error);
     return { error };
   }
 }

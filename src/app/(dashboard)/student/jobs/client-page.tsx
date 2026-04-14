@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Briefcase, MapPin, DollarSign, Send, CheckCircle2, Clock, Globe, ArrowUpRight, Loader2 } from "lucide-react";
+import { MapPin, DollarSign, Send, CheckCircle2, Clock, Globe, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function StudentJobsClientPage({ jobs, studentApplications }: { jobs: any[], studentApplications: any[] }) {

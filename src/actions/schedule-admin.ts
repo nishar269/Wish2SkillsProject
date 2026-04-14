@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { sendNotificationEmail } from "@/lib/mail";
 
 async function checkAdminOrCoordinator() {
   const session = await auth();
@@ -54,7 +55,39 @@ export async function createClassSession(data: any) {
       }
     });
 
-    // TODO: Trigger notification service here in Phase 7
+    const batchInfo = await db.batch.findUnique({
+      where: { id: data.batchId },
+      include: {
+        students: {
+          include: { user: { select: { email: true } } }
+        },
+        course: true,
+      }
+    });
+
+    const subjectInfo = await db.subject.findUnique({
+      where: { id: data.subjectId }
+    });
+
+    if (batchInfo && subjectInfo) {
+      batchInfo.students.forEach((student: any) => {
+        if (student.user.email) {
+          sendNotificationEmail(
+            student.user.email,
+            `Class Scheduled: ${subjectInfo.name}`,
+            "Upcoming Class Notification",
+            `<p>A new class session for <b>${subjectInfo.name}</b> has been scheduled.</p>
+             <p><b>Date:</b> ${new Date(data.date).toLocaleDateString()}</p>
+             <p><b>Time:</b> ${data.startTime} to ${data.endTime}</p>
+             ${data.topic ? `<p><b>Topic:</b> ${data.topic}</p>` : ""}
+             ${data.room ? `<p><b>Room:</b> ${data.room}</p>` : ""}
+             ${data.meetLink ? `<p><b>Join Link:</b> <a href="${data.meetLink}">${data.meetLink}</a></p>` : ""}`,
+            "View Timetable",
+            `${process.env.NEXTAUTH_URL}/student/timetable`
+          ).catch(err => console.error("Email error:", err)); // Async fire-and-forget
+        }
+      });
+    }
 
     revalidatePath("/admin/schedule");
     revalidatePath("/coordinator/schedule");

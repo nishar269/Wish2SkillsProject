@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileText, ExternalLink, Sparkles, Loader2, BrainCircuit } from "lucide-react";
-import { format } from "date-fns";
 import { toast } from "sonner";
 
 export default function StudentResourcesClientPage({ initialMaterials }: { initialMaterials: any[] }) {

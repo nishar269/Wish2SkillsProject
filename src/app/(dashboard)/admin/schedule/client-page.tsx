@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Calendar as CalendarIcon, Clock, MapPin, Plus, Trash2, Video } from "lucide-react";
+import { Clock, MapPin, Plus, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
