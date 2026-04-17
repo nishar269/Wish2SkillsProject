@@ -86,7 +86,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Attendance", href: "/coordinator/attendance", icon: ClipboardCheck },
           { title: "Weak Students", href: "/coordinator/students", icon: AlertTriangle },
           { title: "Schedule", href: "/coordinator/schedule", icon: Calendar },
-          { title: "Notifications", href: "/coordinator/notifications", icon: Bell },
+          { title: "Notifications", href: "/admin/announcements", icon: Bell },
           { title: "Community", href: "/community", icon: MessageSquare },
         ],
       };
@@ -104,7 +104,7 @@ export function getNavConfig(role: Role): SidebarNavConfig {
           { title: "Batches", href: "/admin/batches", icon: Database },
           { title: "Schedule", href: "/admin/schedule", icon: Calendar },
           { title: "Reports", href: "/admin/reports", icon: BarChart3 },
-          { title: "Notifications", href: "/admin/notifications", icon: Bell },
+          { title: "Notifications", href: "/admin/announcements", icon: Bell },
           { title: "Community", href: "/community", icon: MessageSquare },
           { title: "Finances", href: "/admin/fees", icon: Banknote },
           { title: "Settings", href: "/admin/settings", icon: Settings },
