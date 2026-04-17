@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getCategories() {
-  return await db.forumCategory.findMany({
+  let categories = await db.forumCategory.findMany({
     include: {
       _count: {
         select: { posts: true }
@@ -13,6 +13,27 @@ export async function getCategories() {
     },
     orderBy: { name: "asc" }
   });
+
+  if (categories.length === 0) {
+    // Auto-seed if empty
+    const defaultCategories = [
+        { name: "General Discussions", icon: "MessageSquare", description: "Talk about anything campus related." },
+        { name: "Tech & Engineering", icon: "Code", description: "Share projects, code, and technical insights." },
+        { name: "Events & News", icon: "Bell", description: "Stay updated with campus happenings." },
+        { name: "Project Showcase", icon: "Lightbulb", description: "Show off what you've built!" }
+    ];
+
+    for (const cat of defaultCategories) {
+        await db.forumCategory.create({ data: cat });
+    }
+
+    categories = await db.forumCategory.findMany({
+      include: { _count: { select: { posts: true } } },
+      orderBy: { name: "asc" }
+    });
+  }
+
+  return categories;
 }
 
 export async function getPosts(categoryId: string) {
