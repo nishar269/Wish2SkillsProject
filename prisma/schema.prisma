@@ -440,6 +440,7 @@ model Feedback {
   subjectId   String?  @map("subject_id")
   message     String
   rating      Int?     @default(5) // 1-5
+  sentiment   String?  @default("NEUTRAL") // POSITIVE, NEUTRAL, NEGATIVE
   isAnonymous Boolean  @default(false) @map("is_anonymous")
   createdAt   DateTime @default(now()) @map("created_at")
 

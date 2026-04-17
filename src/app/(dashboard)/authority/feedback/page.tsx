@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
-export default function AuthorityFeedbackPage() {
-    const feedbackList = [
-        { student: "Anon", subject: "Java Fundamentals", rating: 5, message: "The curriculum is very well structured. The practical lab sessions are exceptionally helpful.", sentiment: "POSITIVE" },
-        { student: "Anon", subject: "Career Guidance", rating: 4, message: "Would love more mock interviews for specialized roles like DevOps.", sentiment: "NEUTRAL" },
-        { student: "Anon", subject: "System Admin", rating: 2, message: "The lab environment was lagging during peak hours last Tuesday.", sentiment: "NEGATIVE" },
-    ];
+import { getAuthorityFeedbackData } from "@/actions/feedback";
+
+export const dynamic = "force-dynamic";
+
+export default async function AuthorityFeedbackPage() {
+    const data = await getAuthorityFeedbackData();
+    if ("error" in data) return <div className="p-8 text-rose-500">{data.error}</div>;
+
+    const { sentimentDistribution, averageRating, recentFeedbacks } = data;
 
     return (
         <div className="space-y-8 p-6">
@@ -28,7 +31,7 @@ export default function AuthorityFeedbackPage() {
                         <div className="relative z-10 space-y-4">
                             <Star className="h-10 w-10 text-indigo-200 fill-indigo-200" />
                             <h2 className="text-xl font-black italic tracking-tighter uppercase">Satisfaction Rate</h2>
-                            <p className="text-6xl font-black italic tracking-tighter">4.8</p>
+                            <p className="text-6xl font-black italic tracking-tighter">{averageRating}</p>
                             <p className="text-xs font-black uppercase tracking-widest opacity-70">Out of 5.0 (Global Avg)</p>
                             <div className="pt-4">
                                 <span className="px-2 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase tracking-widest">Top 1% Institue</span>
@@ -41,9 +44,9 @@ export default function AuthorityFeedbackPage() {
                         <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Sentiment Spectrum</h3>
                         <div className="space-y-6">
                             {[
-                                { label: "Positive", val: 82, color: "bg-emerald-500" },
-                                { label: "Neutral", val: 12, color: "bg-blue-500" },
-                                { label: "Needs Attention", val: 6, color: "bg-rose-500" },
+                                { label: "Positive", val: sentimentDistribution.positive, color: "bg-emerald-500" },
+                                { label: "Neutral", val: sentimentDistribution.neutral, color: "bg-blue-500" },
+                                { label: "Needs Attention", val: sentimentDistribution.negative, color: "bg-rose-500" },
                             ].map((s, i) => (
                                 <div key={i} className="space-y-2">
                                     <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
@@ -70,8 +73,10 @@ export default function AuthorityFeedbackPage() {
                     </div>
 
                     <div className="space-y-4">
-                        {feedbackList.map((f, i) => (
-                            <Card key={i} className="border-0 shadow-lg rounded-[2.5rem] bg-white dark:bg-slate-950 overflow-hidden">
+                        {recentFeedbacks.length === 0 ? (
+                            <p className="text-slate-400 italic">No feedback submitted yet.</p>
+                        ) : recentFeedbacks.map((f) => (
+                            <Card key={f.id} className="border-0 shadow-lg rounded-[2.5rem] bg-white dark:bg-slate-950 overflow-hidden">
                                 <CardContent className="p-8 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
@@ -88,13 +93,15 @@ export default function AuthorityFeedbackPage() {
                                             "w-3 h-3 rounded-full shadow-[0_0_8px]",
                                             f.sentiment === 'POSITIVE' ? "bg-emerald-500 shadow-emerald-500/50" :
                                             f.sentiment === 'NEGATIVE' ? "bg-rose-500 shadow-rose-500/50" : "bg-blue-500 shadow-blue-500/50"
-                                        )} title={f.sentiment} />
+                                        )} title={f.sentiment || "NEUTRAL"} />
                                     </div>
                                     <p className="text-lg font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
                                         &ldquo;{f.message}&rdquo;
                                     </p>
                                     <div className="pt-4 flex items-center justify-between border-t border-slate-50">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Verifed Student Pulse</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                            {f.studentName}
+                                        </span>
                                         <div className="flex gap-3">
                                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:text-emerald-500"><ThumbsUp className="h-4 w-4" /></Button>
                                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg hover:text-rose-500"><ThumbsDown className="h-4 w-4" /></Button>
