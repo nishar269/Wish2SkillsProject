@@ -128,3 +128,37 @@ export async function getAuthorityDashboardData() {
         throw error;
     }
 }
+
+export async function getCoordinatorDashboardData() {
+    const session = await auth();
+    if (!session || session.user.role !== "COORDINATOR") {
+        throw new Error("Unauthorized");
+    }
+
+    try {
+        const [batches, todayClasses, studentsCount] = await Promise.all([
+            db.batch.findMany({
+                where: { status: "ACTIVE" },
+                include: { course: true, _count: { select: { students: true } } }
+            }),
+            db.classSession.count({
+                where: {
+                    date: {
+                        gte: new Date(new Date().setHours(0,0,0,0)),
+                        lt: new Date(new Date().setHours(23,59,59,999))
+                    }
+                }
+            }),
+            db.student.count({ where: { status: "ACTIVE" } })
+        ]);
+
+        return {
+            activeBatches: batches.length,
+            classesToday: todayClasses,
+            totalStudents: studentsCount,
+            batchesList: batches
+        };
+    } catch {
+        throw new Error("Failed to fetch dashboard data");
+    }
+}

@@ -73,6 +73,8 @@ export async function getSystemSettings() {
       contactEmail: settingsMap.contactEmail || "admin@wish2skill.com",
       academicYear: settingsMap.academicYear || "2026-2027",
       timezone: settingsMap.timezone || "Asia/Kolkata",
+      campusLat: parseFloat(settingsMap.campusLat || "12.9716"),
+      campusLng: parseFloat(settingsMap.campusLng || "77.5946"),
   };
 }
 

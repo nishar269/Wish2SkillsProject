@@ -102,9 +102,9 @@ export default function AuthorityAnalyticsPage() {
                     
                     <div className="space-y-6">
                         {[
-                            { label: "Academic Score", value: Math.min(kpis.institutionalScore + 5, 100), color: "bg-blue-500" },
+                            { label: "Academic Score", value: kpis.institutionalScore, color: "bg-blue-500" },
                             { label: "Attendance Rate", value: kpis.attendanceRate, color: "bg-indigo-500" },
-                            { label: "Engagement Index", value: Math.min(kpis.totalEngagement * 2, 95), color: "bg-emerald-500" },
+                            { label: "Engagement Hub Hits", value: kpis.totalEngagement, color: "bg-emerald-500" },
                         ].map((metric, i) => (
                             <div key={i} className="space-y-2">
                                 <div className="flex justify-between text-sm">
@@ -114,7 +114,7 @@ export default function AuthorityAnalyticsPage() {
                                 <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                                      <div 
                                         className={cn("h-full rounded-full transition-all duration-1000", metric.color)}
-                                        style={{ width: `${metric.value}%` }}
+                                        style={{ width: `${metric.label === "Engagement Hub Hits" ? Math.min(metric.value, 100) : metric.value}%` }}
                                      />
                                 </div>
                             </div>

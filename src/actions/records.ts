@@ -13,11 +13,17 @@ export async function getRecordsStats() {
     const faculty = await db.faculty.count();
     const archiBatches = await db.batch.count({ where: { status: "COMPLETED" } });
     const totalExports = await db.auditLog.count({ where: { action: { contains: "EXPORT" } } });
+    const recentExports = await db.auditLog.findMany({
+        where: { action: { contains: "EXPORT" } },
+        orderBy: { createdAt: "desc" },
+        take: 5
+    });
 
     return {
         totalPeople: students + faculty,
         archives: archiBatches,
         generatedReports: totalExports,
+        recentExports,
         pendingExports: 0
     };
 }

@@ -2,11 +2,12 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { MapPin, Info, School, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getSystemSettings } from "@/actions/settings";
 
 export default async function CampusMapPage() {
-  // Campus Center (Mock Bangalore Coords)
-  const CAMPUS_LAT = 12.9716;
-  const CAMPUS_LNG = 77.5946;
+  const settings = await getSystemSettings();
+  const CAMPUS_LAT = settings.campusLat;
+  const CAMPUS_LNG = settings.campusLng;
 
   return (
     <div className="space-y-8 pb-10">

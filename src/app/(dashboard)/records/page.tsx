@@ -1,6 +1,8 @@
 import { getRecordsStats } from "@/actions/records";
+import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Archive, Download, FileText, Database } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Archive, Download, FileText, Database, Pickaxe, History } from "lucide-react";
 
 export default async function RecordsDashboardPage() {
   const statsData = await getRecordsStats();
@@ -69,10 +71,31 @@ export default async function RecordsDashboardPage() {
       
       <Card className="border-0 shadow-md">
         <CardHeader>
-          <CardTitle className="text-lg">Recent Exports (Demo)</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2"><History className="h-5 w-5" /> Recent Exports Output</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">List of generated CSV/PDF reports will be here.</div>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Export Type</TableHead>
+                <TableHead>Details</TableHead>
+                <TableHead>Timestamp</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {statsData.recentExports?.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center italic text-muted-foreground p-8">No data exports performed yet.</TableCell>
+                </TableRow>
+              ) : statsData.recentExports?.map((exp) => (
+                <TableRow key={exp.id}>
+                  <TableCell className="font-bold font-mono text-sm">{exp.action}</TableCell>
+                  <TableCell className="text-muted-foreground">{exp.details}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{format(new Date(exp.createdAt), "MMM dd, yyyy HH:mm")}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>

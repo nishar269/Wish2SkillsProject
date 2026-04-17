@@ -10,16 +10,11 @@ import {
   ArrowUpRight, ArrowDownRight, ShieldCheck 
 } from "lucide-react";
 
-export default function AuthorityDashboardClient(_: { stats: Record<string, never> }) {
-  // Mock data for charts
-  const enrollmentData = [
-    { name: "Jan", count: 400 },
-    { name: "Feb", count: 300 },
-    { name: "Mar", count: 600 },
-    { name: "Apr", count: 800 },
-    { name: "May", count: 500 },
-    { name: "Jun", count: 900 },
-  ];
+export default function AuthorityDashboardClient({ stats }: { stats: any }) {
+  // Map real enrollment data for the charts
+  const enrollmentData = stats.enrollmentByCourse.length > 0 
+    ? stats.enrollmentByCourse 
+    : [{ name: "No Data", count: 1 }];
 
   const attendanceRate = [
     { name: "Mon", rate: 85 },
@@ -49,10 +44,10 @@ export default function AuthorityDashboardClient(_: { stats: Record<string, neve
       {/* High-Level KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-            { label: "Total Revenue", value: "$4.1M", up: true, trend: "12%", icon: TrendingUp, color: "blue" },
-            { label: "Total Students", value: "1,450", up: true, trend: "8%", icon: Users, color: "indigo" },
-            { label: "Active Faculty", value: "84", up: false, trend: "2%", icon: GraduationCap, color: "purple" },
-            { label: "Placement Rate", value: "94%", up: true, trend: "4%", icon: Award, color: "cyan" },
+            { label: "Total Students", value: stats.summary.students.toLocaleString(), up: true, trend: "Active", icon: Users, color: "indigo" },
+            { label: "Faculty Strength", value: stats.summary.faculty.toLocaleString(), up: true, trend: "Active", icon: GraduationCap, color: "purple" },
+            { label: "Total Courses", value: stats.summary.courses.toLocaleString(), up: true, trend: "Offered", icon: Award, color: "cyan" },
+            { label: "Total Batches", value: stats.summary.batches.toLocaleString(), up: true, trend: "Running", icon: TrendingUp, color: "blue" },
         ].map((kpi, i) => (
             <Card key={i} className="border-0 shadow-xl shadow-slate-200/50 dark:shadow-none overflow-hidden group">
                 <CardContent className="p-6">
@@ -112,18 +107,13 @@ export default function AuthorityDashboardClient(_: { stats: Record<string, neve
              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
-                        data={[
-                            { name: 'Java Full Stack', value: 400 },
-                            { name: 'Data Science', value: 300 },
-                            { name: 'Cloud Computing', value: 300 },
-                            { name: 'UI/UX Design', value: 200 },
-                        ]}
+                        data={enrollmentData}
                         innerRadius={60}
                         outerRadius={80}
                         paddingAngle={5}
-                        dataKey="value"
+                        dataKey="count"
                     >
-                        {enrollmentData.map((entry, index) => (
+                        {enrollmentData.map((entry: any, index: number) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>

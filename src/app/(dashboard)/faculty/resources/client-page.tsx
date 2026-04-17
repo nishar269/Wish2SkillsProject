@@ -34,7 +34,7 @@ export default function FacultyResourcesClientPage({
         description: formData.get("description") as string,
         subjectId: formData.get("subjectId") as string,
         fileUrl: formData.get("fileUrl") as string,
-        fileType: "PDF" as MaterialType, // Mocked for now
+        fileType: (formData.get("fileType") || "PDF") as MaterialType,
     };
 
     startTransition(async () => {
@@ -91,7 +91,18 @@ export default function FacultyResourcesClientPage({
               </div>
               <div className="space-y-2">
                 <Label htmlFor="fileUrl">Document Link (e.g. Google Drive/Cloudinary)</Label>
-                <Input id="fileUrl" name="fileUrl" placeholder="https://..." required />
+                <div className="flex gap-2">
+                   <div className="border rounded-md px-3 bg-slate-50 dark:bg-slate-900 border-slate-200">
+                      <select name="fileType" className="h-9 bg-transparent outline-none text-sm w-20">
+                          <option value="PDF">PDF</option>
+                          <option value="VIDEO">Video</option>
+                          <option value="LINK">Link</option>
+                          <option value="IMAGE">Image</option>
+                          <option value="DOC">Doc</option>
+                      </select>
+                   </div>
+                   <Input id="fileUrl" name="fileUrl" placeholder="https://..." className="flex-1" required />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Short Description</Label>
@@ -141,6 +152,7 @@ export default function FacultyResourcesClientPage({
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">{m.subject.name}</Badge>
+                      <Badge variant="secondary" className="ml-2 text-[10px]">{m.fileType}</Badge>
                     </TableCell>
                     <TableCell className="text-sm">
                       {format(new Date(m.createdAt), "MMM dd, yyyy")}

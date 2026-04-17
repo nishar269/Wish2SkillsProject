@@ -1,41 +1,46 @@
 import { auth } from "@/lib/auth";
+import { getCoordinatorDashboardData } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   GraduationCap,
   Calendar,
   AlertTriangle,
-  ClipboardCheck
+  ClipboardCheck,
+  Users
 } from "lucide-react";
 
 export default async function CoordinatorDashboardPage() {
   const session = await auth();
+  const data = await getCoordinatorDashboardData();
 
   const stats = [
     {
-      title: "Managed Batches",
-      value: "8",
-      detail: "Active across 3 courses",
+      title: "Active Batches",
+      value: data.activeBatches.toString(),
+      detail: "Currently running",
       icon: GraduationCap,
       color: "from-blue-500 to-blue-600",
     },
     {
-      title: "Avg Attendance",
-      value: "88%",
-      detail: "Slight dip this week",
-      icon: ClipboardCheck,
+      title: "Total Students",
+      value: data.totalStudents.toString(),
+      detail: "Across active batches",
+      icon: Users,
       color: "from-amber-500 to-amber-600",
     },
     {
       title: "Classes Today",
-      value: "14",
-      detail: "4 starting soon",
+      value: data.classesToday.toString(),
+      detail: "Scheduled sessions",
       icon: Calendar,
       color: "from-emerald-500 to-emerald-600",
     },
     {
-      title: "Weak Students",
-      value: "12",
-      detail: "Require attention",
+      title: "Attention Needed",
+      value: "0", // Fallback for gamification logic not fully built
+      detail: "Students at risk",
       icon: AlertTriangle,
       color: "from-red-500 to-red-600",
     },
@@ -72,13 +77,38 @@ export default async function CoordinatorDashboardPage() {
         ))}
       </div>
 
-      {/* Adding a placeholder for the batch monitoring section */}
+      {/* Real batch monitoring section */}
       <Card className="border-0 shadow-md">
         <CardHeader>
-          <CardTitle className="text-lg">Batch Monitoring (Demo)</CardTitle>
+          <CardTitle className="text-lg">Active Batches</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-sm text-muted-foreground">Detailed batch metrics will appear here.</div>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Batch Name</TableHead>
+                <TableHead>Course</TableHead>
+                <TableHead>Students</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data.batchesList.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center italic text-muted-foreground">No active batches found.</TableCell>
+                </TableRow>
+              ) : data.batchesList.map((batch) => (
+                <TableRow key={batch.id}>
+                  <TableCell className="font-bold">{batch.name}</TableCell>
+                  <TableCell>{batch.course.code}</TableCell>
+                  <TableCell>{batch._count.students} / {batch.capacity}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-none">{batch.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </CardContent>
       </Card>
     </div>
