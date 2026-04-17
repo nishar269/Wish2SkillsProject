@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Calendar,
   AlertTriangle,
-  ClipboardCheck,
   Users
 } from "lucide-react";
 

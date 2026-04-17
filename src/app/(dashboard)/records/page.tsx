@@ -2,7 +2,7 @@ import { getRecordsStats } from "@/actions/records";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Archive, Download, FileText, Database, Pickaxe, History } from "lucide-react";
+import { Archive, Download, FileText, Database, History } from "lucide-react";
 
 export default async function RecordsDashboardPage() {
   const statsData = await getRecordsStats();

@@ -10,7 +10,7 @@ import {
   ArrowUpRight, ArrowDownRight, ShieldCheck 
 } from "lucide-react";
 
-export default function AuthorityDashboardClient({ stats }: { stats: any }) {
+export default function AuthorityDashboardClient({ stats }: { stats: { summary: Record<string, number>, enrollmentByCourse: {name: string, count: number}[] } }) {
   // Map real enrollment data for the charts
   const enrollmentData = stats.enrollmentByCourse.length > 0 
     ? stats.enrollmentByCourse 
@@ -113,7 +113,7 @@ export default function AuthorityDashboardClient({ stats }: { stats: any }) {
                         paddingAngle={5}
                         dataKey="count"
                     >
-                        {enrollmentData.map((entry: any, index: number) => (
+                        {enrollmentData.map((entry: {name: string, count: number}, index: number) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                         ))}
                     </Pie>

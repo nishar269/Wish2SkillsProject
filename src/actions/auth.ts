@@ -110,7 +110,7 @@ export async function resetPasswordAction(formData: FormData) {
     });
 
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Invalid or expired reset token. Please request a new one." };
   }
 }

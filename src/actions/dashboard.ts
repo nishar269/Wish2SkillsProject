@@ -149,7 +149,7 @@ export async function getCoordinatorDashboardData() {
                     }
                 }
             }),
-            db.student.count({ where: { status: "ACTIVE" } })
+            db.student.count({ where: { user: { status: "ACTIVE" } } })
         ]);
 
         return {
