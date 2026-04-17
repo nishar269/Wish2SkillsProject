@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { submitAssignment } from "@/actions/student-assignments";
+import { getStudentAssignments, submitAssignment } from "@/actions/student-assignments";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,14 @@ import { FileText, Calendar, Send, CheckCircle2, AlertCircle, Loader2 } from "lu
 import { toast } from "sonner";
 import { format, isAfter } from "date-fns";
 
-export default function StudentAssignmentsClientPage({ initialAssignments }: { initialAssignments: any[] }) {
-  const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
+type StudentAssignment = Awaited<ReturnType<typeof getStudentAssignments>>[number];
+
+export default function StudentAssignmentsClientPage({
+  initialAssignments,
+}: {
+  initialAssignments: StudentAssignment[];
+}) {
+  const [selectedAssignment, setSelectedAssignment] = useState<StudentAssignment | null>(null);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmission(formData: FormData) {
@@ -129,7 +135,7 @@ export default function StudentAssignmentsClientPage({ initialAssignments }: { i
                                         id="fileUrl" 
                                         name="fileUrl" 
                                         placeholder="https://..." 
-                                        defaultValue={submission?.fileUrl || ""}
+                                        defaultValue={submission?.contentUrl || ""}
                                         required 
                                     />
                                 </div>

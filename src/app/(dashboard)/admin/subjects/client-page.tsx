@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createSubject, deleteSubject } from "@/actions/subject";
+import { createSubject, deleteSubject, getSubjects } from "@/actions/subject";
+import { getCourses } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,17 +13,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Loader2, Plus, Trash2, FileText, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
-export default function SubjectsPage({ initialSubjects, courses }: { initialSubjects: any[], courses: any[] }) {
-  const [subjects, setSubjects] = useState(initialSubjects);
+export default function SubjectsPage({ initialSubjects, courses }: { initialSubjects: Awaited<ReturnType<typeof getSubjects>>, courses: Awaited<ReturnType<typeof getCourses>> }) {
+  const [subjects] = useState(initialSubjects);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     const data = {
-      name: formData.get("name"),
-      code: formData.get("code"),
-      courseId: formData.get("courseId"),
-      credits: formData.get("credits"),
+      name: formData.get("name") as string,
+      code: formData.get("code") as string,
+      courseId: formData.get("courseId") as string,
+      credits: formData.get("credits") as string,
     };
 
     startTransition(async () => {

@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { Role } from "@/lib/permissions";
 import { loginSchema } from "@/lib/validations";
 import { authConfig } from "./auth.config";
 
@@ -53,7 +54,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           name: user.name,
           email: user.email,
-          role: user.role as any,
+          role: user.role as Role,
           image: user.avatarUrl,
         };
       },

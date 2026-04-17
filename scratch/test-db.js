@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { Pool } = require('@neondatabase/serverless');
 const dotenv = require('dotenv');
 dotenv.config();

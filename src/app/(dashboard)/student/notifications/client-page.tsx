@@ -8,7 +8,25 @@ import { Button } from "@/components/ui/button";
 import { Bell, Clock, Check, Megaphone, Info, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 
-export default function NotificationsClientPage({ initialNotifications, userId }: { initialNotifications: any[], userId: string }) {
+type NotificationItem = {
+  id: string;
+  title: string;
+  message: string;
+  type: "INFO" | "WARNING" | "SUCCESS" | "URGENT";
+  createdAt: Date;
+  readBy: string[];
+  creator: {
+    name: string;
+  };
+};
+
+export default function NotificationsClientPage({
+  initialNotifications,
+  userId,
+}: {
+  initialNotifications: NotificationItem[];
+  userId: string;
+}) {
   const [notifications, setNotifications] = useState(initialNotifications);
 
   const handleMarkRead = async (id: string) => {
@@ -57,10 +75,10 @@ export default function NotificationsClientPage({ initialNotifications, userId }
                     <div className="flex items-start gap-4">
                         <div className={`p-3 rounded-xl shrink-0 ${
                             n.type === 'URGENT' ? 'bg-red-50 text-red-600' :
-                            n.type === 'ACADEMIC' ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-600'
+                            n.type === 'SUCCESS' ? 'bg-blue-50 text-blue-600' : 'bg-slate-50 text-slate-600'
                         }`}>
                             {n.type === 'URGENT' ? <AlertTriangle className="h-5 w-5" /> : 
-                             n.type === 'ACADEMIC' ? <Megaphone className="h-5 w-5" /> : <Info className="h-5 w-5" />}
+                             n.type === 'SUCCESS' ? <Megaphone className="h-5 w-5" /> : <Info className="h-5 w-5" />}
                         </div>
                         
                         <div className="flex-1 min-w-0 space-y-1">

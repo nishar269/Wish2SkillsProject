@@ -7,9 +7,10 @@ import { TrendingUp, Zap, Globe, Shield, Target, Activity, ArrowUpRight, Cpu } f
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import type { SVGProps } from "react";
 
 export default function AuthorityAnalyticsPage() {
-    const [kpis, setKpis] = useState<any>(null);
+    const [kpis, setKpis] = useState<Awaited<ReturnType<typeof getInstitutionalKPIs>> | null>(null);
 
     useEffect(() => {
         getInstitutionalKPIs().then(setKpis);
@@ -214,7 +215,7 @@ export default function AuthorityAnalyticsPage() {
                                 <div className="space-y-2">
                                     <p className="font-black text-slate-900 dark:text-white uppercase text-sm tracking-[0.05em] leading-none group-hover:text-cyan-500 transition-colors">{insight.title}</p>
                                     <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-bold italic opacity-70">
-                                        "{insight.desc}"
+                                        &ldquo;{insight.desc}&rdquo;
                                     </p>
                                 </div>
                             </motion.div>
@@ -244,7 +245,7 @@ export default function AuthorityAnalyticsPage() {
     );
 }
 
-function Sparkles(props: any) {
+function Sparkles(props: SVGProps<SVGSVGElement>) {
     return (
         <svg
           {...props}

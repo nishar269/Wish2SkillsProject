@@ -13,15 +13,37 @@ import { Megaphone, Trash2, Loader2, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function AdminAnnouncementsClientPage({ initialAnnouncements }: { initialAnnouncements: any[] }) {
+type AnnouncementTone = "GENERAL" | "ACADEMIC" | "URGENT";
+
+type AnnouncementItem = {
+  id: string;
+  title: string;
+  message: string;
+  type: "INFO" | "SUCCESS" | "URGENT" | "WARNING";
+  createdAt: Date;
+  creator: {
+    name: string;
+  };
+};
+
+export default function AdminAnnouncementsClientPage({
+  initialAnnouncements,
+}: {
+  initialAnnouncements: AnnouncementItem[];
+}) {
+  const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
+    const tone = formData.get("type");
+    const type: AnnouncementTone =
+      tone === "ACADEMIC" || tone === "URGENT" ? tone : "GENERAL";
+
     const data = {
         title: formData.get("title") as string,
         content: formData.get("content") as string,
-        type: formData.get("type") as string,
+        type,
     };
 
     startTransition(async () => {
@@ -32,6 +54,19 @@ export default function AdminAnnouncementsClientPage({ initialAnnouncements }: {
             toast.success("Announcement broadcasted!");
             setIsOpen(false);
         }
+    });
+  }
+
+  function handleDelete(id: string) {
+    startTransition(async () => {
+      const res = await deleteAnnouncement(id);
+      if (res?.error) {
+        toast.error(res.error);
+        return;
+      }
+
+      setAnnouncements((current) => current.filter((announcement) => announcement.id !== id));
+      toast.success("Announcement removed.");
     });
   }
 
@@ -83,10 +118,10 @@ export default function AdminAnnouncementsClientPage({ initialAnnouncements }: {
       </div>
 
       <div className="space-y-4">
-        {initialAnnouncements.length === 0 ? (
+        {announcements.length === 0 ? (
           <p className="text-muted-foreground italic">No past announcements.</p>
         ) : (
-          initialAnnouncements.map((a) => (
+          announcements.map((a) => (
             <Card key={a.id} className={`border-l-4 ${
                 a.type === 'URGENT' ? 'border-l-red-500' : 'border-l-cyan-500'
             }`}>
@@ -100,16 +135,22 @@ export default function AdminAnnouncementsClientPage({ initialAnnouncements }: {
                                 <Calendar className="h-3 w-3" /> {format(new Date(a.createdAt), "PPP")}
                             </span>
                         </div>
-                        <Button variant="ghost" size="icon" className="text-red-500 h-8 w-8" onClick={() => deleteAnnouncement(a.id)}>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-500 h-8 w-8"
+                            onClick={() => handleDelete(a.id)}
+                            disabled={isPending}
+                        >
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                     <CardTitle className="text-lg">{a.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{a.content}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{a.message}</p>
                     <div className="mt-4 pt-4 border-t border-slate-50 dark:border-slate-800 text-[10px] text-muted-foreground italic">
-                        Posted by {a.author.name}
+                        Posted by {a.creator.name}
                     </div>
                 </CardContent>
             </Card>

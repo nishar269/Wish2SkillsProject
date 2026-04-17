@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createTest } from "@/actions/tests";
+import { getBatches } from "@/actions/admin";
+import { getSubjects } from "@/actions/subject";
+import { createTest, getFacultyTests } from "@/actions/tests";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,27 +16,38 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import Link from "next/link";
 
+type TestQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+};
+
+type FacultyTest = Awaited<ReturnType<typeof getFacultyTests>>;
+type Batch = Awaited<ReturnType<typeof getBatches>>;
+type Subject = Awaited<ReturnType<typeof getSubjects>>;
+
 export default function FacultyTestsClientPage({ 
   initialTests, 
   batches, 
   subjects 
 }: { 
-  initialTests: any[],
-  batches: any[],
-  subjects: any[]
+  initialTests: FacultyTest,
+  batches: Batch,
+  subjects: Subject
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // For dynamic questions
-  const [questions, setQuestions] = useState([{ question: "", options: ["", "", "", ""], correctAnswer: 0 }]);
+  const emptyQuestion = (): TestQuestion => ({ question: "", options: ["", "", "", ""], correctAnswer: 0 });
+  const [questions, setQuestions] = useState<TestQuestion[]>([emptyQuestion()]);
 
-  const addQuestion = () => setQuestions([...questions, { question: "", options: ["", "", "", ""], correctAnswer: 0 }]);
+  const addQuestion = () => setQuestions([...questions, emptyQuestion()]);
   
-  const handleQuestionChange = (idx: number, field: string, value: any) => {
+  const handleQuestionChange = (idx: number, field: "question" | "correctAnswer", value: string | number) => {
     const newQs = [...questions];
-    if (field === 'question') newQs[idx].question = value;
-    if (field === 'correctAnswer') newQs[idx].correctAnswer = value;
+    if (field === "question" && typeof value === "string") newQs[idx].question = value;
+    if (field === "correctAnswer" && typeof value === "number") newQs[idx].correctAnswer = value;
     setQuestions(newQs);
   };
 
@@ -61,7 +74,7 @@ export default function FacultyTestsClientPage({
         } else {
             toast.success("Quiz/Test published successfully!");
             setIsOpen(false);
-            setQuestions([{ question: "", options: ["", "", "", ""], correctAnswer: 0 }]);
+            setQuestions([emptyQuestion()]);
         }
     });
   }
@@ -101,7 +114,7 @@ export default function FacultyTestsClientPage({
                     <Label>Assign Batch</Label>
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                       <select name="batchId" required className="w-full bg-transparent outline-none text-sm">
-                          {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                          {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                       </select>
                     </div>
                 </div>
@@ -109,7 +122,7 @@ export default function FacultyTestsClientPage({
                     <Label>Subject</Label>
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                       <select name="subjectId" required className="w-full bg-transparent outline-none text-sm">
-                          {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                          {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
                     </div>
                 </div>
@@ -212,7 +225,7 @@ export default function FacultyTestsClientPage({
                         <Badge variant="outline">{t.batch.name}</Badge>
                     </TableCell>
                     <TableCell>
-                        <span className="text-xs font-medium">{(t.questions as any[]).length} MCQs</span>
+                        <span className="text-xs font-medium">{(t.questions as TestQuestion[]).length} MCQs</span>
                     </TableCell>
                     <TableCell className="text-right">
                         <Button variant="ghost" size="sm" asChild>

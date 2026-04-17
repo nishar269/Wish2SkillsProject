@@ -10,7 +10,7 @@ import {
   ArrowUpRight, ArrowDownRight, ShieldCheck 
 } from "lucide-react";
 
-export default function AuthorityDashboardClient({ stats }: { stats: any }) {
+export default function AuthorityDashboardClient(_: { stats: Record<string, never> }) {
   // Mock data for charts
   const enrollmentData = [
     { name: "Jan", count: 400 },

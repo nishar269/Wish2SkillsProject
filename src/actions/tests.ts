@@ -4,6 +4,21 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+type TestQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+};
+
+type TestInput = {
+  title: string;
+  batchId: string;
+  subjectId: string;
+  date: string;
+  totalMarks: number;
+  questions: TestQuestion[];
+};
+
 async function checkFaculty() {
   const session = await auth();
   if (!session || session.user.role !== "FACULTY") {
@@ -28,14 +43,7 @@ export async function getFacultyTests() {
   });
 }
 
-export async function createTest(data: {
-    title: string,
-    batchId: string,
-    subjectId: string,
-    date: string,
-    totalMarks: number,
-    questions: any[]
-}) {
+export async function createTest(data: TestInput) {
   await checkFaculty();
   
   try {
@@ -66,7 +74,7 @@ export async function getTestDetails(testId: string) {
 }
 
 // Student actions for taking the test
-export async function submitTestResult(testId: string, answers: any[]) {
+export async function submitTestResult(testId: string, answers: number[]) {
     const session = await auth();
     if (!session || session.user.role !== "STUDENT") throw new Error("Unauthorized");
 
@@ -76,7 +84,7 @@ export async function submitTestResult(testId: string, answers: any[]) {
     const test = await db.test.findUnique({ where: { id: testId } });
     if (!test) throw new Error("Test not found");
 
-    const questions = test.questions as any[];
+    const questions = test.questions as TestQuestion[];
     let score = 0;
 
     answers.forEach((ans, idx) => {
@@ -106,7 +114,7 @@ export async function submitTestResult(testId: string, answers: any[]) {
 
         revalidatePath("/student/tests");
         return { success: true, score };
-    } catch (error) {
+    } catch {
         return { error: "Failed to submit test results." };
     }
 }

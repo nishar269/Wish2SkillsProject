@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { summarizeMaterial } from "@/actions/materials";
+import { getMaterials, summarizeMaterial } from "@/actions/materials";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { FileText, ExternalLink, Sparkles, Loader2, BrainCircuit } from "lucide-react";
 import { toast } from "sonner";
 
-export default function StudentResourcesClientPage({ initialMaterials }: { initialMaterials: any[] }) {
+export default function StudentResourcesClientPage({
+  initialMaterials,
+}: {
+  initialMaterials: Awaited<ReturnType<typeof getMaterials>>;
+}) {
   const [summarizingId, setSummarizingId] = useState<string | null>(null);
   const [activeSummary, setActiveSummary] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const handleSummarize = (id: string) => {
     setSummarizingId(id);
@@ -21,7 +25,7 @@ export default function StudentResourcesClientPage({ initialMaterials }: { initi
         if (res?.error) {
             toast.error(res.error);
         } else {
-            setActiveSummary(res.summary);
+            setActiveSummary(res.summary ?? null);
         }
         setSummarizingId(null);
     });

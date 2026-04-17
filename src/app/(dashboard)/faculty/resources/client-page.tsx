@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createMaterial, deleteMaterial } from "@/actions/materials";
+import { createMaterial, deleteMaterial, getMaterials } from "@/actions/materials";
+import { getSubjects } from "@/actions/subject";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,10 +11,20 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { FilePlus, FileText, Loader2, Trash2, ExternalLink } from "lucide-react";
+import type { MaterialType } from "@prisma/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function FacultyResourcesClientPage({ initialMaterials, subjects }: { initialMaterials: any[], subjects: any[] }) {
+type Material = Awaited<ReturnType<typeof getMaterials>>;
+type Subject = Awaited<ReturnType<typeof getSubjects>>;
+
+export default function FacultyResourcesClientPage({
+  initialMaterials,
+  subjects,
+}: {
+  initialMaterials: Material;
+  subjects: Subject;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -22,7 +34,7 @@ export default function FacultyResourcesClientPage({ initialMaterials, subjects 
         description: formData.get("description") as string,
         subjectId: formData.get("subjectId") as string,
         fileUrl: formData.get("fileUrl") as string,
-        fileType: "PDF" // Mocked for now
+        fileType: "PDF" as MaterialType, // Mocked for now
     };
 
     startTransition(async () => {
@@ -73,7 +85,7 @@ export default function FacultyResourcesClientPage({ initialMaterials, subjects 
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Select Subject</option>
-                        {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                 </div>
               </div>

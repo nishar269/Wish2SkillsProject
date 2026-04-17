@@ -2,31 +2,31 @@
 
 import { useState, useEffect, useRef } from "react";
 import { getChatContacts, getChatMessages, sendChatMessage } from "@/actions/chat";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Send, MessagesSquare, Check, CheckCheck } from "lucide-react";
+import { Search, MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
+type ChatContact = Awaited<ReturnType<typeof getChatContacts>>[number];
+type ChatMessage = Awaited<ReturnType<typeof getChatMessages>>[number];
+
 export function ChatClient({ currentUserId }: { currentUserId: string }) {
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [activeContact, setActiveContact] = useState<any | null>(null);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<ChatContact[]>([]);
+  const [activeContact, setActiveContact] = useState<ChatContact | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  // Polling ref to clear interval
-  const pollInterval = useRef<NodeJS.Timeout | null>(null);
+  const pollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Load contacts
   useEffect(() => {
     getChatContacts().then(setContacts);
   }, []);
 
-  // Poll messages for active contact
   useEffect(() => {
     if (!activeContact) {
       if (pollInterval.current) clearInterval(pollInterval.current);
@@ -36,22 +36,20 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
     const fetchMsgs = () => {
       getChatMessages(activeContact.id).then(msgs => {
         setMessages(prev => {
-           // Basic optimization: if lengths match and last id matches, do nothing to avoid re-renders
            if (prev.length === msgs.length && prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id) return prev;
            return msgs;
         });
       });
     };
 
-    fetchMsgs(); // Initial
-    pollInterval.current = setInterval(fetchMsgs, 3000); // Poll every 3 seconds
+    fetchMsgs(); 
+    pollInterval.current = setInterval(fetchMsgs, 3000);
 
     return () => {
       if (pollInterval.current) clearInterval(pollInterval.current);
     };
   }, [activeContact]);
 
-  // Auto scroll to bottom
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -65,8 +63,7 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
     const textToSend = inputText;
     setInputText("");
     
-    // Optimistic UI
-    const optimisticMsg = {
+    const optimisticMsg: ChatMessage = {
         id: Math.random().toString(),
         content: textToSend,
         senderId: currentUserId,
@@ -82,27 +79,27 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
   const filteredContacts = contacts.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.role.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="glass rounded-[3rem] border border-cyan-500/10 shadow-2xl overflow-hidden flex h-[700px] w-full">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex h-[700px] w-full max-w-7xl mx-auto my-6 font-sans">
       
       {/* ---------------- CONTACTS SIDEBAR ---------------- */}
-      <div className="w-[350px] bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-white/5 flex flex-col shrink-0 relative z-10">
-        <div className="p-6 border-b border-slate-200 dark:border-white/5 bg-white dark:bg-slate-950">
-            <h2 className="text-xl font-black italic tracking-tighter uppercase mb-4 text-slate-900 dark:text-white flex items-center gap-2">
-                <MessagesSquare className="h-5 w-5 text-cyan-500" /> Transmissions
+      <div className="w-[320px] bg-slate-50 border-r border-slate-200 flex flex-col shrink-0">
+        <div className="p-4 border-b border-slate-200 bg-white">
+            <h2 className="text-lg font-bold text-slate-800 mb-3 flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-600" /> Messages
             </h2>
             <div className="relative">
-                <Search className="h-4 w-4 absolute left-4 top-3 text-slate-400" />
+                <Search className="h-4 w-4 absolute left-3 top-2.5 text-slate-400" />
                 <Input 
-                    placeholder="Search agents..." 
+                    placeholder="Search contacts..." 
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-slate-50 dark:bg-slate-900 border-none rounded-2xl h-10 shadow-inner placeholder:text-slate-400 focus-visible:ring-cyan-500"
+                    className="pl-9 bg-slate-50 border-slate-200 shadow-none h-9 text-sm focus-visible:ring-blue-500"
                 />
             </div>
         </div>
 
         <ScrollArea className="flex-1">
-            <div className="p-4 space-y-2 relative h-full">
+            <div className="p-2 space-y-1">
                 {filteredContacts.map(contact => (
                     <button
                         key={contact.id}
@@ -111,36 +108,34 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
                             setContacts(prev => prev.map(c => c.id === contact.id ? { ...c, unreadCount: 0 } : c));
                         }}
                         className={cn(
-                            "w-full flex items-center gap-4 p-4 rounded-3xl transition-all duration-300 text-left border border-transparent outline-none group",
+                            "w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-left",
                             activeContact?.id === contact.id 
-                                ? "bg-white dark:bg-slate-950 border-cyan-500/30 shadow-lg subtle-glow-cyan" 
-                                : "hover:bg-white dark:hover:bg-slate-800 hover:shadow-md"
+                                ? "bg-blue-50 text-blue-900" 
+                                : "hover:bg-slate-100/50 text-slate-700"
                         )}
                     >
                         <div className="relative shrink-0">
-                            <Avatar className="h-12 w-12 border-2 border-white dark:border-slate-800 shadow-sm transition-transform group-hover:scale-105">
-                                {contact.avatarUrl && <img src={contact.avatarUrl} alt="Avatar" className="object-cover" />}
-                                <AvatarFallback className="bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold text-sm tracking-widest uppercase">
+                            <Avatar className="h-10 w-10 border border-slate-200 shrink-0">
+                                {contact.avatarUrl && <AvatarImage src={contact.avatarUrl} alt={contact.name} />}
+                                <AvatarFallback className="bg-slate-200 text-slate-600 font-bold text-xs uppercase">
                                     {contact.name.substring(0, 2)}
                                 </AvatarFallback>
                             </Avatar>
-                            <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full" />
                         </div>
                         <div className="flex-1 min-w-0">
-                            <h3 className={cn("text-sm font-bold truncate transition-colors", activeContact?.id === contact.id ? "text-cyan-600 dark:text-cyan-400" : "text-slate-900 dark:text-white")}>{contact.name}</h3>
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 truncate opacity-70">{contact.role}</p>
+                            <h3 className={cn("text-sm font-semibold truncate", activeContact?.id === contact.id ? "text-blue-900" : "text-slate-900")}>{contact.name}</h3>
+                            <p className="text-xs text-slate-500 truncate capitalize">{contact.role.toLowerCase()}</p>
                         </div>
                         {contact.unreadCount > 0 && (
-                            <div className="h-5 w-5 bg-cyan-500 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 animate-pulse">
+                            <div className="px-2 py-0.5 bg-blue-600 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                                 {contact.unreadCount}
                             </div>
                         )}
                     </button>
                 ))}
                 {filteredContacts.length === 0 && (
-                     <div className="text-center py-20 opacity-50 px-6">
-                        <MessagesSquare className="h-8 w-8 mx-auto text-slate-400 mb-4" />
-                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">No agents found</p>
+                     <div className="text-center py-12 px-6">
+                        <p className="text-sm text-slate-400 font-medium">No contacts found</p>
                     </div>
                 )}
             </div>
@@ -148,33 +143,31 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
       </div>
 
       {/* ---------------- CHAT WINDOW ---------------- */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-slate-950 relative overflow-hidden">
+      <div className="flex-1 flex flex-col bg-white relative">
         
         {/* Empty State */}
         {!activeContact && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-10 z-20 bg-slate-50 dark:bg-slate-900">
-                <div className="w-24 h-24 bg-cyan-500/10 rounded-[2.5rem] flex items-center justify-center mb-6 shadow-2xl shadow-cyan-500/20 rotate-12">
-                   <MessagesSquare className="h-10 w-10 text-cyan-500 -rotate-12" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-slate-50">
+                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                   <MessageSquare className="h-6 w-6 text-slate-400" />
                 </div>
-                <h2 className="text-2xl font-black uppercase tracking-tighter italic text-slate-900 dark:text-white mb-2">Signal Matrix</h2>
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400 max-w-sm leading-relaxed">Select a terminal node from the directory to initiate a secure transmission.</p>
+                <h2 className="text-lg font-bold text-slate-800 mb-1">Your Messages</h2>
+                <p className="text-sm text-slate-500">Select a contact to start chatting.</p>
             </div>
         )}
 
         {activeContact && (
             <>
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[100px] -mr-64 -mt-64 pointer-events-none z-0" />
-                
                 {/* Chat Header */}
-                <div className="h-20 border-b border-slate-100 dark:border-white/5 flex items-center px-8 z-10 shrink-0 bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl">
-                    <div className="flex items-center gap-4">
-                       <Avatar className="h-10 w-10 border border-slate-200 dark:border-white/10">
-                            {activeContact.avatarUrl && <img src={activeContact.avatarUrl} alt="Avatar" className="object-cover" />}
+                <div className="h-16 border-b border-slate-200 flex items-center px-6 shrink-0 bg-white">
+                    <div className="flex items-center gap-3">
+                       <Avatar className="h-8 w-8 border border-slate-200">
+                            {activeContact.avatarUrl && <AvatarImage src={activeContact.avatarUrl} alt={activeContact.name} />}
                             <AvatarFallback className="bg-slate-100 text-slate-600 font-bold text-xs">{activeContact.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h2 className="text-lg font-black italic tracking-tighter text-slate-900 dark:text-white leading-none">{activeContact.name}</h2>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-500 mt-1">Encrypted Connection</p>
+                            <h2 className="text-sm font-bold text-slate-900 leading-none">{activeContact.name}</h2>
+                            <p className="text-xs text-slate-500 mt-1 capitalize">{activeContact.role.toLowerCase()}</p>
                         </div>
                     </div>
                 </div>
@@ -182,33 +175,29 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
                 {/* Messages Area */}
                 <div 
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-8 space-y-6 z-10 scroll-smooth"
+                    className="flex-1 overflow-y-auto p-6 space-y-4"
                 >
                     {messages.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center opacity-50">
-                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Transmission History Cleared</p>
-                            <p className="text-[10px] uppercase text-slate-300 mt-1">Terminal Ready</p>
+                        <div className="h-full flex flex-col items-center justify-center">
+                            <p className="text-sm text-slate-400">No messages yet.</p>
                         </div>
                     ) : (
-                        messages.map((msg, i) => {
+                        messages.map((msg) => {
                             const isMe = msg.senderId === currentUserId;
                             return (
-                                <div key={msg.id} className={cn("flex flex-col", isMe ? "items-end" : "items-start")}>
+                                <div key={msg.id} className={cn("flex flex-col group", isMe ? "items-end" : "items-start")}>
                                     <div className={cn(
-                                        "max-w-[70%] px-6 py-3.5 shadow-sm relative group",
+                                        "max-w-[75%] px-4 py-2 shadow-sm",
                                         isMe 
-                                            ? "bg-cyan-600 text-white rounded-[2rem] rounded-tr-sm" 
-                                            : "bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white rounded-[2rem] rounded-tl-sm border border-slate-200 dark:border-white/5"
+                                            ? "bg-blue-600 text-white rounded-2xl rounded-tr-sm" 
+                                            : "bg-slate-100 text-slate-900 rounded-2xl rounded-tl-sm border border-slate-200/50"
                                     )}>
-                                        <p className="text-[13px] leading-relaxed font-medium">{msg.content}</p>
+                                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                                     </div>
-                                    <div className="flex items-center gap-1.5 mt-2 px-2">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
-                                            {format(new Date(msg.createdAt), "HH:mm")}
+                                    <div className="flex items-center gap-1 mt-1 px-1">
+                                        <span className="text-[10px] text-slate-400 font-medium">
+                                            {format(new Date(msg.createdAt), "h:mm a")}
                                         </span>
-                                        {isMe && (
-                                            msg.readStatus ? <CheckCheck className="h-3 w-3 text-cyan-500" /> : <Check className="h-3 w-3 text-slate-300" />
-                                        )}
                                     </div>
                                 </div>
                             )
@@ -217,20 +206,20 @@ export function ChatClient({ currentUserId }: { currentUserId: string }) {
                 </div>
 
                 {/* Input Area */}
-                <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-white dark:bg-slate-950 z-10 shrink-0">
-                    <form onSubmit={handleSend} className="relative flex items-center gap-4">
+                <div className="p-4 border-t border-slate-200 bg-white shrink-0">
+                    <form onSubmit={handleSend} className="relative flex items-center gap-2">
                         <Input 
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
-                            placeholder="Type payload..." 
-                            className="flex-1 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border-slate-200 dark:border-white/5 h-14 pl-6 pr-16 shadow-inner focus-visible:ring-cyan-500 text-sm font-medium"
+                            placeholder="Type a message..." 
+                            className="flex-1 bg-slate-50 rounded-xl border border-slate-200 h-11 px-4 shadow-sm focus-visible:ring-blue-500 text-sm"
                         />
                         <Button 
                             type="submit" 
                             disabled={!inputText.trim()}
-                            className="h-14 w-14 rounded-[1.5rem] shrink-0 bg-cyan-600 hover:bg-cyan-500 text-white shadow-[0_0_20px_rgba(8,145,178,0.3)] transition-all duration-300 disabled:opacity-50 disabled:shadow-none"
+                            className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                         >
-                            <Send className="h-5 w-5" />
+                            Send
                         </Button>
                     </form>
                 </div>

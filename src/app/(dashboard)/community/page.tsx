@@ -1,9 +1,9 @@
 import { getCategories } from "@/actions/forum";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { MessageSquare, Users, Code, HelpCircle, Lightbulb, BookOpen, Bell } from "lucide-react";
+import { MessageSquare, Users, Code, HelpCircle, Lightbulb, BookOpen, Bell, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 
-const iconMap: Record<string, any> = {
+const iconMap: Record<string, LucideIcon> = {
     Code: Code,
     HelpCircle: HelpCircle,
     Lightbulb: Lightbulb,

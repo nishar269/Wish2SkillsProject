@@ -53,7 +53,7 @@ export async function GET(req: Request) {
         { name: "PostgreSQL Advanced", code: "DB-101", courseId: course.id, credits: 3 },
     ];
 
-    const subjects: any[] = [];
+    const subjects: Array<{ id: string }> = [];
     for (const s of subjectsData) {
         subjects.push(await db.subject.upsert({
             where: { code: s.code },
@@ -196,13 +196,18 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ success: true, message: 'Database seeded successfully with demo users and forum categories!' });
-  } catch (error: any) {
+  } catch (error) {
+    const details =
+      typeof error === "object" && error !== null
+        ? error as { message?: string; name?: string; stack?: string }
+        : {};
+
     console.error("SEED_ERROR:", error);
     return NextResponse.json({ 
       success: false, 
-      error: error.message,
-      name: error.name,
-      stack: error.stack 
+      error: details.message ?? "Unknown error",
+      name: details.name,
+      stack: details.stack 
     }, { status: 500 });
   }
 }

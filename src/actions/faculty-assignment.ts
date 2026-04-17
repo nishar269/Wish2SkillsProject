@@ -4,6 +4,12 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
 async function checkAdmin() {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -36,8 +42,8 @@ export async function createAssignment(data: { facultyId: string, subjectId: str
 
     revalidatePath("/admin/assignments");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") return { error: "This faculty is already assigned to this subject and batch." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") return { error: "This faculty is already assigned to this subject and batch." };
     return { error: "Failed to create assignment." };
   }
 }
@@ -48,7 +54,7 @@ export async function deleteAssignment(id: string) {
     await db.facultyAssignment.delete({ where: { id } });
     revalidatePath("/admin/assignments");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to remove assignment." };
   }
 }

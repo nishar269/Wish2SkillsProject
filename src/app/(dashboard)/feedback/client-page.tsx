@@ -9,16 +9,23 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Star, MessageSquareQuote, Send, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-export default function FeedbackClientPage({ faculty }: { faculty: any[] }) {
+type FacultyOption = {
+  id: string;
+  user: {
+    name: string;
+  };
+};
+
+export default function FeedbackClientPage({ faculty }: { faculty: FacultyOption[] }) {
   const [rating, setRating] = useState(5);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     const data = {
-        content: formData.get("content") as string,
+        message: formData.get("content") as string,
         rating: rating,
-        type: formData.get("type") as string,
-        targetId: formData.get("targetId") as string || undefined
+        category: formData.get("category") as string,
+        facultyId: (formData.get("facultyId") as string) || undefined
     };
 
     startTransition(async () => {
@@ -64,7 +71,7 @@ export default function FeedbackClientPage({ faculty }: { faculty: any[] }) {
                <div className="space-y-2">
                 <Label>Category</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="type" required className="w-full bg-transparent outline-none text-sm">
+                    <select name="category" required className="w-full bg-transparent outline-none text-sm">
                         <option value="GENERAL">General Experience</option>
                         <option value="ACADEMIC">Academic Quality</option>
                         <option value="FACILITY">Infrastructure / Facilities</option>
@@ -75,7 +82,7 @@ export default function FeedbackClientPage({ faculty }: { faculty: any[] }) {
               <div className="space-y-2">
                 <Label>Specific Faculty (Optional)</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="targetId" className="w-full bg-transparent outline-none text-sm">
+                    <select name="facultyId" className="w-full bg-transparent outline-none text-sm">
                         <option value="">None / General</option>
                         {faculty.map(f => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>

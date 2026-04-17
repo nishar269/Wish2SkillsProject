@@ -13,13 +13,22 @@ import { Calendar, Loader2, Plus, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function StudentLeaveClientPage({ initialLeaves }: { initialLeaves: any[] }) {
+type LeaveRequestItem = {
+  id: string;
+  reason: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  reviewNotes: string | null;
+};
+
+export default function StudentLeaveClientPage({ initialLeaves }: { initialLeaves: LeaveRequestItem[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     const data = {
-        type: formData.get("type") as string,
         reason: formData.get("reason") as string,
         start: formData.get("start") as string,
         end: formData.get("end") as string,
@@ -54,17 +63,6 @@ export default function StudentLeaveClientPage({ initialLeaves }: { initialLeave
               <DialogTitle>New Leave Application</DialogTitle>
             </DialogHeader>
             <form action={handleSubmit} className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <Label>Leave Type</Label>
-                <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="type" required className="w-full bg-transparent outline-none text-sm">
-                        <option value="SICK">Sick Leave</option>
-                        <option value="CASUAL">Casual Leave</option>
-                        <option value="EMERGENCY">Emergency Leave</option>
-                    </select>
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="start">From Date</Label>
@@ -97,7 +95,7 @@ export default function StudentLeaveClientPage({ initialLeaves }: { initialLeave
             <Card key={l.id} className="border-slate-100 hover:shadow-md transition-all">
                 <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
-                        <Badge variant="outline" className="mb-2 uppercase text-[10px] tracking-widest">{l.type}</Badge>
+                        <Badge variant="outline" className="mb-2 uppercase text-[10px] tracking-widest">Leave Request</Badge>
                         <Badge 
                             variant={l.status === 'APPROVED' ? 'default' : l.status === 'REJECTED' ? 'destructive' : 'secondary'}
                             className={`${l.status === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : ''} border-0`}
@@ -115,10 +113,10 @@ export default function StudentLeaveClientPage({ initialLeaves }: { initialLeave
                         &ldquo;{l.reason}&rdquo;
                     </p>
                     
-                    {l.remarks && (
+                    {l.reviewNotes && (
                         <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg text-xs">
                              <span className="font-bold block mb-1">Approver Remarks:</span>
-                             <span className="text-muted-foreground">{l.remarks}</span>
+                             <span className="text-muted-foreground">{l.reviewNotes}</span>
                         </div>
                     )}
 

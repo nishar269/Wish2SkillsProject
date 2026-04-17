@@ -20,7 +20,7 @@ export async function getPosts(categoryId: string) {
     where: { categoryId },
     include: {
       author: {
-        select: { name: true, image: true, role: true }
+        select: { name: true, avatarUrl: true, role: true }
       },
       _count: {
         select: { comments: true }
@@ -38,13 +38,13 @@ export async function getPost(postId: string) {
     where: { id: postId },
     include: {
       author: {
-        select: { name: true, image: true, role: true }
+        select: { name: true, avatarUrl: true, role: true }
       },
       category: true,
       comments: {
         include: {
           author: {
-            select: { name: true, image: true, role: true }
+            select: { name: true, avatarUrl: true, role: true }
           }
         },
         orderBy: { createdAt: "asc" }
@@ -67,7 +67,7 @@ export async function createPost(data: { title: string, content: string, categor
 
     revalidatePath(`/community/${data.categoryId}`);
     return { success: true, id: post.id };
-  } catch (error) {
+  } catch {
     return { error: "Failed to create post" };
   }
 }
@@ -86,7 +86,7 @@ export async function createComment(data: { content: string, postId: string }) {
 
     revalidatePath(`/community/post/${data.postId}`);
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to add comment" };
   }
 }
@@ -97,5 +97,5 @@ export async function incrementViewCount(postId: string) {
       where: { id: postId },
       data: { viewCount: { increment: 1 } }
     });
-  } catch (e) {}
+  } catch {}
 }

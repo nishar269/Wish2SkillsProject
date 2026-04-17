@@ -5,6 +5,21 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { courseSchema } from "@/lib/validations";
 
+type BatchInput = {
+  name: string;
+  courseId: string;
+  capacity?: string;
+  startDate: string;
+  endDate?: string;
+  status?: "UPCOMING" | "ACTIVE" | "COMPLETED";
+};
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
 // --- Middleware/Helper to check admin ---
 async function checkAdmin() {
   const session = await auth();
@@ -48,14 +63,14 @@ export async function createCourse(formData: FormData) {
   };
 
   const parsed = courseSchema.safeParse(rawData);
-  if (!parsed.success) return { error: parsed.error.errors[0].message };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid course data." };
 
   try {
-    await db.course.create({ data: parsed.data as any });
+    await db.course.create({ data: parsed.data });
     revalidatePath("/admin/courses");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") return { error: "Course name or code already exists." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") return { error: "Course name or code already exists." };
     return { error: "Failed to create course." };
   }
 }
@@ -66,7 +81,7 @@ export async function deleteCourse(id: string) {
     await db.course.delete({ where: { id } });
     revalidatePath("/admin/courses");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Cannot delete course because it has associated batches or students." };
   }
 }
@@ -88,7 +103,7 @@ export async function getBatches() {
   });
 }
 
-export async function createBatch(data: any) {
+export async function createBatch(data: BatchInput) {
   await checkAdmin();
   
   // Quick manual validation for now
@@ -101,7 +116,7 @@ export async function createBatch(data: any) {
       data: {
         name: data.name,
         courseId: data.courseId,
-        capacity: parseInt(data.capacity) || 30,
+        capacity: data.capacity ? parseInt(data.capacity, 10) || 30 : 30,
         startDate: new Date(data.startDate),
         endDate: data.endDate ? new Date(data.endDate) : null,
         status: data.status || "UPCOMING"
@@ -109,8 +124,8 @@ export async function createBatch(data: any) {
     });
     revalidatePath("/admin/batches");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") return { error: "Batch name already exists." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") return { error: "Batch name already exists." };
     return { error: "Failed to create batch." };
   }
 }
@@ -121,7 +136,7 @@ export async function deleteBatch(id: string) {
     await db.batch.delete({ where: { id } });
     revalidatePath("/admin/batches");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Cannot delete batch because it has associated students or classes." };
   }
 }

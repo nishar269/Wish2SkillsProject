@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createFee, deleteFee } from "@/actions/fees";
+import { createFee, deleteFee, getAllFees, getStudentsForFees } from "@/actions/fees";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,17 @@ import { Plus, Trash2, Loader2, Filter } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function AdminFeesClientPage({ initialFees, students }: { initialFees: any[], students: any[] }) {
-  const [fees, setFees] = useState(initialFees);
+type FeeRecord = Awaited<ReturnType<typeof getAllFees>>;
+type FeeStudent = Awaited<ReturnType<typeof getStudentsForFees>>;
+
+export default function AdminFeesClientPage({
+  initialFees,
+  students,
+}: {
+  initialFees: FeeRecord;
+  students: FeeStudent;
+}) {
+  const [fees] = useState(initialFees);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -68,7 +77,7 @@ export default function AdminFeesClientPage({ initialFees, students }: { initial
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900">
                     <select name="studentId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Search student...</option>
-                        {students.map(s => (
+                        {students.map((s) => (
                             <option key={s.id} value={s.id}>{s.user.name}</option>
                         ))}
                     </select>

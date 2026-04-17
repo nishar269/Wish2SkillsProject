@@ -4,6 +4,16 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+type AssignmentInput = {
+  title: string;
+  description?: string;
+  batchId: string;
+  subjectId: string;
+  dueDate: string;
+  totalPoints: string;
+  fileUrl?: string;
+};
+
 async function checkFaculty() {
   const session = await auth();
   if (!session || session.user.role !== "FACULTY") {
@@ -28,7 +38,7 @@ export async function getFacultyAssignments() {
   });
 }
 
-export async function createAssignment(data: any) {
+export async function createAssignment(data: AssignmentInput) {
   const session = await checkFaculty();
   const faculty = await db.faculty.findUnique({ where: { userId: session.user.id } });
   if (!faculty) throw new Error("Faculty profile not found");
@@ -79,7 +89,7 @@ export async function gradeSubmission(submissionId: string, data: { grade: numbe
         });
         revalidatePath("/faculty/assignments");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to grade submission." };
     }
 }

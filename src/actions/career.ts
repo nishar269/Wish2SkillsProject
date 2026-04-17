@@ -57,7 +57,7 @@ export async function deleteJobPost(id: string) {
     await db.jobPost.delete({ where: { id } });
     revalidatePath("/admin/career");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to delete job post." };
   }
 }
@@ -79,7 +79,7 @@ export async function updateApplicationStatus(id: string, status: string) {
             data: { status }
         });
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to update status." };
     }
 }

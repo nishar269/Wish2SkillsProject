@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { markAttendanceBulk } from "@/actions/attendance";
+import { getSessionStudents, markAttendanceBulk } from "@/actions/attendance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,15 +10,32 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { format } from "date-fns";
 
-export default function SessionAttendanceClientPage({ session, initialStudents }: { session: any, initialStudents: any[] }) {
+type AttendanceStatus = "PRESENT" | "ABSENT" | "LATE" | "EXCUSED";
+type Session = {
+  id: string;
+  date: Date;
+  subject: { name: string };
+  batch: { name: string };
+};
+type Student = Awaited<ReturnType<typeof getSessionStudents>>[number] & {
+  currentStatus: AttendanceStatus;
+};
+
+export default function SessionAttendanceClientPage({
+  session,
+  initialStudents,
+}: {
+  session: Session;
+  initialStudents: Awaited<ReturnType<typeof getSessionStudents>>;
+}) {
   const [students, setStudents] = useState(initialStudents.map(s => ({
     ...s,
     currentStatus: s.attendances[0]?.status || "ABSENT"
-  })));
+  })) as Student[]);
   
   const [isPending, startTransition] = useTransition();
 
-  const handleStatusChange = (studentId: string, status: string) => {
+  const handleStatusChange = (studentId: string, status: AttendanceStatus) => {
     setStudents(prev => prev.map(s => 
       s.id === studentId ? { ...s, currentStatus: status } : s
     ));

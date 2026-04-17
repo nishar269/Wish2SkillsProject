@@ -42,7 +42,7 @@ export async function markAsRead(id: string) {
         });
         revalidatePath("/student/notifications");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to mark as read." };
     }
 }

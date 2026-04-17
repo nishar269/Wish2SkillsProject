@@ -38,7 +38,7 @@ export async function chatWithCampusAI(prompt: string, history: { role: string, 
     const result = await chat.sendMessage(`${systemInstruction}\n\nUser Question: ${prompt}`);
     const response = await result.response;
     return { text: response.text() };
-  } catch (error: any) {
+  } catch (error) {
     console.error("Gemini Error:", error);
     return { text: "Sorry, I'm having trouble connecting to my creative circuits right now. Please try again in a moment." };
   }

@@ -1,5 +1,6 @@
 "use client";
 
+import { getStudentPerformanceData } from "@/actions/performance";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, TrendingUp, Award, Calendar, Zap, Target, BookOpen } from "lucide-react";
@@ -8,7 +9,9 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export default function StudentPerformanceClientPage({ data }: { data: any }) {
+type StudentPerformanceData = Exclude<Awaited<ReturnType<typeof getStudentPerformanceData>>, { error: string }>;
+
+export default function StudentPerformanceClientPage({ data }: { data: StudentPerformanceData }) {
     const { results, stats } = data;
 
     return (
@@ -57,7 +60,7 @@ export default function StudentPerformanceClientPage({ data }: { data: any }) {
                                 <p className="text-slate-400 font-bold italic">No assessment data found yet.</p>
                              </Card>
                         ) : (
-                            results.map((r: any) => {
+                            results.map((r) => {
                                 const percentage = Math.round((r.marksObtained / r.test.totalMarks) * 100);
                                 return (
                                     <div key={r.id} className="group relative">
@@ -149,5 +152,4 @@ export default function StudentPerformanceClientPage({ data }: { data: any }) {
         </div>
     );
 }
-
 

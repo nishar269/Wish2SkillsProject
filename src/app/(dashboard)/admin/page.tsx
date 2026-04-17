@@ -11,13 +11,18 @@ import {
   ShieldCheck, 
   Activity, 
   Briefcase,
+  CalendarDays,
   PieChart,
-  UserCircle2
+  UserCircle2,
+  BellRing
 } from "lucide-react";
 import { format } from "date-fns";
 
+type AdminDashboardData = Awaited<ReturnType<typeof getAuthorityDashboardData>>;
+type RecentLog = AdminDashboardData["recentLogs"][number];
+
 export default function AdminDashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<AdminDashboardData | null>(null);
 
   useEffect(() => {
     getAuthorityDashboardData().then(setData);
@@ -90,8 +95,8 @@ export default function AdminDashboardPage() {
                   <p className="text-sm font-medium">No system activity recorded in this session.</p>
                 </div>
               ) : (
-                recentLogs.slice(0, 10).map((log: any, i: number) => (
-                  <div key={i} className="pleasant-card p-5 flex items-center gap-5 border-slate-100">
+                recentLogs.slice(0, 10).map((log: RecentLog) => (
+                  <div key={log.id} className="pleasant-card p-5 flex items-center gap-5 border-slate-100">
                     <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
                        <UserCircle2 className="h-5 w-5" />
                     </div>
@@ -158,6 +163,3 @@ export default function AdminDashboardPage() {
     </div>
   );
 }
-
-// Missing imports fix
-import { CalendarDays } from "lucide-react";

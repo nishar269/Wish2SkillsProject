@@ -5,6 +5,31 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
+type StudentInput = {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  courseId: string;
+  batchId: string;
+  enrollmentNo?: string;
+  parentPhone?: string;
+  address?: string;
+};
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
+function getErrorTargets(error: unknown) {
+  if (typeof error !== "object" || error === null || !("meta" in error)) return [];
+  const meta = (error as { meta?: { target?: unknown } }).meta;
+  if (!meta?.target) return [];
+  return Array.isArray(meta.target) ? meta.target.map(String) : [String(meta.target)];
+}
+
 async function checkAdmin() {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -24,7 +49,7 @@ export async function getStudents() {
   });
 }
 
-export async function createStudent(data: any) {
+export async function createStudent(data: StudentInput) {
   await checkAdmin();
   
   if (!data.name || !data.email || !data.password || !data.courseId || !data.batchId) {
@@ -60,10 +85,11 @@ export async function createStudent(data: any) {
 
     revalidatePath("/admin/students");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") {
-        if (error.meta?.target?.includes("email")) return { error: "Email already exists." };
-        if (error.meta?.target?.includes("enrollment_no")) return { error: "Enrollment number already exists." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") {
+        const targets = getErrorTargets(error);
+        if (targets.includes("email")) return { error: "Email already exists." };
+        if (targets.includes("enrollment_no")) return { error: "Enrollment number already exists." };
     }
     return { error: "Failed to create student." };
   }
@@ -83,7 +109,7 @@ export async function deleteStudent(id: string) {
     
     revalidatePath("/admin/students");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to delete student." };
   }
 }

@@ -4,6 +4,22 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+type JobPostInput = {
+  title: string;
+  company: string;
+  location: string;
+  type: string;
+  salaryRange?: string;
+  description: string;
+  requirements: string;
+};
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
 async function checkAdmin() {
   const session = await auth();
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR")) {
@@ -11,7 +27,7 @@ async function checkAdmin() {
   }
 }
 
-export async function createJobPost(data: any) {
+export async function createJobPost(data: JobPostInput) {
   await checkAdmin();
   try {
     await db.jobPost.create({
@@ -27,7 +43,7 @@ export async function createJobPost(data: any) {
     });
     revalidatePath("/career");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to post job." };
   }
 }
@@ -56,8 +72,8 @@ export async function applyForJob(jobId: string, resumeUrl?: string) {
         });
         revalidatePath("/career");
         return { success: true };
-    } catch (error: any) {
-        if (error.code === 'P2002') return { error: "You have already applied for this job." };
+    } catch (error) {
+        if (getErrorCode(error) === "P2002") return { error: "You have already applied for this job." };
         return { error: "Failed to apply." };
     }
 }

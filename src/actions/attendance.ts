@@ -183,7 +183,7 @@ export async function selfMarkAttendance(sessionId: string, coords?: { lat: numb
 
         revalidatePath("/student/attendance");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to mark attendance." };
     }
 }

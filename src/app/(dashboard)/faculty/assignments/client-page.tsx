@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createAssignment } from "@/actions/assignments";
+import { createAssignment, getFacultyAssignments } from "@/actions/assignments";
+import { getBatches } from "@/actions/admin";
+import { getSubjects } from "@/actions/subject";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,20 +16,32 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import Link from "next/link";
 
+type FacultyAssignment = Awaited<ReturnType<typeof getFacultyAssignments>>;
+type Batch = Awaited<ReturnType<typeof getBatches>>;
+type Subject = Awaited<ReturnType<typeof getSubjects>>;
+
 export default function FacultyAssignmentsClientPage({ 
   initialAssignments, 
   batches, 
   subjects 
 }: { 
-  initialAssignments: any[],
-  batches: any[],
-  subjects: any[]
+  initialAssignments: FacultyAssignment,
+  batches: Batch,
+  subjects: Subject
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
-    const data = Object.fromEntries(formData);
+    const data = {
+      title: formData.get("title") as string,
+      batchId: formData.get("batchId") as string,
+      subjectId: formData.get("subjectId") as string,
+      dueDate: formData.get("dueDate") as string,
+      totalPoints: formData.get("totalPoints") as string,
+      description: formData.get("description") as string,
+      fileUrl: formData.get("fileUrl") as string,
+    };
 
     startTransition(async () => {
         const res = await createAssignment(data);
@@ -70,7 +84,7 @@ export default function FacultyAssignmentsClientPage({
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                         <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                             <option value="" disabled>Select Batch</option>
-                            {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                            {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                         </select>
                     </div>
                 </div>
@@ -79,7 +93,7 @@ export default function FacultyAssignmentsClientPage({
                     <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                         <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                             <option value="" disabled>Select Subject</option>
-                            {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                            {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
                     </div>
                 </div>

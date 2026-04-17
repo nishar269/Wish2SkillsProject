@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { selfMarkAttendance } from "@/actions/attendance";
+import { getStudentAttendance, selfMarkAttendance } from "@/actions/attendance";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,10 +10,25 @@ import { Clock } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-export default function StudentAttendanceClientPage({ history, availableSession }: { history: any[], availableSession: any }) {
+type AttendanceHistory = Awaited<ReturnType<typeof getStudentAttendance>>;
+type AvailableSession = {
+  id: string;
+  startTime: Date;
+  subject: { name: string };
+} | null;
+
+export default function StudentAttendanceClientPage({
+  history,
+  availableSession,
+}: {
+  history: AttendanceHistory;
+  availableSession: AvailableSession;
+}) {
   const [isPending, startTransition] = useTransition();
 
   const handleMarkAttendance = () => {
+    if (!availableSession) return;
+
     if (!navigator.geolocation) {
         toast.error("Geolocation is not supported by your browser.");
         return;
@@ -39,7 +54,7 @@ export default function StudentAttendanceClientPage({ history, availableSession 
             } else {
                 toast.success("Attendance verified and marked!");
             }
-        } catch (err) {
+        } catch {
             toast.error("Unable to retrieve your location. Check your permission settings and GPS.");
         }
     });

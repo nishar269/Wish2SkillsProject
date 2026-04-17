@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { gradeSubmission } from "@/actions/assignments";
+import { getAssignmentSubmissions, gradeSubmission } from "@/actions/assignments";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -15,8 +15,23 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { format } from "date-fns";
 
-export default function AssignmentGradingClientPage({ assignment, submissions }: { assignment: any, submissions: any[] }) {
-  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+type Assignment = {
+  id: string;
+  title: string;
+  totalPoints: number;
+  batch: { name: string };
+};
+
+type Submission = Awaited<ReturnType<typeof getAssignmentSubmissions>>[number];
+
+export default function AssignmentGradingClientPage({
+  assignment,
+  submissions,
+}: {
+  assignment: Assignment;
+  submissions: Submission[];
+}) {
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [isPending, startTransition] = useTransition();
 
   async function handleGradeSubmit(formData: FormData) {
@@ -86,7 +101,7 @@ export default function AssignmentGradingClientPage({ assignment, submissions }:
                     </TableCell>
                     <TableCell className="text-right flex items-center justify-end gap-2">
                          <Button variant="ghost" size="icon" asChild className="text-cyan-600">
-                            <a href={s.fileUrl} target="_blank" rel="noopener noreferrer">
+                            <a href={s.contentUrl || "#"} target="_blank" rel="noopener noreferrer">
                                 <ExternalLink className="h-4 w-4" />
                             </a>
                          </Button>

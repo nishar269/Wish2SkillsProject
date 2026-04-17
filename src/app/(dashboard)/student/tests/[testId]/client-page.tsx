@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { submitTestResult } from "@/actions/tests";
+import { getTestDetails, submitTestResult } from "@/actions/tests";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -10,9 +10,17 @@ import { Timer, ArrowRight, ArrowLeft, Send, CheckCircle2, Loader2 } from "lucid
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export default function TakeTestClientPage({ test }: { test: any }) {
+type TestQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+};
+
+type TestDetails = NonNullable<Awaited<ReturnType<typeof getTestDetails>>>;
+
+export default function TakeTestClientPage({ test }: { test: TestDetails }) {
   const router = useRouter();
-  const questions = test.questions as any [];
+  const questions = test.questions as TestQuestion[];
   const [currentIdx, setCurrentIdx] = useState(0);
   const [answers, setAnswers] = useState<number[]>(new Array(questions.length).fill(-1));
   const [isPending, startTransition] = useTransition();
@@ -124,7 +132,7 @@ export default function TakeTestClientPage({ test }: { test: any }) {
         </Card>
 
         <div className="flex flex-wrap gap-2 justify-center">
-            {questions.map((_: any, i: number) => (
+            {questions.map((_, i) => (
                 <button
                     key={i}
                     onClick={() => setCurrentIdx(i)}

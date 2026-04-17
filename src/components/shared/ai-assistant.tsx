@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [, setIsOfflineMode] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "bot", content: string }[]>([
     { role: "bot", content: "Protocol active. System ready for intelligence query. How can I assist your workflow today?" }
   ]);
@@ -39,7 +39,7 @@ export function AIAssistant() {
         const res = await chatWithCampusAI(userMessage, history);
         if (res.isOffline) setIsOfflineMode(true);
         setMessages(prev => [...prev, { role: "bot", content: res.text }]);
-    } catch (error) {
+    } catch {
         setMessages(prev => [...prev, { role: "bot", content: "Signal breakdown. Neural connection interrupted." }]);
     } finally {
         setIsLoading(false);

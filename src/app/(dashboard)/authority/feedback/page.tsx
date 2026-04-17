@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 export default function AuthorityFeedbackPage() {
     const feedbackList = [
@@ -90,7 +91,7 @@ export default function AuthorityFeedbackPage() {
                                         )} title={f.sentiment} />
                                     </div>
                                     <p className="text-lg font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                                        "{f.message}"
+                                        &ldquo;{f.message}&rdquo;
                                     </p>
                                     <div className="pt-4 flex items-center justify-between border-t border-slate-50">
                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Verifed Student Pulse</span>
@@ -113,8 +114,4 @@ export default function AuthorityFeedbackPage() {
             </div>
         </div>
     );
-}
-
-function cn(...inputs: any[]) {
-    return inputs.filter(Boolean).join(" ");
 }

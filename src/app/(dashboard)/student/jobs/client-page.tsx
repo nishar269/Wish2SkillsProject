@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { getJobPosts } from "@/actions/career";
 import { applyToJob } from "@/actions/student-jobs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +12,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { MapPin, DollarSign, Send, CheckCircle2, Clock, Globe, ArrowUpRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-export default function StudentJobsClientPage({ jobs, studentApplications }: { jobs: any[], studentApplications: any[] }) {
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+type Job = Awaited<ReturnType<typeof getJobPosts>>[number];
+type StudentApplication = {
+  jobId: string;
+  status: string;
+};
+
+export default function StudentJobsClientPage({
+  jobs,
+  studentApplications,
+}: {
+  jobs: Job[];
+  studentApplications: StudentApplication[];
+}) {
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const handleApply = (formData: FormData) => {
@@ -42,7 +55,7 @@ export default function StudentJobsClientPage({ jobs, studentApplications }: { j
           <p className="text-muted-foreground italic col-span-full">New opportunities are processing. Check back soon!</p>
         ) : (
           jobs.map((job) => {
-            const application = studentApplications.find(a => a.jobId === job.id);
+            const application = studentApplications.find((a) => a.jobId === job.id);
             const isApplied = !!application;
 
             return (
@@ -114,7 +127,7 @@ export default function StudentJobsClientPage({ jobs, studentApplications }: { j
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-black italic tracking-tighter">Submit Application</DialogTitle>
                                     <DialogDescription className="font-medium text-slate-500">
-                                        Applying for **{job.title}** at **{job.company}**.
+                                        Applying for {job.title} at {job.company}.
                                     </DialogDescription>
                                 </DialogHeader>
                                 <form action={handleApply} className="space-y-6 mt-6">
@@ -130,7 +143,7 @@ export default function StudentJobsClientPage({ jobs, studentApplications }: { j
                                             />
                                             <Globe className="absolute right-4 top-4 h-6 w-6 text-slate-300" />
                                         </div>
-                                        <p className="text-[10px] text-muted-foreground italic px-1">Make sure the link is set to "Anyone with link" access.</p>
+                                        <p className="text-[10px] text-muted-foreground italic px-1">Make sure the link is set to &quot;Anyone with link&quot; access.</p>
                                     </div>
 
                                     <Button type="submit" disabled={isPending} className="w-full h-14 bg-cyan-600 hover:bg-cyan-700 text-white rounded-2xl font-black text-lg shadow-2xl shadow-cyan-600/20 transition-all">

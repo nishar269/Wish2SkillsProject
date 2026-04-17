@@ -8,7 +8,7 @@ export default async function TakeTestPage({ params }: { params: Promise<{ testI
   const { testId } = await params;
   const test = await db.test.findUnique({
     where: { id: testId },
-    include: { subject: true }
+    include: { subject: true, batch: true }
   });
 
   if (!test) return notFound();

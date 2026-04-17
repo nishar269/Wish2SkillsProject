@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import type { SidebarNavItem } from "@/config/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface DashboardSidebarProps {
   items: SidebarNavItem[];
@@ -22,14 +22,9 @@ interface DashboardSidebarProps {
   onLinkClick?: () => void;
 }
 
-export function DashboardSidebar({ items, user, onLogout, onLinkClick }: DashboardSidebarProps) {
+export function DashboardSidebar({ items, label, user, onLogout, onLinkClick }: DashboardSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const initials = user.name
     .split(" ")
@@ -37,8 +32,6 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
     .join("")
     .toUpperCase()
     .slice(0, 2);
-
-  if (!mounted) return <aside className="h-screen w-64 border-r bg-white" />;
 
   return (
     <TooltipProvider>
@@ -55,10 +48,16 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
             {!collapsed && (
-              <span className="font-bold text-slate-900 tracking-tight truncate">CampusOS</span>
+              <div className="min-w-0">
+                <span className="block font-bold text-slate-900 tracking-tight truncate">CampusOS</span>
+                <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-slate-400 truncate">
+                  {label}
+                </span>
+              </div>
             )}
           </div>
           <button
+            type="button"
             onClick={() => setCollapsed(!collapsed)}
             className="ml-auto w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-white transition-all"
           >
@@ -95,7 +94,7 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
               );
 
               return collapsed ? (
-                <Tooltip key={item.href} delayDuration={0}>
+                <Tooltip key={item.href}>
                   <TooltipTrigger asChild>{link}</TooltipTrigger>
                   <TooltipContent side="right" className="font-bold text-xs bg-slate-950 text-white border-none">
                     {item.title}
@@ -125,6 +124,7 @@ export function DashboardSidebar({ items, user, onLogout, onLinkClick }: Dashboa
             )}
           </div>
           <button
+              type="button"
               onClick={onLogout}
               className={cn(
                   "w-full mt-3 flex items-center justify-center gap-2 p-2.5 rounded-xl text-red-500 hover:bg-red-50 transition-all text-xs font-bold group",

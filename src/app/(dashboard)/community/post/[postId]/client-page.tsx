@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { createComment } from "@/actions/forum";
+import { useState, useTransition, type FormEvent } from "react";
+import { createComment, getPost } from "@/actions/forum";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,11 +12,13 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
-export default function PostClientPage({ post }: { post: any }) {
+type ForumPost = NonNullable<Awaited<ReturnType<typeof getPost>>>;
+
+export default function PostClientPage({ post }: { post: ForumPost }) {
   const [comment, setComment] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  async function handleAddComment(e: React.FormEvent) {
+  async function handleAddComment(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!comment.trim()) return;
 
@@ -46,9 +49,10 @@ export default function PostClientPage({ post }: { post: any }) {
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
-                            {post.author.image ? <img src={post.author.image} className="w-full h-full object-cover" /> : <User className="h-6 w-6 text-slate-400" />}
-                        </div>
+                        <Avatar className="w-12 h-12 border-2 border-white shadow-sm rounded-2xl">
+                            <AvatarImage src={post.author.avatarUrl ?? undefined} alt={post.author.name ?? ""} />
+                            <AvatarFallback>{post.author.name?.charAt(0).toUpperCase() ?? <User className="h-6 w-6 text-slate-400" />}</AvatarFallback>
+                        </Avatar>
                         <div>
                             <p className="font-black text-slate-900 dark:text-white">{post.author.name}</p>
                             <div className="flex items-center gap-2">
@@ -120,7 +124,7 @@ export default function PostClientPage({ post }: { post: any }) {
         {post.comments.length === 0 ? (
           <div className="p-12 text-center text-slate-400 font-bold italic">No replies yet. Start the conversation!</div>
         ) : (
-          post.comments.map((comment: any) => (
+          post.comments.map((comment) => (
             <div key={comment.id} className="flex gap-4">
                 <div className="mt-2 shrink-0">
                     <CornerDownRight className="h-6 w-6 text-slate-200" />
@@ -129,9 +133,10 @@ export default function PostClientPage({ post }: { post: any }) {
                     <CardContent className="p-6 space-y-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
-                                     {comment.author.image ? <img src={comment.author.image} className="w-full h-full object-cover" /> : <User className="h-4 w-4 text-slate-400" />}
-                                </div>
+                                <Avatar className="w-8 h-8 border-2 border-white shadow-sm rounded-xl">
+                                     <AvatarImage src={comment.author.avatarUrl ?? undefined} alt={comment.author.name ?? ""} />
+                                     <AvatarFallback>{comment.author.name?.charAt(0).toUpperCase() ?? <User className="h-4 w-4 text-slate-400" />}</AvatarFallback>
+                                </Avatar>
                                 <div>
                                     <span className="text-sm font-black text-slate-900 dark:text-white uppercase">{comment.author.name}</span>
                                     <Badge variant="outline" className="text-[8px] uppercase font-black tracking-widest ml-2 h-4 px-1 border-slate-100">{comment.author.role}</Badge>

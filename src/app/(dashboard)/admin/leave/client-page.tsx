@@ -6,15 +6,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Check, X, Loader2, Calendar, User } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function AdminLeaveClientPage({ initialLeaves }: { initialLeaves: any[] }) {
-  const [selectedLeave, setSelectedLeave] = useState<any>(null);
+type LeaveRequestItem = {
+  id: string;
+  reason: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  startDate: Date;
+  endDate: Date;
+  createdAt: Date;
+  reviewNotes: string | null;
+  student: {
+    user: {
+      name: string;
+      role: string;
+      email: string;
+    };
+  };
+};
+
+export default function AdminLeaveClientPage({ initialLeaves }: { initialLeaves: LeaveRequestItem[] }) {
+  const [selectedLeave, setSelectedLeave] = useState<LeaveRequestItem | null>(null);
   const [isPending, startTransition] = useTransition();
 
   async function handleProcess(status: "APPROVED" | "REJECTED", remarks: string) {
@@ -43,7 +59,7 @@ export default function AdminLeaveClientPage({ initialLeaves }: { initialLeaves:
             <TableHeader>
               <TableRow>
                 <TableHead>Applicant</TableHead>
-                <TableHead>Type</TableHead>
+                <TableHead>Reason</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Applied On</TableHead>
                 <TableHead className="text-right">Action</TableHead>
@@ -65,14 +81,12 @@ export default function AdminLeaveClientPage({ initialLeaves }: { initialLeaves:
                            <User className="h-3.5 w-3.5 text-slate-500" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold">{l.user.name}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase">{l.user.role}</p>
+                          <p className="text-sm font-semibold">{l.student.user.name}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase">{l.student.user.role}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{l.type}</Badge>
-                    </TableCell>
+                    <TableCell className="max-w-sm truncate text-xs text-muted-foreground">{l.reason}</TableCell>
                     <TableCell className="text-xs">
                        {format(new Date(l.startDate), "MMM dd")} - {format(new Date(l.endDate), "MMM dd")}
                     </TableCell>
@@ -92,10 +106,10 @@ export default function AdminLeaveClientPage({ initialLeaves }: { initialLeaves:
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedLeave} onOpenChange={() => setSelectedLeave(null)}>
+       <Dialog open={!!selectedLeave} onOpenChange={() => setSelectedLeave(null)}>
           <DialogContent className="max-w-lg">
              <DialogHeader>
-                <DialogTitle>Leave Application: {selectedLeave?.user.name}</DialogTitle>
+                <DialogTitle>Leave Application: {selectedLeave?.student.user.name}</DialogTitle>
              </DialogHeader>
              <div className="space-y-6 mt-4">
                 <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">

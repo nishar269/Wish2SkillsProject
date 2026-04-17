@@ -33,7 +33,7 @@ export async function updateProfile(data: { name: string, phone?: string }) {
 
     revalidatePath("/settings");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to update profile." };
   }
 }
@@ -55,7 +55,7 @@ export async function updatePassword(data: { current: string, new: string }) {
       data: { passwordHash }
     });
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to update password." };
   }
 }

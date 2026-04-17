@@ -10,14 +10,14 @@ export async function getPublicPortfolio(studentId: string) {
       course: true,
       batch: true,
       results: { include: { test: true }, orderBy: { createdAt: "desc" } },
-      applications: { include: { jobPost: true } },
+      applications: { include: { job: true } },
     }
   });
 
   if (!student) return null;
 
   // Calculate Average Score
-  const totalScore = student.results.reduce((acc, curr) => acc + (curr.marksObtained / curr.test.totalMarks), 0);
+  const totalScore = student.results.reduce((acc: number, curr) => acc + (curr.marksObtained / curr.test.totalMarks), 0);
   const avgPerformance = student.results.length > 0 ? Math.round((totalScore / student.results.length) * 100) : 0;
 
   return {

@@ -8,7 +8,6 @@ export async function getChatContacts() {
   if (!session) throw new Error("Unauthorized");
   
   const userId = session.user.id;
-  const role = session.user.role;
 
   // Let's fetch all users that aren't the current user so they can chat with anyone
   // For a massive app, this should be limited, but for CampusOS MVP, anyone can DM anyone.

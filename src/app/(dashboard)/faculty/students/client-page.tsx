@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getFacultyStudents } from "@/actions/faculty-students";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Search, Mail, GraduationCap, Phone, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function FacultyStudentsClientPage({ initialStudents }: { initialStudents: any[] }) {
+export default function FacultyStudentsClientPage({
+  initialStudents,
+}: {
+  initialStudents: Awaited<ReturnType<typeof getFacultyStudents>>;
+}) {
     const [searchQuery, setSearchQuery] = useState("");
 
     const filteredStudents = initialStudents.filter(student => 

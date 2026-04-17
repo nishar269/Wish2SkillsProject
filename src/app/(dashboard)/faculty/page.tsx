@@ -17,10 +17,11 @@ import {
   Layers,
   Zap
 } from "lucide-react";
+import type { SVGProps } from "react";
 import { format } from "date-fns";
 
 export default function FacultyDashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<Awaited<ReturnType<typeof getFacultyDashboardData>> | null>(null);
 
   useEffect(() => {
     getFacultyDashboardData().then(setData);
@@ -90,7 +91,7 @@ export default function FacultyDashboardPage() {
                   No upcoming sessions found in queue.
                 </div>
               ) : (
-                upcomingClasses.map((cls: any, i: number) => (
+                upcomingClasses.map((cls, i) => (
                   <div key={i} className="premium-card p-5 flex items-center gap-6 group hover:border-primary/20 bg-card">
                     <div className="text-center min-w-[60px]">
                       <p className="text-xs font-bold text-primary leading-none mb-1">{format(new Date(cls.date), "HH:mm")}</p>
@@ -156,7 +157,7 @@ export default function FacultyDashboardPage() {
   );
 }
 
-function TrendingUp(props: any) {
+function TrendingUp(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       {...props}

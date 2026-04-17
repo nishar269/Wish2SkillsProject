@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { updateProfile, updatePassword } from "@/actions/settings";
+import { getUserProfile, updateProfile, updatePassword } from "@/actions/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { User, Lock, Phone, Mail, Shield, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 
-export default function SettingsClientPage({ user }: { user: any }) {
+type SettingsUser = NonNullable<Awaited<ReturnType<typeof getUserProfile>>>;
+
+export default function SettingsClientPage({ user }: { user: SettingsUser }) {
   const [isPending, startTransition] = useTransition();
 
   async function handleProfileUpdate(formData: FormData) {
@@ -33,7 +35,8 @@ export default function SettingsClientPage({ user }: { user: any }) {
     const confirm = formData.get("confirm") as string;
 
     if (newPass !== confirm) {
-        return toast.error("Passwords do not match!");
+        toast.error("Passwords do not match!");
+        return;
     }
 
     startTransition(async () => {
@@ -137,7 +140,13 @@ export default function SettingsClientPage({ user }: { user: any }) {
               <CardDescription>Ensure your account remains secure with a strong password.</CardDescription>
             </CardHeader>
             <CardContent>
-              <form id="pass-form" action={handlePasswordUpdate} className="space-y-4 max-w-md">
+              <form
+                id="pass-form"
+                action={async (formData) => {
+                  await handlePasswordUpdate(formData);
+                }}
+                className="space-y-4 max-w-md"
+              >
                 <div className="space-y-2">
                     <Label htmlFor="current">Current Password</Label>
                     <div className="relative">

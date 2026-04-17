@@ -10,9 +10,11 @@ export async function getStudentDashboardData() {
   const student = await db.student.findUnique({
     where: { userId: session.user.id },
     include: {
+      user: true,
       course: true,
       batch: {
         include: {
+          course: true,
           classSessions: {
             where: { date: { gte: new Date(new Date().setHours(0,0,0,0)) } },
             include: { subject: true, faculty: { include: { user: true } } },

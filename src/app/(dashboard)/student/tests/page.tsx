@@ -9,6 +9,12 @@ import { PlayCircle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
+type TestQuestion = {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+};
+
 export default async function StudentTestsPage() {
   const session = await auth();
   if (!session) return null;
@@ -61,7 +67,7 @@ export default async function StudentTestsPage() {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between text-sm text-muted-foreground pb-4 border-b">
                     <span>{format(new Date(t.date), "MMM dd, yyyy")}</span>
-                    <span>{(t.questions as any[]).length} Questions</span>
+                    <span>{(t.questions as TestQuestion[]).length} Questions</span>
                   </div>
 
                   {hasAttempted ? (

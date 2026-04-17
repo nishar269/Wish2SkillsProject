@@ -1,7 +1,5 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { DashboardShell } from "@/components/shared/dashboard-shell";
-import { DashboardHeader } from "@/components/shared/dashboard-header";
 import { ChatClient } from "./client-page";
 
 export const metadata = {
@@ -14,14 +12,14 @@ export default async function ChatPage() {
   if (!session) redirect("/login");
 
   return (
-    <DashboardShell>
-      <DashboardHeader
-        heading="Live Communications"
-        text="Real-time encrypted signal transmission and team channels."
-      />
-      <div className="flex-1 w-full p-4 lg:p-8">
-        <ChatClient currentUserId={session.user.id} />
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight">Live Communications</h1>
+        <p className="text-muted-foreground">
+          Real-time encrypted signal transmission and team channels.
+        </p>
       </div>
-    </DashboardShell>
+      <ChatClient currentUserId={session.user.id} />
+    </div>
   );
 }

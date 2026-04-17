@@ -4,6 +4,19 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
+type SubjectInput = {
+  name: string;
+  code: string;
+  courseId: string;
+  credits?: string;
+};
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
 async function checkAdmin() {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -31,7 +44,7 @@ export async function getSubjects() {
   });
 }
 
-export async function createSubject(data: any) {
+export async function createSubject(data: SubjectInput) {
   await checkAdmin();
   
   if (!data.name || !data.code || !data.courseId) {
@@ -44,13 +57,13 @@ export async function createSubject(data: any) {
         name: data.name,
         code: data.code,
         courseId: data.courseId,
-        credits: parseInt(data.credits) || 3,
+        credits: data.credits ? parseInt(data.credits, 10) || 3 : 3,
       }
     });
     revalidatePath("/admin/subjects");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") return { error: "Subject code already exists." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") return { error: "Subject code already exists." };
     return { error: "Failed to create subject." };
   }
 }
@@ -61,7 +74,7 @@ export async function deleteSubject(id: string) {
     await db.subject.delete({ where: { id } });
     revalidatePath("/admin/subjects");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Cannot delete subject because it is linked to classes or materials." };
   }
 }

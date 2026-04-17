@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { payFee } from "@/actions/fees";
+import { getStudentFees, payFee } from "@/actions/fees";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +12,11 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function StudentFeesClientPage({ initialFees }: { initialFees: any[] }) {
+export default function StudentFeesClientPage({
+  initialFees,
+}: {
+  initialFees: Awaited<ReturnType<typeof getStudentFees>>;
+}) {
   const [isPending, startTransition] = useTransition();
 
   const handlePay = (feeId: string) => {
@@ -78,7 +82,7 @@ export default function StudentFeesClientPage({ initialFees }: { initialFees: an
                 <CardFooter className="bg-slate-50/50 dark:bg-slate-900/50 p-6 flex justify-between items-center">
                     {fee.status === 'PAID' ? (
                         <div className="flex items-center gap-2 text-emerald-600 text-sm font-bold">
-                            <CheckCircle2 className="h-4 w-4" /> Paid on {format(new Date(fee.paidAt), "MMM dd, yyyy")}
+                            <CheckCircle2 className="h-4 w-4" /> Paid on {fee.paidAt ? format(new Date(fee.paidAt), "MMM dd, yyyy") : "recorded"}
                         </div>
                     ) : (
                         <>

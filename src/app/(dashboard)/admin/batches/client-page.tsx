@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createBatch, deleteBatch } from "@/actions/admin";
+import { createBatch, deleteBatch, getBatches, getCourses } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,17 +13,17 @@ import { Loader2, Plus, Trash2, Database, Calendar as CalendarIcon } from "lucid
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function BatchesPage({ initialBatches, courses }: { initialBatches: any[], courses: any[] }) {
-  const [batches, setBatches] = useState(initialBatches);
+export default function BatchesPage({ initialBatches, courses }: { initialBatches: Awaited<ReturnType<typeof getBatches>>, courses: Awaited<ReturnType<typeof getCourses>> }) {
+  const [batches] = useState(initialBatches);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     const data = {
-      name: formData.get("name"),
-      courseId: formData.get("courseId"),
-      capacity: formData.get("capacity"),
-      startDate: formData.get("startDate"),
+      name: formData.get("name") as string,
+      courseId: formData.get("courseId") as string,
+      capacity: formData.get("capacity") as string,
+      startDate: formData.get("startDate") as string,
     };
 
     startTransition(async () => {

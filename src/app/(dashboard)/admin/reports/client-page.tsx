@@ -1,13 +1,17 @@
 "use client";
 
+import { getAdminReportData } from "@/actions/reports";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, BookOpen, Database, Download, PieChart, Activity, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-export default function AdminReportsClientPage({ data }: { data: any }) {
+type AdminReportData = Exclude<Awaited<ReturnType<typeof getAdminReportData>>, { error: string }>;
+
+export default function AdminReportsClientPage({ data }: { data: AdminReportData }) {
     const { summary, recentActivity, enrollmentByCourse } = data;
 
     return (
@@ -54,7 +58,7 @@ export default function AdminReportsClientPage({ data }: { data: any }) {
                         <CardTitle className="text-2xl font-black italic tracking-tighter uppercase">By Course</CardTitle>
                     </CardHeader>
                     <CardContent className="p-8 pt-0 space-y-6">
-                        {enrollmentByCourse.map((course: any, i: number) => (
+                        {enrollmentByCourse.map((course, i) => (
                             <div key={i} className="space-y-2">
                                 <div className="flex justify-between text-xs font-black uppercase tracking-widest">
                                     <span className="truncate max-w-[150px]">{course.name}</span>
@@ -75,7 +79,7 @@ export default function AdminReportsClientPage({ data }: { data: any }) {
                     </div>
 
                     <div className="space-y-4">
-                        {recentActivity.map((act: any) => (
+                        {recentActivity.map((act) => (
                              <div key={act.id} className="p-6 bg-white dark:bg-slate-950 rounded-[2rem] shadow-sm border border-slate-100 dark:border-slate-800 flex items-center justify-between group hover:shadow-md transition-all">
                                 <div className="flex items-center gap-4">
                                     <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-xl">
@@ -101,8 +105,4 @@ export default function AdminReportsClientPage({ data }: { data: any }) {
             </div>
         </div>
     );
-}
-
-function cn(...inputs: any[]) {
-    return inputs.filter(Boolean).join(" ");
 }

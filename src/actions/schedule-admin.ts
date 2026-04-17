@@ -5,6 +5,18 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { sendNotificationEmail } from "@/lib/mail";
 
+type ClassSessionInput = {
+  batchId: string;
+  subjectId: string;
+  facultyId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  room?: string;
+  meetLink?: string;
+  topic?: string;
+};
+
 async function checkAdminOrCoordinator() {
   const session = await auth();
   if (!session || (session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR")) {
@@ -29,7 +41,7 @@ export async function getClassSessions(batchId?: string) {
   });
 }
 
-export async function createClassSession(data: any) {
+export async function createClassSession(data: ClassSessionInput) {
   await checkAdminOrCoordinator();
 
   if (!data.batchId || !data.subjectId || !data.facultyId || !data.date || !data.startTime || !data.endTime) {
@@ -70,7 +82,7 @@ export async function createClassSession(data: any) {
     });
 
     if (batchInfo && subjectInfo) {
-      batchInfo.students.forEach((student: any) => {
+      batchInfo.students.forEach((student) => {
         if (student.user.email) {
           sendNotificationEmail(
             student.user.email,
@@ -92,7 +104,7 @@ export async function createClassSession(data: any) {
     revalidatePath("/admin/schedule");
     revalidatePath("/coordinator/schedule");
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error(error);
     return { error: "Failed to schedule class session." };
   }
@@ -105,7 +117,7 @@ export async function deleteClassSession(id: string) {
     revalidatePath("/admin/schedule");
     revalidatePath("/coordinator/schedule");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to delete scheduled class." };
   }
 }

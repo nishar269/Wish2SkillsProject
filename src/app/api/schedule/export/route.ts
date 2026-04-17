@@ -2,14 +2,23 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+type ExportSession = {
+  id: string;
+  date: Date;
+  room: string | null;
+  subject: { name: string };
+  faculty?: { user: { name: string } };
+  batch?: { name: string };
+};
+
+export async function GET() {
   try {
     const session = await auth();
     if (!session) return new NextResponse("Unauthorized", { status: 401 });
 
     const userId = session.user.id;
     const role = session.user.role;
-    let sessions: any[] = [];
+    let sessions: ExportSession[] = [];
 
     // Fetch classes based on role
     if (role === "STUDENT") {
@@ -51,7 +60,7 @@ export async function GET(request: Request) {
     }
 
     // Build standard ICS string
-    let icsContent = [
+    const icsContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
       "PRODID:-//Wish2Skill CampusOS//EN",
@@ -79,7 +88,7 @@ export async function GET(request: Request) {
         `DTSTART:${dtStart}`,
         `DTEND:${dtEnd}`,
         `SUMMARY:${s.subject.name} - Class`,
-        `DESCRIPTION:${role === 'STUDENT' ? 'Prof. ' + s.faculty.user.name : 'Batch: ' + s.batch.name}`,
+        `DESCRIPTION:${role === 'STUDENT' ? 'Prof. ' + (s.faculty?.user.name || 'Faculty') : 'Batch: ' + (s.batch?.name || 'N/A')}`,
         `LOCATION:${s.room || 'Campus'}`,
         "END:VEVENT"
       );

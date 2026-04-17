@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createClassSession, deleteClassSession } from "@/actions/schedule-admin";
+import { getBatches } from "@/actions/admin";
+import { getFaculty } from "@/actions/faculty-admin";
+import { createClassSession, deleteClassSession, getClassSessions } from "@/actions/schedule-admin";
+import { getSubjects } from "@/actions/subject";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,9 +12,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clock, MapPin, Plus, Trash2, Video } from "lucide-react";
+import { Clock, Loader2, MapPin, Plus, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+
+type Session = Awaited<ReturnType<typeof getClassSessions>>;
+type Batch = Awaited<ReturnType<typeof getBatches>>;
+type Subject = Awaited<ReturnType<typeof getSubjects>>;
+type FacultyMember = Awaited<ReturnType<typeof getFaculty>>;
 
 export default function ScheduleClientPage({ 
   initialSessions,
@@ -19,17 +27,27 @@ export default function ScheduleClientPage({
   subjects,
   facultyMembers
 }: { 
-  initialSessions: any[],
-  batches: any[],
-  subjects: any[],
-  facultyMembers: any[]
+  initialSessions: Session,
+  batches: Batch,
+  subjects: Subject,
+  facultyMembers: FacultyMember
 }) {
-  const [sessions, setSessions] = useState(initialSessions);
+  const [sessions] = useState(initialSessions);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
-    const data = Object.fromEntries(formData);
+    const data = {
+      batchId: formData.get("batchId") as string,
+      subjectId: formData.get("subjectId") as string,
+      facultyId: formData.get("facultyId") as string,
+      date: formData.get("date") as string,
+      startTime: formData.get("startTime") as string,
+      endTime: formData.get("endTime") as string,
+      room: formData.get("room") as string,
+      meetLink: formData.get("meetLink") as string,
+      topic: formData.get("topic") as string,
+    };
 
     startTransition(async () => {
       const res = await createClassSession(data);
@@ -80,7 +98,7 @@ export default function ScheduleClientPage({
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Select Batch</option>
-                        {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -89,7 +107,7 @@ export default function ScheduleClientPage({
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Select Subject</option>
-                        {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                        {subjects.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
                     </select>
                   </div>
                 </div>
@@ -100,7 +118,7 @@ export default function ScheduleClientPage({
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="facultyId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Assign Faculty</option>
-                        {facultyMembers.map(f => <option key={f.id} value={f.id}>{f.user.name}</option>)}
+                        {facultyMembers.map((f) => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>
                 </div>
               </div>

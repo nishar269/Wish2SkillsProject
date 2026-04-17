@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import type { CalendarEvent } from "@/actions/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, MapPin, ChevronLeft, ChevronRight, GraduationCap, ClipboardList } from "lucide-react";
+import { Clock, MapPin, ChevronLeft, ChevronRight, GraduationCap, ClipboardList, Bell } from "lucide-react";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, startOfWeek, endOfWeek } from "date-fns";
 
-export default function CalendarClientPage({ initialEvents }: { initialEvents: any[] }) {
+export default function CalendarClientPage({ initialEvents }: { initialEvents: CalendarEvent[] }) {
   const [currentDate, setCurrentDate] = useState(new Date());
 
   const monthStart = startOfMonth(currentDate);
@@ -100,8 +101,12 @@ export default function CalendarClientPage({ initialEvents }: { initialEvents: a
                         <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm shadow-red-500/50" />
                         <span className="text-sm font-medium">Examinations</span>
                     </div>
+                    <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm shadow-amber-500/50" />
+                        <span className="text-sm font-medium">Announcements</span>
+                    </div>
                  </CardContent>
-            </Card>
+             </Card>
 
             <div className="space-y-4">
                 <h3 className="font-black text-xs uppercase tracking-widest text-slate-500 pl-1">Selected Day Agenda</h3>
@@ -111,8 +116,18 @@ export default function CalendarClientPage({ initialEvents }: { initialEvents: a
                     getEventsForDay(currentDate).map(e => (
                         <Card key={e.id} className="border-0 shadow-md">
                             <CardContent className="p-4 flex items-center gap-4">
-                                <div className={`p-2 rounded-xl ${e.type === 'EXAM' ? 'bg-red-50 text-red-500' : 'bg-blue-50 text-blue-500'}`}>
-                                    {e.type === 'EXAM' ? <ClipboardList className="h-4 w-4" /> : <GraduationCap className="h-4 w-4" />}
+                                <div className={`p-2 rounded-xl ${
+                                    e.type === 'EXAM'
+                                      ? 'bg-red-50 text-red-500'
+                                      : e.type === 'ANNOUNCEMENT'
+                                        ? 'bg-amber-50 text-amber-500'
+                                        : 'bg-blue-50 text-blue-500'
+                                }`}>
+                                    {e.type === 'EXAM'
+                                      ? <ClipboardList className="h-4 w-4" />
+                                      : e.type === 'ANNOUNCEMENT'
+                                        ? <Bell className="h-4 w-4" />
+                                        : <GraduationCap className="h-4 w-4" />}
                                 </div>
                                 <div>
                                     <p className="text-sm font-bold line-clamp-1">{e.title}</p>

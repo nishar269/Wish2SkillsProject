@@ -46,21 +46,21 @@ export async function submitAssignment(assignmentId: string, fileUrl: string) {
                 }
             },
             update: {
-                fileUrl,
+                contentUrl: fileUrl,
                 submittedAt: new Date(),
                 status: "SUBMITTED"
             },
             create: {
                 assignmentId,
                 studentId: student.id,
-                fileUrl,
+                contentUrl: fileUrl,
                 status: "SUBMITTED"
             }
         });
 
         revalidatePath("/student/assignments");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to submit assignment." };
     }
 }

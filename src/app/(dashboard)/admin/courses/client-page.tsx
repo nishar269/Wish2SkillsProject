@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createCourse, deleteCourse } from "@/actions/admin";
+import { createCourse, deleteCourse, getCourses } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,8 +13,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Loader2, Plus, Trash2, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 
-export default function CoursesPage({ initialCourses }: { initialCourses: any[] }) {
-  const [courses, setCourses] = useState(initialCourses);
+export default function CoursesPage({ initialCourses }: { initialCourses: Awaited<ReturnType<typeof getCourses>> }) {
+  const [courses] = useState(initialCourses);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 

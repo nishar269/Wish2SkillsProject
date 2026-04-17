@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { applyForJob } from "@/actions/jobs";
+import { applyForJob, getJobs, getStudentApplications } from "@/actions/jobs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,13 @@ import { Briefcase, Building2, MapPin, DollarSign, Send, CheckCircle2, Loader2 }
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function CareerPortalClientPage({ initialJobs, myApplications }: { initialJobs: any[], myApplications: any[] }) {
+export default function CareerPortalClientPage({
+  initialJobs,
+  myApplications,
+}: {
+  initialJobs: Awaited<ReturnType<typeof getJobs>>;
+  myApplications: Awaited<ReturnType<typeof getStudentApplications>>;
+}) {
   const [isPending, startTransition] = useTransition();
 
   const handleApply = (jobId: string) => {

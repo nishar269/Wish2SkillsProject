@@ -31,7 +31,7 @@ export default async function AdminSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Institute Identity</CardTitle>
-              <CardDescription>Update your organization's name and contact information.</CardDescription>
+              <CardDescription>Update your organization&apos;s name and contact information.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">

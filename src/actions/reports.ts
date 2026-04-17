@@ -74,7 +74,9 @@ export async function getInstitutionalKPIs() {
   // 3. Financial Health (Fees collected vs requested)
   const totalFees = await db.feeRecord.aggregate({ _sum: { amount: true } });
   const paidFees = await db.feeRecord.aggregate({ _sum: { amount: true }, where: { status: "PAID" } });
-  const collectionEfficiency = totalFees._sum.amount ? (paidFees._sum.amount / totalFees._sum.amount) * 100 : 98;
+  const totalFeeAmount = totalFees._sum.amount ?? 0;
+  const paidFeeAmount = paidFees._sum.amount ?? 0;
+  const collectionEfficiency = totalFeeAmount > 0 ? (paidFeeAmount / totalFeeAmount) * 100 : 98;
 
   return {
     institutionalScore,

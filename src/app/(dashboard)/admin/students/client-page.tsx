@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { createStudent, deleteStudent } from "@/actions/student-admin";
+import { getBatches, getCourses } from "@/actions/admin";
+import { getStudents } from "@/actions/student-admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,21 +19,31 @@ export default function StudentClientPage({
   courses, 
   batches 
 }: { 
-  initialStudents: any[],
-  courses: any[],
-  batches: any[]
+  initialStudents: Awaited<ReturnType<typeof getStudents>>,
+  courses: Awaited<ReturnType<typeof getCourses>>,
+  batches: Awaited<ReturnType<typeof getBatches>>
 }) {
-  const [students, setStudents] = useState(initialStudents);
+  const [students] = useState(initialStudents);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   // For controlled course/batch selection
   const [selectedCourseId, setSelectedCourseId] = useState("");
 
-  const filteredBatches = batches.filter(b => b.courseId === selectedCourseId);
+  const filteredBatches = batches.filter((b) => b.courseId === selectedCourseId);
 
   async function handleSubmit(formData: FormData) {
-    const data = Object.fromEntries(formData);
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      phone: formData.get("phone") as string,
+      courseId: formData.get("courseId") as string,
+      batchId: formData.get("batchId") as string,
+      enrollmentNo: formData.get("enrollmentNo") as string,
+      parentPhone: formData.get("parentPhone") as string,
+      address: formData.get("address") as string,
+    };
 
     startTransition(async () => {
       const res = await createStudent(data);
@@ -111,7 +123,7 @@ export default function StudentClientPage({
                         onChange={(e) => setSelectedCourseId(e.target.value)}
                     >
                         <option value="" disabled>Select Course</option>
-                        {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -126,7 +138,7 @@ export default function StudentClientPage({
                         disabled={!selectedCourseId}
                     >
                         <option value="" disabled>Select Batch</option>
-                        {filteredBatches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        {filteredBatches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                   </div>
                 </div>

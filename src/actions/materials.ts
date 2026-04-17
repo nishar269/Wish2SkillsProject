@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import type { MaterialType } from "@prisma/client";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
@@ -30,9 +31,9 @@ export async function createMaterial(data: {
     title: string, 
     description?: string, 
     fileUrl: string, 
-    fileType: string | any, 
+    fileType: MaterialType,
     subjectId: string,
-    batchId: string
+    batchId?: string
 }) {
     const session = await checkFacultyOrAdmin();
     
@@ -43,6 +44,27 @@ export async function createMaterial(data: {
     }
 
     try {
+        const batchId = data.batchId ?? (
+            await db.subject.findUnique({
+                where: { id: data.subjectId },
+                select: {
+                    course: {
+                        select: {
+                            batches: {
+                                orderBy: { createdAt: "asc" },
+                                take: 1,
+                                select: { id: true }
+                            }
+                        }
+                    }
+                }
+            })
+        )?.course.batches[0]?.id;
+
+        if (!batchId) {
+            return { error: "No batch is linked to this subject's course." };
+        }
+
         await db.material.create({
             data: {
                 title: data.title,
@@ -50,7 +72,7 @@ export async function createMaterial(data: {
                 fileUrl: data.fileUrl,
                 fileType: data.fileType,
                 subjectId: data.subjectId,
-                batchId: data.batchId,
+                batchId,
                 uploadedBy: uploadedBy || "", // Fallback
             }
         });
@@ -70,7 +92,7 @@ export async function deleteMaterial(id: string) {
         await db.material.delete({ where: { id } });
         revalidatePath("/faculty/resources");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to delete material." };
     }
 }
@@ -104,7 +126,7 @@ export async function summarizeMaterial(id: string) {
         const result = await model.generateContent(prompt);
         const response = await result.response;
         return { summary: response.text() };
-    } catch (e) {
+    } catch {
         return { error: "Failed to generate summary." };
     }
 }

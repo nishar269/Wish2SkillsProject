@@ -1,5 +1,22 @@
-import { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import { Role } from "@/lib/permissions";
+
+type AppToken = JWT & {
+  id?: string;
+  role?: Role;
+};
+
+type AppSession = Session & {
+  user: NonNullable<Session["user"]> & {
+    id: string;
+    role?: Role;
+  };
+};
+
+function isRole(value: unknown): value is Role {
+  return typeof value === "string" && Object.values(Role).includes(value as Role);
+}
 
 export const authConfig = {
   pages: {
@@ -8,20 +25,35 @@ export const authConfig = {
   },
   callbacks: {
     async jwt({ token, user }) {
+      const appToken = token as AppToken;
+
       if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
-        console.log('AUTH_JWT: Token initialized for', user.email, 'with role', (user as any).role);
+        appToken.id = user.id;
+
+        const role = "role" in (user as User) ? (user as User & { role?: unknown }).role : undefined;
+        if (isRole(role)) {
+          appToken.role = role;
+        }
+
+        console.log('AUTH_JWT: Token initialized for', user.email, 'with role', appToken.role);
       }
-      return token;
+      return appToken;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string;
-        (session.user as any).role = token.role;
-        console.log('AUTH_SESSION: Session ready for', session.user.email, 'with role', (session.user as any).role);
+      const appToken = token as AppToken;
+      const appSession = session as AppSession;
+
+      if (appSession.user) {
+        if (typeof appToken.id === "string") {
+          appSession.user.id = appToken.id;
+        }
+        if (isRole(appToken.role)) {
+          appSession.user.role = appToken.role;
+        }
+
+        console.log('AUTH_SESSION: Session ready for', appSession.user.email, 'with role', appSession.user.role);
       }
-      return session;
+      return appSession;
     },
     async authorized({ auth, request }) {
       const isLoggedIn = !!auth?.user;

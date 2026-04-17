@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createFaculty, deleteFaculty } from "@/actions/faculty-admin";
+import { createFaculty, deleteFaculty, getFaculty } from "@/actions/faculty-admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,13 +12,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Loader2, Plus, Trash2, GraduationCap, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
 
-export default function FacultyClientPage({ initialFaculty }: { initialFaculty: any[] }) {
-  const [faculty, setFaculty] = useState(initialFaculty);
+export default function FacultyClientPage({ initialFaculty }: { initialFaculty: Awaited<ReturnType<typeof getFaculty>> }) {
+  const [faculty] = useState(initialFaculty);
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
-    const data = Object.fromEntries(formData);
+    const data = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+      phone: formData.get("phone") as string,
+      specialization: formData.get("specialization") as string,
+      experience: formData.get("experience") as string,
+      qualification: formData.get("qualification") as string,
+    };
 
     startTransition(async () => {
       const res = await createFaculty(data);

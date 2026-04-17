@@ -1,3 +1,4 @@
+import type { SVGProps } from "react";
 import { getStudentDashboardData } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,8 +32,8 @@ export default async function CertificatesPage() {
             </CardHeader>
             <CardContent className="relative z-10 space-y-6">
                 <div className="p-6 rounded-3xl border-2 border-dotted border-slate-200 bg-slate-50/50 flex flex-col md:flex-row items-center gap-6">
-                    <div className="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center border-4 border-cyan-500/20">
-                        <medal className="h-10 w-10 text-cyan-600" />
+	                    <div className="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center border-4 border-cyan-500/20">
+	                        <CertificateMedal className="h-10 w-10 text-cyan-600" />
                     </div>
                     <div className="text-center md:text-left space-y-1">
                         <h3 className="text-xl font-bold">{student.course.name}</h3>
@@ -104,7 +105,7 @@ export default async function CertificatesPage() {
   );
 }
 
-function medal(props: any) {
+function CertificateMedal(props: SVGProps<SVGSVGElement>) {
     return (
         <svg
           {...props}

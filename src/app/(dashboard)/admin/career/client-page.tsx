@@ -1,12 +1,18 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createJobPost, deleteJobPost, getJobApplications, updateApplicationStatus } from "@/actions/career";
+import {
+  createJobPost,
+  deleteJobPost,
+  getJobApplications,
+  getJobPosts,
+  updateApplicationStatus,
+} from "@/actions/career";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,12 +20,15 @@ import { Plus, Trash2, Users, MapPin, Loader2, ExternalLink } from "lucide-react
 import { toast } from "sonner";
 import { format } from "date-fns";
 
-export default function CareerClientPage({ initialJobs }: { initialJobs: any[] }) {
-  const [jobs, setJobs] = useState(initialJobs);
+type JobPost = Awaited<ReturnType<typeof getJobPosts>>[number];
+type JobApplication = Awaited<ReturnType<typeof getJobApplications>>[number];
+
+export default function CareerClientPage({ initialJobs }: { initialJobs: JobPost[] }) {
+  const [jobs] = useState(initialJobs);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [selectedJob, setSelectedJob] = useState<any>(null);
-  const [applications, setApplications] = useState<any[]>([]);
+  const [selectedJob, setSelectedJob] = useState<JobPost | null>(null);
+  const [applications, setApplications] = useState<JobApplication[]>([]);
 
   async function handleAddJob(formData: FormData) {
     const data = {
@@ -43,7 +52,7 @@ export default function CareerClientPage({ initialJobs }: { initialJobs: any[] }
     });
   }
 
-  async function handleViewApplications(job: any) {
+  async function handleViewApplications(job: JobPost) {
       setSelectedJob(job);
       const apps = await getJobApplications(job.id);
       setApplications(apps);

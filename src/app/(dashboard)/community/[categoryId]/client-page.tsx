@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createPost } from "@/actions/forum";
+import { createPost, getCategories, getPosts } from "@/actions/forum";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,8 +14,17 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 
-export default function CategoryClientPage({ initialPosts, category }: { initialPosts: any[], category: any }) {
-  const [posts, setPosts] = useState(initialPosts);
+type ForumPost = Awaited<ReturnType<typeof getPosts>>[number];
+type ForumCategory = Awaited<ReturnType<typeof getCategories>>[number];
+
+export default function CategoryClientPage({
+  initialPosts,
+  category,
+}: {
+  initialPosts: ForumPost[];
+  category: ForumCategory;
+}) {
+  const posts = initialPosts;
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -96,9 +106,12 @@ export default function CategoryClientPage({ initialPosts, category }: { initial
                     
                     <div className="flex flex-wrap items-center gap-y-2 gap-x-6">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center border-2 border-white shadow-sm shrink-0 overflow-hidden">
-                                {post.author.image ? <img src={post.author.image} className="w-full h-full object-cover" /> : <User className="h-4 w-4 text-slate-400" />}
-                            </div>
+                            <Avatar className="w-8 h-8 border-2 border-white shadow-sm shrink-0">
+                                <AvatarImage src={post.author.avatarUrl ?? undefined} alt={post.author.name ?? ""} />
+                                <AvatarFallback>
+                                  {post.author.name?.charAt(0).toUpperCase() ?? <User className="h-4 w-4 text-slate-400" />}
+                                </AvatarFallback>
+                            </Avatar>
                             <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{post.author.name}</span>
                             <Badge variant="outline" className="text-[9px] uppercase font-black tracking-widest h-5 px-1.5 border-slate-200">{post.author.role}</Badge>
                         </div>

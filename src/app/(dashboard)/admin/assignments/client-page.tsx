@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { createAssignment, deleteAssignment } from "@/actions/faculty-assignment";
+import { createAssignment, deleteAssignment, getAssignments } from "@/actions/faculty-assignment";
+import { getBatches } from "@/actions/admin";
+import { getFaculty } from "@/actions/faculty-admin";
+import { getSubjects } from "@/actions/subject";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,10 +20,10 @@ export default function AdminAssignmentsClientPage({
   subjects,
   batches
 }: { 
-  initialAssignments: any[],
-  facultyMembers: any[],
-  subjects: any[],
-  batches: any[]
+  initialAssignments: Awaited<ReturnType<typeof getAssignments>>,
+  facultyMembers: Awaited<ReturnType<typeof getFaculty>>,
+  subjects: Awaited<ReturnType<typeof getSubjects>>,
+  batches: Awaited<ReturnType<typeof getBatches>>
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -76,7 +79,7 @@ export default function AdminAssignmentsClientPage({
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="facultyId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Choose Instructor</option>
-                        {facultyMembers.map(f => <option key={f.id} value={f.id}>{f.user.name}</option>)}
+                        {facultyMembers.map((f) => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>
                 </div>
               </div>
@@ -86,7 +89,7 @@ export default function AdminAssignmentsClientPage({
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Choose Subject</option>
-                        {subjects.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                        {subjects.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
                     </select>
                 </div>
               </div>
@@ -96,7 +99,7 @@ export default function AdminAssignmentsClientPage({
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
                     <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Choose Batch</option>
-                        {batches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                        {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                 </div>
               </div>

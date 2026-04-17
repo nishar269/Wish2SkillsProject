@@ -24,7 +24,7 @@ export async function createFee(data: { studentId: string, title: string, amount
     });
     revalidatePath("/admin/fees");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to issue fee." };
   }
 }
@@ -55,7 +55,7 @@ export async function payFee(feeId: string) {
         });
         revalidatePath("/student/fees");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Payment failed." };
     }
 }
@@ -74,7 +74,7 @@ export async function deleteFee(id: string) {
         await db.feeRecord.delete({ where: { id } });
         revalidatePath("/admin/fees");
         return { success: true };
-    } catch (error) {
+    } catch {
         return { error: "Failed to delete fee record." };
     }
 }

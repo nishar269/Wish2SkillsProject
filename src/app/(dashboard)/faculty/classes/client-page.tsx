@@ -1,14 +1,16 @@
 "use client";
 
+import type { getFacultyClasses } from "@/actions/faculty-classes";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Users, Video, Plus, CalendarDays, DownloadCloud } from "lucide-react";
+import { Calendar, Users, Video, CalendarDays, DownloadCloud } from "lucide-react";
 import { format, startOfWeek, addDays, isSameDay } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 
-export default function FacultyClassesClientPage({ initialSessions }: { initialSessions: any[] }) {
+type FacultyClassSession = Exclude<Awaited<ReturnType<typeof getFacultyClasses>>, { error: string }>[number];
+
+export default function FacultyClassesClientPage({ initialSessions }: { initialSessions: FacultyClassSession[] }) {
     const [selectedDate, setSelectedDate] = useState(new Date());
     
     const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -17,18 +19,18 @@ export default function FacultyClassesClientPage({ initialSessions }: { initialS
     const dailySessions = initialSessions.filter(session => isSameDay(new Date(session.date), selectedDate));
 
     return (
-        <div className="space-y-8 p-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="space-y-8 p-8 max-w-7xl mx-auto bg-slate-50 min-h-screen">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-6">
                 <div>
-                    <h1 className="text-4xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase flex items-center gap-4">
+                    <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-4">
                         Teaching Schedule
-                        <a href="/api/schedule/export" className="hidden sm:flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-cyan-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest transition-colors shadow-lg active:scale-95">
+                        <a href="/api/schedule/export" className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-xs font-semibold shadow-sm transition-colors">
                             <DownloadCloud className="h-4 w-4" /> <span>Sync .ics</span>
                         </a>
                     </h1>
-                    <p className="text-slate-500 font-medium italic">Manage your active lecture sessions and student engagement.</p>
+                    <p className="text-slate-500 font-medium mt-1">Manage your active lecture sessions.</p>
                 </div>
-                <div className="bg-white dark:bg-slate-950 p-1.5 rounded-[1.5rem] shadow-xl border border-slate-100 dark:border-slate-800 flex gap-1">
+                <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex gap-1">
                     {weekDays.map((day) => {
                         const isSelected = isSameDay(day, selectedDate);
                         const isToday = isSameDay(day, new Date());
@@ -38,15 +40,15 @@ export default function FacultyClassesClientPage({ initialSessions }: { initialS
                                 key={day.toString()}
                                 onClick={() => setSelectedDate(day)}
                                 className={cn(
-                                    "flex flex-col items-center justify-center w-14 h-20 rounded-2xl transition-all",
-                                    isSelected ? "bg-slate-900 text-white shadow-2xl" : "hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-400",
-                                    isToday && !isSelected && "border-2 border-slate-200"
+                                    "flex flex-col items-center justify-center w-12 h-16 rounded-lg transition-all",
+                                    isSelected ? "bg-blue-600 text-white shadow-sm" : "hover:bg-slate-50 text-slate-500",
+                                    isToday && !isSelected && "border border-blue-200"
                                 )}
                             >
-                                <span className={cn("text-[10px] font-black uppercase tracking-widest", isSelected ? "text-slate-400" : "text-slate-400")}>
+                                <span className={cn("text-[10px] uppercase font-bold", isSelected ? "text-blue-100" : "text-slate-400")}>
                                     {format(day, "EEE")}
                                 </span>
-                                <span className="text-xl font-black">{format(day, "dd")}</span>
+                                <span className="text-lg font-bold">{format(day, "dd")}</span>
                             </button>
                         );
                     })}
@@ -55,58 +57,53 @@ export default function FacultyClassesClientPage({ initialSessions }: { initialS
 
             <div className="grid lg:grid-cols-4 gap-8">
                 <div className="lg:col-span-3 space-y-6">
-                    <div className="flex items-center justify-between border-b pb-4 border-slate-100">
-                         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-slate-400">
-                            <CalendarDays className="h-4 w-4" /> Sessions for {format(selectedDate, "EEEE, MMM d")}
-                         </div>
-                         <Button variant="ghost" className="text-cyan-600 font-bold hover:bg-cyan-50 rounded-xl">
-                            <Plus className="h-4 w-4 mr-2" /> Request Reschedule
-                         </Button>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-500 border-b pb-4 border-slate-200">
+                        <CalendarDays className="h-4 w-4" /> Sessions for {format(selectedDate, "EEEE, MMMM d, yyyy")}
                     </div>
 
                     {dailySessions.length === 0 ? (
-                        <div className="py-24 text-center bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
-                             <Calendar className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-                             <p className="text-slate-400 font-black italic uppercase tracking-tighter text-xl">No lectures today</p>
-                             <p className="text-slate-300 text-xs mt-2 uppercase tracking-widest font-bold">Enjoy your research time!</p>
+                        <div className="py-20 text-center bg-white rounded-2xl border border-slate-200 shadow-sm">
+                             <Calendar className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+                             <p className="text-slate-600 font-bold text-lg">No lectures scheduled</p>
+                             <p className="text-slate-400 text-sm mt-1">You have no teaching assignments for this date.</p>
                         </div>
                     ) : (
-                        <div className="grid gap-6">
+                        <div className="grid gap-4">
                             {dailySessions.map((session) => (
-                                <Card key={session.id} className="border-0 shadow-lg hover:shadow-2xl transition-all duration-500 rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-950 group border-l-[12px] border-l-cyan-500">
-                                    <CardContent className="p-8 flex flex-col md:flex-row gap-8 items-center">
-                                        <div className="flex flex-col items-center justify-center shrink-0 space-y-1">
-                                            <p className="text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white uppercase">
-                                                {format(new Date(session.startTime), "hh:mm")}
+                                <Card key={session.id} className="border border-slate-200 shadow-sm rounded-xl bg-white overflow-hidden">
+                                    <CardContent className="p-6 flex flex-col md:flex-row gap-6 items-center">
+                                        <div className="flex flex-col items-center justify-center shrink-0 w-24">
+                                            <p className="text-xl font-bold text-slate-900">
+                                                {format(new Date(session.startTime), "h:mm")}
                                             </p>
-                                            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{format(new Date(session.startTime), "a")}</p>
+                                            <p className="text-xs font-semibold text-slate-500 uppercase">{format(new Date(session.startTime), "a")}</p>
                                         </div>
 
-                                        <div className="h-12 w-px bg-slate-100 hidden md:block" />
+                                        <div className="h-10 w-px bg-slate-200 hidden md:block" />
 
-                                        <div className="flex-1 space-y-3 text-center md:text-left">
-                                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                                                <Badge variant="outline" className="text-[10px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border-cyan-100">
+                                        <div className="flex-1 space-y-2 text-center md:text-left">
+                                            <div className="flex items-center justify-center md:justify-start gap-2">
+                                                <Badge variant="outline" className="text-[10px] font-semibold bg-slate-50 text-slate-700">
                                                     {session.batch.course.code}
                                                 </Badge>
-                                                <Badge className="text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white">
+                                                <Badge className="text-[10px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border-none">
                                                     Batch {session.batch.name}
                                                 </Badge>
                                             </div>
-                                            <h3 className="text-2xl font-black italic tracking-tighter uppercase leading-tight group-hover:text-cyan-600 transition-colors">
+                                            <h3 className="text-lg font-bold text-slate-900">
                                                 {session.subject.name}
                                             </h3>
                                         </div>
 
                                         <div className="flex flex-wrap items-center justify-center gap-4 shrink-0">
-                                            <div className="flex flex-col items-center px-4 py-2 bg-slate-50 rounded-2xl">
-                                                <p className="text-lg font-black">{session.batch.capacity}</p>
-                                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Total Seats</p>
+                                            <div className="flex flex-col items-center px-4 py-2 bg-slate-50 border border-slate-100 rounded-lg">
+                                                <p className="text-base font-bold text-slate-700">{session.batch.capacity}</p>
+                                                <p className="text-[10px] font-semibold text-slate-500">Students</p>
                                             </div>
                                             {session.meetLink && (
-                                                <Button className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest shadow-xl shadow-blue-600/20">
-                                                    <Video className="h-5 w-5 mr-2" /> Start Meet
-                                                </Button>
+                                                <a href={session.meetLink} target="_blank" className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors">
+                                                    <Video className="h-4 w-4 mr-2" /> Join Meet
+                                                </a>
                                             )}
                                         </div>
                                     </CardContent>
@@ -117,26 +114,13 @@ export default function FacultyClassesClientPage({ initialSessions }: { initialS
                 </div>
 
                 <div className="space-y-6">
-                    <Card className="border-0 shadow-xl rounded-[2.5rem] bg-cyan-600 text-white p-8 relative overflow-hidden">
-                        <div className="relative z-10">
-                            <Users className="h-10 w-10 mb-4 opacity-50" />
-                            <h3 className="text-xl font-black italic tracking-tighter uppercase leading-none mb-1">Weekly Load</h3>
-                            <p className="text-5xl font-black italic tracking-tighter mb-4">{initialSessions.length}</p>
-                            <p className="text-[10px] opacity-70 uppercase font-black tracking-widest leading-relaxed italic">Active lecture sessions scheduled for this academic cycle.</p>
-                        </div>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
-                    </Card>
-
-                    <div className="p-8 rounded-[2.5rem] bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 space-y-6 shadow-sm">
-                         <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">Tools & Quick Actions</h3>
-                         <div className="grid gap-3">
-                            <Button variant="outline" className="justify-start h-12 rounded-xl font-bold text-xs uppercase tracking-tight">
-                                <Clock className="h-4 w-4 mr-3 text-cyan-600" /> Mark Exam Dates
-                            </Button>
-                            <Button variant="outline" className="justify-start h-12 rounded-xl font-bold text-xs uppercase tracking-tight">
-                                <Users className="h-4 w-4 mr-3 text-cyan-600" /> Generate Batch List
-                            </Button>
-                         </div>
+                    <div className="border border-slate-200 shadow-sm rounded-2xl bg-white p-6">
+                        <Users className="h-8 w-8 mb-4 text-blue-500" />
+                        <h3 className="text-sm font-semibold text-slate-500 mb-1">Total Academic Load</h3>
+                        <p className="text-4xl font-bold text-slate-900 mb-2">{initialSessions.length}</p>
+                        <p className="text-xs text-slate-500 leading-relaxed">
+                            Total mapped sessions for your account during this active semester.
+                        </p>
                     </div>
                 </div>
             </div>

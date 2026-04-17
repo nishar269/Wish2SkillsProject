@@ -5,6 +5,22 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 
+type FacultyInput = {
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  specialization?: string;
+  experience?: string;
+  qualification?: string;
+};
+
+function getErrorCode(error: unknown) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? String((error as { code: unknown }).code)
+    : null;
+}
+
 async function checkAdmin() {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {
@@ -25,7 +41,7 @@ export async function getFaculty() {
   });
 }
 
-export async function createFaculty(data: any) {
+export async function createFaculty(data: FacultyInput) {
   await checkAdmin();
   
   if (!data.name || !data.email || !data.password) {
@@ -51,7 +67,7 @@ export async function createFaculty(data: any) {
         data: {
           userId: user.id,
           specialization: data.specialization,
-          experience: parseInt(data.experience) || 0,
+          experience: data.experience ? parseInt(data.experience, 10) || 0 : 0,
           qualification: data.qualification,
         }
       });
@@ -59,8 +75,8 @@ export async function createFaculty(data: any) {
 
     revalidatePath("/admin/faculty");
     return { success: true };
-  } catch (error: any) {
-    if (error.code === "P2002") return { error: "Email already exists." };
+  } catch (error) {
+    if (getErrorCode(error) === "P2002") return { error: "Email already exists." };
     return { error: "Failed to create faculty member." };
   }
 }
@@ -79,7 +95,7 @@ export async function deleteFaculty(id: string) {
     
     revalidatePath("/admin/faculty");
     return { success: true };
-  } catch (error) {
+  } catch {
     return { error: "Failed to delete faculty member." };
   }
 }
