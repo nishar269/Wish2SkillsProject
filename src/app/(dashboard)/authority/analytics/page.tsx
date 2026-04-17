@@ -53,17 +53,17 @@ export default function AuthorityAnalyticsPage() {
     ];
 
     return (
-        <div className="p-8 space-y-10 max-w-7xl mx-auto pb-20">
+        <div className="space-y-10 max-w-7xl mx-auto pb-20">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200">
+            <div className="premium-shell flex flex-col md:flex-row md:items-end justify-between gap-6 px-6 py-6 md:px-8">
                 <div>
-                    <div className="flex items-center gap-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-3">
+                    <div className="premium-kicker border-[#e0d5c4] bg-white/55 text-[#9d7b43] mb-3">
                         <BarChart3 className="h-3.5 w-3.5" /> Executive Analytics
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Institutional Overview</h1>
-                    <p className="text-slate-500 text-sm font-medium mt-1">Real-time institutional performance metrics and insights.</p>
+                    <h1 className="premium-title text-5xl text-[#141c2d]">Institutional Overview</h1>
+                    <p className="text-[#655742] text-sm font-medium mt-1">Real-time institutional performance metrics and insights.</p>
                 </div>
-                <Button className="text-xs font-bold rounded-xl bg-blue-600 hover:bg-blue-700">
+                <Button size="lg" className="text-xs font-semibold">
                     Download Report <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
                 </Button>
             </div>
@@ -71,7 +71,7 @@ export default function AuthorityAnalyticsPage() {
             {/* KPI Cards */}
             <div className="grid gap-6 md:grid-cols-3">
                 {stats.map((stat, i) => (
-                    <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <div key={i} className="premium-card p-6">
                         <div className="flex items-start justify-between mb-6">
                             <div className={cn("p-3 rounded-xl", stat.bg)}>
                                 <stat.icon className={cn("h-5 w-5", stat.color)} />
@@ -89,7 +89,7 @@ export default function AuthorityAnalyticsPage() {
 
             <div className="grid lg:grid-cols-5 gap-8">
                 {/* Performance Metrics */}
-                <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="lg:col-span-3 premium-card p-6">
                     <div className="flex items-center justify-between mb-8">
                         <div>
                             <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Performance Metrics</h3>
@@ -135,7 +135,7 @@ export default function AuthorityAnalyticsPage() {
                 </div>
 
                 {/* Insights */}
-                <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                <div className="lg:col-span-2 premium-card p-6">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Key Insights</h3>
                         <div className="flex items-center gap-1.5">

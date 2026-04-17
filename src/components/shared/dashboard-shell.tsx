@@ -31,8 +31,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
-      {/* Desktop Sidebar */}
+    <div className="flex h-screen overflow-hidden bg-transparent">
       <div className="hidden lg:flex">
         <DashboardSidebar
           items={navConfig.mainNav}
@@ -42,9 +41,8 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         />
       </div>
 
-      {/* Mobile Sidebar (Sheet) */}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-        <SheetContent side="left" className="p-0 border-none w-72">
+        <SheetContent side="left" className="w-80 border-none bg-transparent p-0 shadow-none">
           <DashboardSidebar
             items={navConfig.mainNav}
             label={navConfig.label}
@@ -55,17 +53,19 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
         </SheetContent>
       </Sheet>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <DashboardHeader 
-          user={user} 
-          onLogout={handleLogout} 
-          onMenuToggle={() => setIsMobileMenuOpen(true)} 
-        />
+      <div className="relative flex-1 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(199,164,106,0.14),transparent_24%),radial-gradient(circle_at_top_left,rgba(22,32,51,0.07),transparent_28%)]" />
+        <div className="relative flex h-full flex-col overflow-hidden px-3 py-3 md:px-4">
+          <DashboardHeader
+            user={user}
+            onLogout={handleLogout}
+            onMenuToggle={() => setIsMobileMenuOpen(true)}
+          />
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-6 max-w-7xl mx-auto">{children}</div>
-        </main>
+          <main className="flex-1 overflow-y-auto">
+            <div className="mx-auto max-w-7xl px-2 py-5 md:px-4 md:py-6">{children}</div>
+          </main>
+        </div>
       </div>
 
       <AIAssistant />

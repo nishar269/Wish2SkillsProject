@@ -1,10 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
-import { loginAction } from "@/actions/auth";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import {
   GraduationCap,
@@ -21,14 +17,17 @@ import {
   ClipboardCheck,
 } from "lucide-react";
 
+import { loginAction } from "@/actions/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
 const DEMO_ACCOUNTS = [
   {
     role: "Admin",
     email: "admin@wish2skill.com",
     password: "Password123",
     icon: UserCog,
-    color: "bg-blue-600",
-    lightColor: "bg-blue-50 text-blue-700 border-blue-200",
     desc: "Full system access",
   },
   {
@@ -36,17 +35,13 @@ const DEMO_ACCOUNTS = [
     email: "faculty@wish2skill.com",
     password: "Password123",
     icon: BookOpen,
-    color: "bg-indigo-600",
-    lightColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    desc: "Classes & attendance",
+    desc: "Classes and attendance",
   },
   {
     role: "Student",
     email: "student@wish2skill.com",
     password: "Password123",
     icon: GraduationCap,
-    color: "bg-emerald-600",
-    lightColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
     desc: "Learning dashboard",
   },
   {
@@ -54,8 +49,6 @@ const DEMO_ACCOUNTS = [
     email: "coord@wish2skill.com",
     password: "Password123",
     icon: ClipboardCheck,
-    color: "bg-amber-600",
-    lightColor: "bg-amber-50 text-amber-700 border-amber-200",
     desc: "Batch management",
   },
 ];
@@ -63,7 +56,7 @@ const DEMO_ACCOUNTS = [
 const FEATURES = [
   { icon: Shield, text: "Secure RBAC Authentication" },
   { icon: Users, text: "Multi-Role Dashboard Access" },
-  { icon: BarChart3, text: "Real-Time Analytics & Reports" },
+  { icon: BarChart3, text: "Real-Time Analytics and Reports" },
   { icon: BookOpen, text: "AI-Powered Learning Tools" },
 ];
 
@@ -90,245 +83,220 @@ export default function LoginPage() {
   }
 
   function fillCredentials(email: string, password: string, role: string) {
-    const e = document.getElementById("email") as HTMLInputElement;
-    const p = document.getElementById("password") as HTMLInputElement;
-    if (e && p) {
-      e.value = email;
-      p.value = password;
+    const emailInput = document.getElementById("email") as HTMLInputElement | null;
+    const passwordInput = document.getElementById("password") as HTMLInputElement | null;
+
+    if (emailInput && passwordInput) {
+      emailInput.value = email;
+      passwordInput.value = password;
       setSelectedRole(role);
       setError(null);
     }
   }
 
   return (
-    <div className="min-h-screen flex font-sans selection:bg-blue-100">
-      {/* Left Panel — Branding & Features */}
-      <div className="hidden lg:flex lg:w-[52%] bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-[100px]" />
-          <div className="absolute bottom-32 right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[150px]" />
-          {/* Grid pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px'
-          }} />
-        </div>
+    <div className="min-h-screen bg-transparent">
+      <div className="grid min-h-screen lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="premium-dark-panel premium-grid relative m-4 hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12">
+          <div className="absolute right-0 top-0 h-72 w-72 rounded-full bg-[#c7a46a]/18 blur-3xl" />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30">
-              <GraduationCap className="h-7 w-7 text-white" />
+          <div className="relative z-10 flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#d5b482,#b78c46)] text-[#131b2c] shadow-[0_12px_30px_rgba(199,164,106,0.3)]">
+              <GraduationCap className="h-7 w-7" />
             </div>
             <div>
-              <h2 className="text-white font-bold text-xl tracking-tight">Wish2Skill</h2>
-              <p className="text-blue-400 text-[10px] font-semibold uppercase tracking-[0.2em]">CampusOS Platform</p>
+              <h2 className="premium-title text-[2rem] leading-none text-white">Wish2Skill</h2>
+              <p className="pt-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#c7a46a]">
+                CampusOS Platform
+              </p>
             </div>
           </div>
 
-          {/* Hero Content */}
-          <div className="space-y-8 max-w-lg">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-widest">
-                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                System Online
-              </div>
-              <h1 className="text-4xl xl:text-5xl font-bold text-white leading-[1.15] tracking-tight">
-                AI-Powered Institute{" "}
-                <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
-                  Management
-                </span>
+          <div className="relative z-10 max-w-xl space-y-8">
+            <div className="premium-kicker border-white/10 bg-white/8 text-[#d9cbb2]">
+              <div className="h-2 w-2 rounded-full bg-[#c7a46a]" />
+              Institution Control Layer
+            </div>
+
+            <div className="space-y-5">
+              <h1 className="premium-title text-6xl leading-[0.96] text-white xl:text-7xl">
+                Secure institutional access with a premium command-room feel.
               </h1>
-              <p className="text-slate-400 text-base leading-relaxed">
-                A comprehensive ERP & LMS solution designed for modern educational institutions.
-                Streamline operations, automate workflows, and enhance learning with AI.
+              <p className="max-w-lg text-lg leading-relaxed text-[#d6c5aa]">
+                Sign in to an environment built for administrators, faculty, students and coordinators. Clean operations, premium presence, no visual clutter.
               </p>
             </div>
 
-            {/* Feature list */}
-            <div className="grid grid-cols-2 gap-3">
-              {FEATURES.map((f, i) => (
-                <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5">
-                  <f.icon className="h-4 w-4 text-blue-400 shrink-0" />
-                  <span className="text-white/70 text-xs font-medium">{f.text}</span>
+            <div className="grid grid-cols-2 gap-4">
+              {FEATURES.map((feature) => (
+                <div key={feature.text} className="rounded-[22px] border border-white/8 bg-white/6 px-4 py-4">
+                  <feature.icon className="mb-3 h-5 w-5 text-[#f0d6a5]" />
+                  <span className="text-sm leading-snug text-[#e8dcc7]">{feature.text}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Footer stats */}
-          <div className="flex items-center gap-8">
-            <div>
-              <p className="text-2xl font-bold text-white">6</p>
-              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">User Roles</p>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
-            <div>
-              <p className="text-2xl font-bold text-white">50+</p>
-              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Features</p>
-            </div>
-            <div className="h-8 w-px bg-white/10" />
-            <div>
-              <p className="text-2xl font-bold text-white">AI</p>
-              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Integrated</p>
-            </div>
+          <div className="relative z-10 grid grid-cols-3 gap-4">
+            {[
+              { value: "6", label: "roles" },
+              { value: "GPS", label: "verified" },
+              { value: "AI", label: "guided" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-[22px] border border-white/8 bg-white/6 px-4 py-4">
+                <p className="premium-title text-3xl text-white">{stat.value}</p>
+                <p className="pt-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#bda174]">
+                  {stat.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Right Panel — Login Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 bg-white">
-        <div className="w-full max-w-md space-y-8">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-              <GraduationCap className="h-6 w-6" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">Wish2Skill</span>
-          </div>
-
-          {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Welcome back
-            </h1>
-            <p className="text-slate-500 text-sm">
-              Sign in to access your institute dashboard
-            </p>
-          </div>
-
-          {/* Quick Role Selector */}
-          <div className="space-y-3">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              Quick Access — Demo Accounts
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((account) => (
-                <button
-                  key={account.role}
-                  type="button"
-                  onClick={() => fillCredentials(account.email, account.password, account.role)}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 group ${
-                    selectedRole === account.role
-                      ? account.lightColor + " border-current shadow-sm"
-                      : "border-slate-100 hover:border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
-                    selectedRole === account.role ? account.color + " text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
-                  }`}>
-                    <account.icon className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <p className={`text-xs font-bold ${selectedRole === account.role ? "" : "text-slate-700"}`}>
-                      {account.role}
-                    </p>
-                    <p className={`text-[10px] ${selectedRole === account.role ? "opacity-70" : "text-slate-400"}`}>
-                      {account.desc}
-                    </p>
-                  </div>
-                  {selectedRole === account.role && (
-                    <CheckCircle2 className="h-3.5 w-3.5 ml-auto shrink-0" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-100" />
-            </div>
-            <div className="relative flex justify-center text-[10px] uppercase">
-              <span className="bg-white px-3 text-slate-400 font-bold tracking-widest">
-                Or enter credentials
-              </span>
-            </div>
-          </div>
-
-          {/* Login Form */}
-          <form action={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 text-red-600 text-xs font-semibold border border-red-100">
-                <Shield className="h-4 w-4 shrink-0" />
-                {error}
+        <div className="flex items-center justify-center px-6 py-10 md:px-10">
+          <div className="premium-shell w-full max-w-xl px-7 py-8 md:px-10 md:py-10">
+            <div className="mb-8 flex items-center gap-3 lg:hidden">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#d5b482,#b78c46)] text-[#131b2c]">
+                <GraduationCap className="h-6 w-6" />
               </div>
-            )}
-
-            <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-bold text-slate-600">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="you@institution.edu"
-                required
-                disabled={isPending}
-                className="h-11 border-slate-200 focus:border-blue-500 rounded-xl text-sm bg-slate-50 focus:bg-white transition-colors"
-              />
+              <div>
+                <div className="premium-title text-3xl text-[#141c2d]">Wish2Skill</div>
+                <div className="pt-1 text-[10px] font-semibold uppercase tracking-[0.26em] text-[#9d7b43]">
+                  CampusOS
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-xs font-bold text-slate-600">
-                  Password
+            <div className="space-y-2">
+              <div className="premium-kicker border-[#e0d5c4] bg-white/65 text-[#9d7b43]">Secure Access</div>
+              <h1 className="premium-title pt-3 text-5xl text-[#141c2d]">Welcome back</h1>
+              <p className="text-sm leading-relaxed text-[#665843]">
+                Sign in to enter the institutional workspace. Access is role-governed and tuned to your dashboard.
+              </p>
+            </div>
+
+            <div className="mt-8 space-y-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.26em] text-[#92754a]">
+                Quick Demo Access
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {DEMO_ACCOUNTS.map((account) => (
+                  <button
+                    key={account.role}
+                    type="button"
+                    onClick={() => fillCredentials(account.email, account.password, account.role)}
+                    className={`group flex items-center gap-3 rounded-[22px] border px-4 py-3 text-left transition-all ${
+                      selectedRole === account.role
+                        ? "border-[#c7a46a] bg-[rgba(199,164,106,0.16)] text-[#141c2d] shadow-[0_12px_30px_rgba(183,140,70,0.12)]"
+                        : "border-[#e3d8c9] bg-white/72 hover:border-[#ccb083] hover:bg-white"
+                    }`}
+                  >
+                    <div
+                      className={`flex h-10 w-10 items-center justify-center rounded-2xl transition-colors ${
+                        selectedRole === account.role
+                          ? "bg-[linear-gradient(135deg,#d5b482,#b78c46)] text-[#131b2c]"
+                          : "bg-[#f2eadf] text-[#8f6c35] group-hover:bg-[#ede1cd]"
+                      }`}
+                    >
+                      <account.icon className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{account.role}</p>
+                      <p className="pt-1 text-[11px] text-[#6d5f48]">{account.desc}</p>
+                    </div>
+                    {selectedRole === account.role && (
+                      <CheckCircle2 className="ml-auto h-4 w-4 shrink-0 text-[#8f6c35]" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative my-7">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-[#e4dacb]" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-[#f6f1e8] px-3 text-[10px] font-semibold uppercase tracking-[0.26em] text-[#9b8060]">
+                  Or use your credentials
+                </span>
+              </div>
+            </div>
+
+            <form action={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-xs font-semibold text-red-700">
+                  <Shield className="h-4 w-4 shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7b694e]">
+                  Email Address
                 </Label>
-                <Link href="/forgot-password" className="text-[10px] font-bold text-blue-600 hover:text-blue-700">
-                  Forgot Password?
-                </Link>
-              </div>
-              <div className="relative">
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="you@institution.edu"
                   required
                   disabled={isPending}
-                  className="h-11 border-slate-200 focus:border-blue-500 rounded-xl text-sm pr-11 bg-slate-50 focus:bg-white transition-colors"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
               </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7b694e]">
+                    Password
+                  </Label>
+                  <Link href="/forgot-password" className="text-[11px] font-semibold text-[#9d7b43] hover:text-[#141c2d]">
+                    Forgot Password?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    required
+                    disabled={isPending}
+                    className="pr-11"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#8d7857] transition-colors hover:text-[#141c2d]"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <Button type="submit" disabled={isPending} size="lg" className="w-full">
+                {isPending ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <>
+                    Enter Dashboard
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="pt-6 text-center">
+              <p className="text-xs text-[#7b6a51]">
+                Need access?{" "}
+                <Link href="/" className="font-semibold text-[#9d7b43] hover:text-[#141c2d]">
+                  Contact your administrator
+                </Link>
+              </p>
+              <p className="pt-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#b39a75]">
+                (c) 2026 Wish2Skill CampusOS
+              </p>
             </div>
-
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="w-full h-11 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 group"
-            >
-              {isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <>
-                  Sign In to Dashboard
-                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
-                </>
-              )}
-            </Button>
-          </form>
-
-          {/* Footer */}
-          <div className="pt-4 text-center space-y-3">
-            <p className="text-xs text-slate-400">
-              Don&apos;t have an account?{" "}
-              <Link href="/" className="text-blue-600 font-bold hover:text-blue-700">
-                Contact your Admin
-              </Link>
-            </p>
-            <p className="text-[10px] text-slate-300 font-medium">
-              © 2026 Wish2Skill CampusOS — Secure Authentication Protocol
-            </p>
           </div>
         </div>
       </div>
