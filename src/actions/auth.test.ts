@@ -26,7 +26,31 @@ vi.mock("next-auth", () => ({
   AuthError,
 }));
 
-import { loginAction, logoutAction } from "./auth";
+import { loginAction, logoutAction, forgotPasswordAction, resetPasswordAction } from "./auth";
+
+vi.mock("@/lib/mail", () => ({
+  sendNotificationEmail: vi.fn(),
+}));
+
+import { sendNotificationEmail } from "@/lib/mail";
+
+const mockDbAuth = vi.hoisted(() => ({
+  user: { findUnique: vi.fn(), update: vi.fn() },
+}));
+vi.mock("@/lib/db", () => ({ db: mockDbAuth }));
+
+vi.mock("jsonwebtoken", () => ({
+  default: {
+    sign: vi.fn(() => "mock_token"),
+    verify: vi.fn(() => ({ userId: "123" })),
+  }
+}));
+
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+vi.mock("bcryptjs", () => ({
+  default: { hash: vi.fn(() => "hashed_pwd") }
+}));
 
 function createLoginForm(email: string, password: string) {
   const formData = new FormData();
@@ -71,5 +95,41 @@ describe("auth actions", () => {
   it("logs out without redirecting", async () => {
     await logoutAction();
     expect(signOut).toHaveBeenCalledWith({ redirect: false });
+  });
+
+  describe("Password Recovery Flow", () => {
+    it("returns error if email is missing in forgotPasswordAction", async () => {
+      const form = new FormData();
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ error: "Email is required." });
+    });
+
+    it("sends recovery email for valid user", async () => {
+      const form = new FormData();
+      form.set("email", "admin@wish2skill.com");
+      mockDbAuth.user.findUnique.mockResolvedValue({ id: "123", email: "admin@wish2skill.com" });
+      
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ success: true });
+      expect(sendNotificationEmail).toHaveBeenCalled();
+    });
+
+    it("rejects token reset if passwords do not match", async () => {
+      const form = new FormData();
+      form.set("token", "xyz");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass9999");
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Passwords do not match." });
+    });
+
+    it("accepts valid token and updates password", async () => {
+      const form = new FormData();
+      form.set("token", "valid_token");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass1234");
+
+      mockDbAuth.user.findUnique.mockResolvedValue({ id: "123" });
+      
+      await expect(resetPasswordAction(form)).resolves.toEqual({ success: true });
+      expect(mockDbAuth.user.update).toHaveBeenCalled();
+    });
   });
 });
