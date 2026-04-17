@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { courseSchema } from "@/lib/validations";
+import { logAction } from "@/actions/audit";
 
 type BatchInput = {
   name: string;
@@ -66,7 +67,8 @@ export async function createCourse(formData: FormData) {
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Invalid course data." };
 
   try {
-    await db.course.create({ data: parsed.data });
+    const course = await db.course.create({ data: parsed.data });
+    await logAction("CREATE", "Course", course.id, `Admin created course: ${course.name}`);
     revalidatePath("/admin/courses");
     return { success: true };
   } catch (error) {
@@ -78,7 +80,8 @@ export async function createCourse(formData: FormData) {
 export async function deleteCourse(id: string) {
   await checkAdmin();
   try {
-    await db.course.delete({ where: { id } });
+    const course = await db.course.delete({ where: { id } });
+    await logAction("DELETE", "Course", id, `Admin deleted course: ${course.name}`);
     revalidatePath("/admin/courses");
     return { success: true };
   } catch {
@@ -112,7 +115,7 @@ export async function createBatch(data: BatchInput) {
   }
 
   try {
-    await db.batch.create({
+    const batch = await db.batch.create({
       data: {
         name: data.name,
         courseId: data.courseId,
@@ -122,6 +125,7 @@ export async function createBatch(data: BatchInput) {
         status: data.status || "UPCOMING"
       }
     });
+    await logAction("CREATE", "Batch", batch.id, `Admin created batch: ${batch.name}`);
     revalidatePath("/admin/batches");
     return { success: true };
   } catch (error) {
@@ -133,7 +137,8 @@ export async function createBatch(data: BatchInput) {
 export async function deleteBatch(id: string) {
   await checkAdmin();
   try {
-    await db.batch.delete({ where: { id } });
+    const batch = await db.batch.delete({ where: { id } });
+    await logAction("DELETE", "Batch", id, `Admin deleted batch: ${batch.name}`);
     revalidatePath("/admin/batches");
     return { success: true };
   } catch {

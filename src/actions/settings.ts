@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { logAction } from "@/actions/audit";
 import bcrypt from "bcryptjs";
 
 export async function getUserProfile() {
@@ -87,6 +88,7 @@ export async function updateSystemSettings(data: { key: string, value: string }[
               create: { key: setting.key, value: setting.value }
           });
       }
+      await logAction("UPDATE", "SystemSetting", "GLOBAL", "Admin updated global system settings");
       revalidatePath("/admin/settings");
       return { success: true };
   } catch {
