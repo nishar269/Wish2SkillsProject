@@ -51,7 +51,7 @@ const DEMO_ACCOUNTS = [
   },
   {
     role: "Coordinator",
-    email: "coordinator@wish2skill.com",
+    email: "coord@wish2skill.com",
     password: "Password123",
     icon: ClipboardCheck,
     color: "bg-amber-600",

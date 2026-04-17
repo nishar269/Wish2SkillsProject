@@ -57,7 +57,7 @@ export default function AdminSettingsClientPage({ initialSettings }: { initialSe
               <Card>
                 <CardHeader>
                   <CardTitle>Institute Identity</CardTitle>
-                  <CardDescription>Update your organization's dynamic information.</CardDescription>
+                  <CardDescription>Update your organization&apos;s dynamic information.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">

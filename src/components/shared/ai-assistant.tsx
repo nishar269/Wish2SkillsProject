@@ -37,7 +37,7 @@ export function AIAssistant() {
         }));
 
         const res = await chatWithCampusAI(userMessage, history);
-        if (res.isOffline) setIsOfflineMode(true);
+        if ("isOffline" in res && res.isOffline) setIsOfflineMode(true);
         setMessages(prev => [...prev, { role: "bot", content: res.text }]);
     } catch {
         setMessages(prev => [...prev, { role: "bot", content: "Something went wrong. Please try again." }]);

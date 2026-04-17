@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { getBatches } from "@/actions/admin";
 import { getFaculty } from "@/actions/faculty-admin";
-import { createClassSession, deleteClassSession, getClassSessions } from "@/actions/schedule-admin";
+import { createClassSession, deleteClassSession, getClassSessions, updateClassSession } from "@/actions/schedule-admin";
 import { getSubjects } from "@/actions/subject";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +12,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Clock, Loader2, MapPin, Plus, Trash2, Video } from "lucide-react";
+import { Clock, Loader2, MapPin, Pencil, Plus, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 type Session = Awaited<ReturnType<typeof getClassSessions>>;
+type SessionItem = Session[number];
 type Batch = Awaited<ReturnType<typeof getBatches>>;
 type Subject = Awaited<ReturnType<typeof getSubjects>>;
 type FacultyMember = Awaited<ReturnType<typeof getFaculty>>;
@@ -32,9 +34,12 @@ export default function ScheduleClientPage({
   subjects: Subject,
   facultyMembers: FacultyMember
 }) {
-  const [sessions] = useState(initialSessions);
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedSession, setSelectedSession] = useState<SessionItem | null>(null);
   const [isPending, startTransition] = useTransition();
+  const sessions = initialSessions;
+  const isEditing = selectedSession !== null;
 
   async function handleSubmit(formData: FormData) {
     const data = {
@@ -50,12 +55,17 @@ export default function ScheduleClientPage({
     };
 
     startTransition(async () => {
-      const res = await createClassSession(data);
+      const res = selectedSession
+        ? await updateClassSession(selectedSession.id, data)
+        : await createClassSession(data);
+
       if (res?.error) {
         toast.error(res.error);
       } else {
-        toast.success("Class session scheduled!");
+        toast.success(selectedSession ? "Class session updated." : "Class session scheduled!");
+        router.refresh();
         setIsOpen(false);
+        setSelectedSession(null);
       }
     });
   }
@@ -69,8 +79,19 @@ export default function ScheduleClientPage({
           toast.error(res.error);
         } else {
           toast.success("Class session removed.");
+          router.refresh();
         }
     });
+  }
+
+  function openCreateDialog() {
+    setSelectedSession(null);
+    setIsOpen(true);
+  }
+
+  function openEditDialog(session: SessionItem) {
+    setSelectedSession(session);
+    setIsOpen(true);
   }
 
   return (
@@ -83,20 +104,20 @@ export default function ScheduleClientPage({
 
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-cyan-600 hover:bg-cyan-700 text-white">
+            <Button className="bg-cyan-600 hover:bg-cyan-700 text-white" onClick={openCreateDialog}>
               <Plus className="h-4 w-4 mr-2" /> Schedule Class
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Schedule New Class Session</DialogTitle>
+              <DialogTitle>{isEditing ? "Edit Class Session" : "Schedule New Class Session"}</DialogTitle>
             </DialogHeader>
-            <form action={handleSubmit} className="space-y-4 mt-4">
+            <form key={selectedSession?.id ?? "new"} action={handleSubmit} className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Batch</Label>
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="batchId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                    <select name="batchId" required defaultValue={selectedSession?.batchId ?? ""} className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Select Batch</option>
                         {batches.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
@@ -105,7 +126,7 @@ export default function ScheduleClientPage({
                 <div className="space-y-2">
                   <Label>Subject</Label>
                   <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="subjectId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                    <select name="subjectId" required defaultValue={selectedSession?.subjectId ?? ""} className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Select Subject</option>
                         {subjects.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
                     </select>
@@ -116,7 +137,7 @@ export default function ScheduleClientPage({
               <div className="space-y-2">
                 <Label>Faculty Member</Label>
                 <div className="border rounded-md px-3 py-2 bg-slate-50 dark:bg-slate-900 border-slate-200">
-                    <select name="facultyId" required defaultValue="" className="w-full bg-transparent outline-none text-sm">
+                    <select name="facultyId" required defaultValue={selectedSession?.facultyId ?? ""} className="w-full bg-transparent outline-none text-sm">
                         <option value="" disabled>Assign Faculty</option>
                         {facultyMembers.map((f) => <option key={f.id} value={f.id}>{f.user.name}</option>)}
                     </select>
@@ -126,37 +147,37 @@ export default function ScheduleClientPage({
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="date">Date</Label>
-                  <Input id="date" name="date" type="date" required />
+                  <Input id="date" name="date" type="date" required defaultValue={selectedSession ? format(new Date(selectedSession.date), "yyyy-MM-dd") : ""} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="startTime">Start Time</Label>
-                  <Input id="startTime" name="startTime" type="time" required />
+                  <Input id="startTime" name="startTime" type="time" required defaultValue={selectedSession ? format(new Date(selectedSession.startTime), "HH:mm") : ""} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="endTime">End Time</Label>
-                  <Input id="endTime" name="endTime" type="time" required />
+                  <Input id="endTime" name="endTime" type="time" required defaultValue={selectedSession ? format(new Date(selectedSession.endTime), "HH:mm") : ""} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                  <div className="space-y-2">
                   <Label htmlFor="room">Room / Location</Label>
-                  <Input id="room" name="room" placeholder="Lab 101" />
+                  <Input id="room" name="room" placeholder="Lab 101" defaultValue={selectedSession?.room ?? ""} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="meetLink">Online Link (Optional)</Label>
-                  <Input id="meetLink" name="meetLink" placeholder="Zoom/Meet Link" />
+                  <Input id="meetLink" name="meetLink" placeholder="Zoom/Meet Link" defaultValue={selectedSession?.meetLink ?? ""} />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="topic">Topic / Agenda</Label>
-                <Input id="topic" name="topic" placeholder="e.g. Introduction to React" />
+                <Input id="topic" name="topic" placeholder="e.g. Introduction to React" defaultValue={selectedSession?.topic ?? ""} />
               </div>
 
               <Button type="submit" disabled={isPending} className="w-full bg-cyan-600 hover:bg-cyan-700">
                 {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                Confirm Schedule
+                {isEditing ? "Save Schedule Changes" : "Confirm Schedule"}
               </Button>
             </form>
           </DialogContent>
@@ -228,6 +249,9 @@ export default function ScheduleClientPage({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" className="text-slate-600 hover:bg-slate-100" onClick={() => openEditDialog(s)} disabled={isPending}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="text-red-500 hover:bg-red-50" onClick={() => handleDelete(s.id)} disabled={isPending}>
                         <Trash2 className="h-4 w-4" />
                       </Button>

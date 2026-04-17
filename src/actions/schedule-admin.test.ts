@@ -7,7 +7,9 @@ const { auth, revalidatePath, sendNotificationEmail, db } = vi.hoisted(() => ({
   db: {
     classSession: {
       findMany: vi.fn(),
+      findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
       delete: vi.fn(),
     },
     batch: {
@@ -99,10 +101,95 @@ describe("schedule admin actions", () => {
 
   it("deletes scheduled classes for authorized roles", async () => {
     auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
+    db.classSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      date: new Date("2026-05-15"),
+      startTime: new Date("2026-05-15T09:00"),
+      endTime: new Date("2026-05-15T10:00"),
+      topic: "Motion",
+      batch: {
+        students: [
+          { user: { email: "student1@example.com" } },
+          { user: { email: "student2@example.com" } },
+        ],
+      },
+      subject: { name: "Physics" },
+    });
 
     const { deleteClassSession } = await import("./schedule-admin");
 
     await expect(deleteClassSession("session-1")).resolves.toEqual({ success: true });
+    expect(db.classSession.findUnique).toHaveBeenCalledWith({
+      where: { id: "session-1" },
+      include: {
+        batch: {
+          include: {
+            students: {
+              include: { user: { select: { email: true } } },
+            },
+          },
+        },
+        subject: true,
+      },
+    });
     expect(db.classSession.delete).toHaveBeenCalledWith({ where: { id: "session-1" } });
+    expect(sendNotificationEmail).toHaveBeenCalledTimes(2);
+  });
+
+  it("updates scheduled classes and notifies the new batch", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.classSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      batch: {
+        id: "batch-1",
+        students: [{ user: { email: "oldstudent@example.com" } }],
+      },
+      subject: { name: "Physics" },
+      date: new Date("2026-05-15"),
+      startTime: new Date("2026-05-15T09:00"),
+      endTime: new Date("2026-05-15T10:00"),
+      topic: "Motion",
+    });
+    db.batch.findUnique.mockResolvedValue({
+      id: "batch-2",
+      students: [
+        { user: { email: "student1@example.com" } },
+        { user: { email: "student2@example.com" } },
+      ],
+    });
+    db.subject.findUnique.mockResolvedValue({ id: "subject-2", name: "Chemistry" });
+
+    const { updateClassSession } = await import("./schedule-admin");
+
+    await expect(
+      updateClassSession("session-1", {
+        batchId: "batch-2",
+        subjectId: "subject-2",
+        facultyId: "faculty-2",
+        date: "2026-05-16",
+        startTime: "11:00",
+        endTime: "12:00",
+        room: "Lab 5",
+        topic: "Atoms",
+      })
+    ).resolves.toEqual({ success: true });
+
+    expect(db.classSession.update).toHaveBeenCalledWith({
+      where: { id: "session-1" },
+      data: {
+        batchId: "batch-2",
+        subjectId: "subject-2",
+        facultyId: "faculty-2",
+        date: new Date("2026-05-16"),
+        startTime: new Date("2026-05-16T11:00"),
+        endTime: new Date("2026-05-16T12:00"),
+        room: "Lab 5",
+        meetLink: undefined,
+        topic: "Atoms",
+      },
+    });
+    expect(sendNotificationEmail).toHaveBeenCalledTimes(3);
+    expect(revalidatePath).toHaveBeenCalledWith("/admin/schedule");
+    expect(revalidatePath).toHaveBeenCalledWith("/coordinator/schedule");
   });
 });

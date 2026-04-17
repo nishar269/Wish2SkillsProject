@@ -1,35 +1,37 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { sendEmail, Resend } = vi.hoisted(() => ({
-  sendEmail: vi.fn(),
-  Resend: vi.fn().mockImplementation(function MockResend() {
-    return {
-      emails: {
-        send: sendEmail,
-      },
-    };
-  }),
-}));
+const { sendMail, createTransport } = vi.hoisted(() => {
+  const sendMailMock = vi.fn();
+  return {
+    sendMail: sendMailMock,
+    createTransport: vi.fn().mockReturnValue({
+      sendMail: sendMailMock,
+    }),
+  };
+});
 
-vi.mock("resend", () => ({ Resend }));
+vi.mock("nodemailer", () => ({ default: { createTransport } }));
 
 describe("mail helper", () => {
   beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
-    delete process.env.RESEND_API_KEY;
+    delete process.env.SMTP_USER;
+    delete process.env.SMTP_PASS;
   });
 
-  it("skips sending when RESEND_API_KEY is missing", async () => {
+  it("skips sending when SMTP credentials are missing", async () => {
     const { sendNotificationEmail } = await import("./mail");
 
     await expect(sendNotificationEmail("user@example.com", "Subject", "Title", "Message")).resolves.toBeUndefined();
-    expect(sendEmail).not.toHaveBeenCalled();
+    expect(sendMail).not.toHaveBeenCalled();
   });
 
-  it("sends mail when RESEND_API_KEY is present", async () => {
-    process.env.RESEND_API_KEY = "re_test";
-    sendEmail.mockResolvedValue({ data: { id: "email-1" }, error: null });
+  it("sends mail when SMTP credentials are present", async () => {
+    process.env.SMTP_USER = "test@example.com";
+    process.env.SMTP_PASS = "password123";
+    
+    sendMail.mockResolvedValue({ messageId: "email-1" });
 
     const { sendNotificationEmail } = await import("./mail");
 
