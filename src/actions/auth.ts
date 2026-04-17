@@ -23,7 +23,7 @@ export async function loginAction(formData: FormData) {
     });
 
     if (result?.error) {
-       return { error: "Invalid credentials sync attempt. Please check access secret." };
+       return { error: "Invalid email or password. Please try again." };
     }
 
     return { success: true };

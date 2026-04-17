@@ -61,7 +61,7 @@ export default async function CertificatesPage() {
                     )}
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 text-[10px] font-black uppercase text-slate-400">
-                        <ShieldCheck className="h-4 w-4 text-emerald-500" /> Verified by CampusOS Node
+                        <ShieldCheck className="h-4 w-4 text-emerald-500" /> Verified by CampusOS
                     </div>
                 </div>
             </CardContent>

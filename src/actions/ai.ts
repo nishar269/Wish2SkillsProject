@@ -11,7 +11,7 @@ export async function chatWithCampusAI(prompt: string, history: { role: string, 
 
   if (!process.env.GEMINI_API_KEY) {
     return { 
-        text: "Neural connection offline. I am currently operating on internal protocols. Please initialize the 'GEMINI_API_KEY' node to enable full multi-modal intelligence. My local data banks are ready to manage your institutional workflows in the meantime.",
+        text: "The AI service is currently unavailable. Please ensure the GEMINI_API_KEY is configured. In the meantime, feel free to navigate the platform using the sidebar.",
         isOffline: true
     };
   }
@@ -40,6 +40,6 @@ export async function chatWithCampusAI(prompt: string, history: { role: string, 
     return { text: response.text() };
   } catch (error) {
     console.error("Gemini Error:", error);
-    return { text: "Sorry, I'm having trouble connecting to my creative circuits right now. Please try again in a moment." };
+    return { text: "Sorry, I'm having trouble processing your request right now. Please try again in a moment." };
   }
 }
