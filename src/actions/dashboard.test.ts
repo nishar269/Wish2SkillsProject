@@ -23,7 +23,6 @@ vi.mock("@/lib/auth", () => ({
 
 import { 
   getStudentDashboardData, 
-  getFacultyDashboardData, 
   getAuthorityDashboardData, 
   getCoordinatorDashboardData 
 } from "./dashboard";

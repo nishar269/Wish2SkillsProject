@@ -46,8 +46,7 @@ vi.mock("jsonwebtoken", () => ({
   }
 }));
 
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+// jwt and bcrypt mock setups
 vi.mock("bcryptjs", () => ({
   default: { hash: vi.fn(() => "hashed_pwd") }
 }));
