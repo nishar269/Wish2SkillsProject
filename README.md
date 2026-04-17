@@ -48,11 +48,12 @@
 | **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS, Lucide React |
 | **Backend** | Next.js Server Actions, Node.js |
 | **Database** | PostgreSQL (Neon.tech), Prisma ORM |
-| **Authentication** | NextAuth.js v5 (Auth.js) |
+| **Authentication** | NextAuth.js v5 (Auth.js) & Custom JWT Reset Links |
 | **AI Layer** | Google Gemini API (Generative AI) |
-| **Messaging** | Resend API (Email Notifications) |
+| **Messaging** | Nodemailer (SMTP Email Notifications) |
 | **UI Components** | Radix UI, Shadcn/UI, Framer Motion |
-| **Analytics** | Recharts |
+| **Analytics** | Recharts (100% Live PostgreSQL Integration) |
+| **CI/CD pipeline**| GitHub Actions (Tests, Lint, Types), Netlify Edge Serverless |
 
 ---
 
@@ -72,7 +73,11 @@ NEXTAUTH_SECRET="your_secret_key"
 NEXTAUTH_URL="http://localhost:3000"
 
 GEMINI_API_KEY="your_google_gemini_api_key"
-RESEND_API_KEY="your_resend_api_key"
+
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="your_smtp_user"
+SMTP_PASS="your_smtp_password"
 ```
 
 ### 3. Initialize Database
