@@ -6,7 +6,7 @@ describe("authConfig", () => {
   it("stores user id and valid role on the JWT", async () => {
     const token = await authConfig.callbacks.jwt({
       token: {},
-      user: { id: "user-1", role: "ADMIN" },
+      user: { id: "user-1", role: "ADMIN" } as any,
       account: null,
       profile: undefined,
       trigger: "signIn",
@@ -20,7 +20,7 @@ describe("authConfig", () => {
   it("ignores invalid roles in the JWT callback", async () => {
     const token = await authConfig.callbacks.jwt({
       token: {},
-      user: { id: "user-1", role: "NOT_A_ROLE" },
+      user: { id: "user-1", role: "NOT_A_ROLE" } as any,
       account: null,
       profile: undefined,
       trigger: "signIn",

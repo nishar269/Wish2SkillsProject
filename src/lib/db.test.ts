@@ -11,7 +11,6 @@ const { PrismaClient } = vi.hoisted(() => {
 vi.mock("@prisma/client", () => ({ PrismaClient }));
 
 describe("db singleton", () => {
-  const originalNodeEnv = process.env.NODE_ENV;
 
   beforeEach(() => {
     vi.resetModules();
@@ -20,11 +19,11 @@ describe("db singleton", () => {
   });
 
   afterEach(() => {
-    process.env.NODE_ENV = originalNodeEnv;
+    vi.unstubAllEnvs();
   });
 
   it("creates and caches a prisma client outside production", async () => {
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
 
     const { db } = await import("./db");
 
@@ -34,7 +33,7 @@ describe("db singleton", () => {
   });
 
   it("reuses an existing cached prisma client", async () => {
-    process.env.NODE_ENV = "test";
+    vi.stubEnv("NODE_ENV", "test");
     const existing = { tag: "existing-prisma" };
     (globalThis as typeof globalThis & { prisma?: unknown }).prisma = existing;
 
