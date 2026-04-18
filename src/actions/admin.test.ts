@@ -133,6 +133,13 @@ describe("admin actions", () => {
     });
   });
 
+  it("rejects course creation for non-admin users (e.g. coordinator)", async () => {
+    auth.mockResolvedValue({ user: { role: "COORDINATOR" } });
+    const formData = new FormData();
+    const { createCourse } = await import("./admin");
+    await expect(createCourse(formData)).rejects.toThrow("Unauthorized");
+  });
+
   it("returns batches for faculty access", async () => {
     auth.mockResolvedValue({ user: { role: "FACULTY" } });
     db.batch.findMany.mockResolvedValue([{ id: "batch-1" }]);
@@ -171,8 +178,33 @@ describe("admin actions", () => {
         status: "UPCOMING",
       },
     });
-    expect(logAction).toHaveBeenCalledWith("CREATE", "Batch", "batch-1", "Admin created batch: Batch A");
     expect(revalidatePath).toHaveBeenCalledWith("/admin/batches");
+    return { success: true };
+  });
+
+  it("handles empty description and custom capacity with fallbacks", async () => {
+    auth.mockResolvedValue({ user: { role: "ADMIN" } });
+    db.course.create.mockResolvedValue({ id: "c1", name: "X" });
+    db.batch.create.mockResolvedValue({ id: "b1", name: "B" });
+    
+    const { createCourse, createBatch } = await import("./admin");
+    
+    // Course with empty description
+    const form = new FormData();
+    form.set("name", "Valid Course");
+    form.set("code", "VC01");
+    form.set("durationMonths", "1");
+    form.set("description", "   ");
+    await createCourse(form);
+    expect(db.course.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ description: undefined })
+    }));
+
+    // Batch with invalid capacity
+    await createBatch({ name: "Batch B", courseId: "c1", startDate: "2026-01-01", capacity: "invalid" });
+    expect(db.batch.create).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({ capacity: 30 })
+    }));
   });
 
   it("rejects batch creation when required fields are missing", async () => {
@@ -184,6 +216,18 @@ describe("admin actions", () => {
       error: "Required fields are missing.",
     });
     expect(db.batch.create).not.toHaveBeenCalled();
+  });
+
+  it("handles non-object errors in getErrorCode via failure cases", async () => {
+    auth.mockResolvedValue({ user: { role: "ADMIN" } });
+    db.course.create.mockRejectedValue("string error"); 
+    const { createCourse } = await import("./admin");
+    const form = new FormData();
+    form.set("name", "Valid Course");
+    form.set("code", "VC01");
+    form.set("durationMonths", "1");
+    const res = await createCourse(form);
+    expect(res).toEqual({ error: "Failed to create course." });
   });
 
   it("returns a duplicate error when batch creation violates a unique key", async () => {

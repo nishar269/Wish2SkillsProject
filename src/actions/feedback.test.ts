@@ -143,6 +143,48 @@ describe("feedback actions", () => {
       );
       errorSpy.mockRestore();
     });
+
+    it("falls back to rule-based sentiment (NEGATIVE) when Gemini fails", async () => {
+      process.env.GEMINI_API_KEY = "test-key";
+      auth.mockResolvedValue({ user: { id: "student-user" } });
+      db.student.findUnique.mockResolvedValue({ id: "student-1" });
+      db.feedback.create.mockResolvedValue({ id: "1" });
+      generateContent.mockRejectedValue(new Error("Gemini unavailable"));
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const { submitFeedback } = await import("./feedback");
+      await expect(
+        submitFeedback({ message: "Poor management and bad classes.", rating: 2 })
+      ).resolves.toEqual({ success: true });
+
+      expect(db.feedback.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ sentiment: "NEGATIVE" }),
+        })
+      );
+      errorSpy.mockRestore();
+    });
+
+    it("uses default sentiment (NEUTRAL) when Gemini returns invalid response", async () => {
+        process.env.GEMINI_API_KEY = "test-key";
+        auth.mockResolvedValue({ user: { id: "student-user" } });
+        db.student.findUnique.mockResolvedValue({ id: "student-1" });
+        db.feedback.create.mockResolvedValue({ id: "1" });
+        generateContent.mockResolvedValue({
+          response: { text: () => "MAYBE" }
+        });
+  
+        const { submitFeedback } = await import("./feedback");
+        await expect(
+          submitFeedback({ message: "Average experience overall.", rating: 3 })
+        ).resolves.toEqual({ success: true });
+  
+        expect(db.feedback.create).toHaveBeenCalledWith(
+          expect.objectContaining({
+            data: expect.objectContaining({ sentiment: "NEUTRAL" }),
+          })
+        );
+      });
   });
 
   describe("getAuthorityFeedbackData", () => {
