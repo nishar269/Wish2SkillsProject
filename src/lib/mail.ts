@@ -1,7 +1,83 @@
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-// Create a reusable transporter using Gmail SMTP
-function getTransporter() {
+type MailProvider = "resend" | "smtp" | "suppressed";
+type MailDeliveryMode = "live" | "log" | "disabled";
+
+type MailSender = {
+  email: string;
+  name: string;
+};
+
+type MailDispatchResult = {
+  id: string | null;
+  provider: MailProvider;
+};
+
+type MailTransport = {
+  provider: MailProvider;
+  send: (payload: {
+    to: string;
+    subject: string;
+    html: string;
+    sender: MailSender;
+  }) => Promise<MailDispatchResult>;
+};
+
+function getSender() {
+  const email = process.env.MAIL_FROM_EMAIL ?? process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER;
+
+  if (!email) {
+    return null;
+  }
+
+  return {
+    email,
+    name: process.env.MAIL_FROM_NAME ?? "Wish2Skill CampusOS",
+  };
+}
+
+function getDeliveryMode(): MailDeliveryMode {
+  const configuredMode = process.env.MAIL_DELIVERY_MODE;
+
+  if (configuredMode === "live" || configuredMode === "log" || configuredMode === "disabled") {
+    return configuredMode;
+  }
+
+  return process.env.NODE_ENV === "production" ? "live" : "log";
+}
+
+function createResendTransport() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return null;
+  }
+
+  const client = new Resend(apiKey);
+
+  return {
+    provider: "resend" as const,
+    async send({ to, subject, html, sender }) {
+      const { data, error } = await client.emails.send({
+        from: `"${sender.name}" <${sender.email}>`,
+        to,
+        subject,
+        html,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      return {
+        id: data?.id ?? null,
+        provider: "resend" as const,
+      };
+    },
+  } satisfies MailTransport;
+}
+
+function createSmtpTransport() {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
@@ -9,13 +85,85 @@ function getTransporter() {
     return null;
   }
 
-  return nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user,
-      pass,
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT ?? 587);
+  const secure = process.env.SMTP_SECURE === "true" || port === 465;
+  const service = process.env.SMTP_SERVICE ?? (host ? undefined : "gmail");
+
+  const transporter = nodemailer.createTransport(
+    service
+      ? {
+          service,
+          auth: { user, pass },
+        }
+      : {
+          host,
+          port,
+          secure,
+          auth: { user, pass },
+        }
+  );
+
+  return {
+    provider: "smtp" as const,
+    async send({ to, subject, html, sender }) {
+      const info = await transporter.sendMail({
+        from: `"${sender.name}" <${sender.email}>`,
+        to,
+        subject,
+        html,
+      });
+
+      return {
+        id: info.messageId ?? null,
+        provider: "smtp" as const,
+      };
     },
-  });
+  } satisfies MailTransport;
+}
+
+function getTransport() {
+  return createResendTransport() ?? createSmtpTransport();
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  return "Unknown mail transport error";
+}
+
+function getErrorCode(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return null;
+  }
+
+  const withCode = error as {
+    code?: string;
+    statusCode?: number;
+    responseCode?: number;
+  };
+
+  return withCode.responseCode ?? withCode.statusCode ?? withCode.code ?? null;
+}
+
+function isRetryableEmailError(error: unknown) {
+  const code = getErrorCode(error);
+
+  if (typeof code === "number") {
+    return [421, 425, 429, 450, 451, 452, 454].includes(code);
+  }
+
+  if (typeof code === "string") {
+    return ["ECONNECTION", "ECONNRESET", "ETIMEDOUT", "ESOCKET"].includes(code);
+  }
+
+  return false;
 }
 
 export async function sendNotificationEmail(
@@ -26,10 +174,20 @@ export async function sendNotificationEmail(
   actionLabel?: string,
   actionUrl?: string
 ) {
-  const transporter = getTransporter();
+  const deliveryMode = getDeliveryMode();
+  const sender = getSender();
+  const transport = getTransport();
 
-  if (!transporter) {
-    console.log("Email Notification Skipped (No SMTP credentials):", { to, subject, message });
+  if (deliveryMode !== "live") {
+    console.log(`Email delivery ${deliveryMode === "disabled" ? "disabled" : "suppressed"}:`, {
+      to,
+      subject,
+    });
+    return { success: true, id: null, provider: "suppressed" as const };
+  }
+
+  if (!sender || !transport) {
+    console.log("Email Notification Skipped (No email provider configured):", { to, subject });
     return;
   }
 
@@ -57,17 +215,23 @@ export async function sendNotificationEmail(
   `;
 
   try {
-    const info = await transporter.sendMail({
-      from: `"Wish2Skill CampusOS" <${process.env.SMTP_USER}>`,
+    const result = await transport.send({
       to,
       subject,
       html,
+      sender,
     });
 
-    console.log("Email sent:", info.messageId);
-    return { success: true, id: info.messageId };
+    console.log(`Email sent via ${result.provider}:`, result.id ?? "(no id)");
+    return { success: true, id: result.id, provider: result.provider };
   } catch (error) {
-    console.error("Email Error:", error);
-    return { error };
+    const log = isRetryableEmailError(error) ? console.warn : console.error;
+    log(`Email delivery failed via ${transport.provider}:`, {
+      code: getErrorCode(error),
+      message: getErrorMessage(error),
+      to,
+      subject,
+    });
+    return;
   }
 }
