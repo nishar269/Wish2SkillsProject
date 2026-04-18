@@ -8,30 +8,61 @@ export function PWARegistry() {
       return;
     }
 
-    const clearDeploymentCaches = async () => {
+    const deployId =
+      process.env.NEXT_PUBLIC_DEPLOY_ID ||
+      process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
+      "dev";
+
+    const cleanupKey = `wish2skill-sw-cleanup:${deployId}`;
+    const reloadKey = `wish2skill-sw-reload:${deployId}`;
+
+    const hasAlreadyCleanedUp = () => {
+      try {
+        return window.localStorage.getItem(cleanupKey) === "done";
+      } catch {
+        return false;
+      }
+    };
+
+    const markCleanedUp = () => {
+      try {
+        window.localStorage.setItem(cleanupKey, "done");
+      } catch {
+        // localStorage can be disabled; best-effort only.
+      }
+    };
+
+    if (hasAlreadyCleanedUp()) {
+      return;
+    }
+
+    const clearDeploymentCaches = async (): Promise<number> => {
       if (!("caches" in window)) {
-        return;
+        return 0;
       }
 
       const keys = await caches.keys();
-      await Promise.all(
-        keys
-          .filter((key) => key.startsWith("wish2skill-"))
-          .map((key) => caches.delete(key).catch(() => undefined))
+      const wish2skillKeys = keys.filter((key) => key.startsWith("wish2skill-"));
+
+      await Promise.allSettled(
+        wish2skillKeys.map((key) => caches.delete(key).catch(() => undefined))
       );
+
+      return wish2skillKeys.length;
     };
 
     const removeLegacyServiceWorkers = async () => {
-      const registrations = await navigator.serviceWorker.getRegistrations();
+      const registrations = await navigator.serviceWorker.getRegistrations().catch(() => []);
       const hadRegistrations = registrations.length > 0;
 
-      await Promise.all(
-        registrations.map((registration) => registration.unregister().catch(() => false))
-      );
-      await clearDeploymentCaches();
+      await Promise.allSettled(registrations.map((registration) => registration.unregister()));
+      const deletedCacheCount = await clearDeploymentCaches();
 
-      const reloadKey = "wish2skill-sw-reset";
-      if (hadRegistrations && !window.sessionStorage.getItem(reloadKey)) {
+      // Mark before potentially reloading to avoid loops.
+      markCleanedUp();
+
+      const shouldReload = hadRegistrations || deletedCacheCount > 0;
+      if (shouldReload && !window.sessionStorage.getItem(reloadKey)) {
         window.sessionStorage.setItem(reloadKey, "done");
         window.location.reload();
         return;
@@ -40,8 +71,9 @@ export function PWARegistry() {
       window.sessionStorage.removeItem(reloadKey);
     };
 
-    removeLegacyServiceWorkers().catch((error) => {
-      console.error("Service worker cleanup failed:", error);
+    removeLegacyServiceWorkers().catch(() => {
+      // Best-effort cleanup only; don't block boot.
+      markCleanedUp();
     });
   }, []);
 
