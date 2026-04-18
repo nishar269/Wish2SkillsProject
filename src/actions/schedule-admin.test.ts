@@ -33,6 +33,50 @@ describe("schedule admin actions", () => {
     sendNotificationEmail.mockResolvedValue({ success: true });
   });
 
+  describe("auth guards and validations", () => {
+    it("rejects unauthorized access for all actions", async () => {
+      auth.mockResolvedValue(null);
+      
+      const { getClassSessions, createClassSession, updateClassSession, deleteClassSession } = await import("./schedule-admin");
+      
+      await expect(getClassSessions("b1")).rejects.toThrow("Unauthorized");
+      await expect(createClassSession({} as any)).rejects.toThrow("Unauthorized");
+      await expect(updateClassSession("1", {} as any)).rejects.toThrow("Unauthorized");
+      await expect(deleteClassSession("1")).rejects.toThrow("Unauthorized");
+
+      auth.mockResolvedValue({ user: { role: "STUDENT" } });
+      await expect(createClassSession({} as any)).rejects.toThrow("Unauthorized");
+      await expect(updateClassSession("1", {} as any)).rejects.toThrow("Unauthorized");
+      await expect(deleteClassSession("1")).rejects.toThrow("Unauthorized");
+    });
+
+    it("returns error if required fields are missing during creation", async () => {
+      auth.mockResolvedValue({ user: { role: "ADMIN" } });
+      const { createClassSession } = await import("./schedule-admin");
+      await expect(createClassSession({ batchId: "b1" } as any)).resolves.toEqual({ error: "Required fields are missing." });
+    });
+
+    it("returns error if required fields are missing during update", async () => {
+      auth.mockResolvedValue({ user: { role: "ADMIN" } });
+      const { updateClassSession } = await import("./schedule-admin");
+      await expect(updateClassSession("s1", { batchId: "b1" } as any)).resolves.toEqual({ error: "Required fields are missing." });
+    });
+
+    it("returns error if class session is not found during update", async () => {
+      auth.mockResolvedValue({ user: { role: "ADMIN" } });
+      db.classSession.findUnique.mockResolvedValue(null);
+      const { updateClassSession } = await import("./schedule-admin");
+      await expect(updateClassSession("s1", {
+        batchId: "b1",
+        subjectId: "su1",
+        facultyId: "f1",
+        date: "2026-05-15",
+        startTime: "09:00",
+        endTime: "10:00",
+      })).resolves.toEqual({ error: "Class session not found." });
+    });
+  });
+
   it("returns class sessions for authenticated users", async () => {
     const sessions = [{ id: "session-1" }];
     auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
@@ -99,6 +143,26 @@ describe("schedule admin actions", () => {
     expect(revalidatePath).toHaveBeenCalledWith("/coordinator/schedule");
   });
 
+  it("returns error if createClassSession fails in database", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.classSession.create.mockRejectedValue(new Error("db failing"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { createClassSession } = await import("./schedule-admin");
+    await expect(
+      createClassSession({
+        batchId: "batch-1",
+        subjectId: "subject-1",
+        facultyId: "faculty-1",
+        date: "2026-05-15",
+        startTime: "09:00",
+        endTime: "10:00",
+      })
+    ).resolves.toEqual({ error: "Failed to schedule class session." });
+
+    errorSpy.mockRestore();
+  });
+
   it("deletes scheduled classes for authorized roles", async () => {
     auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
     db.classSession.findUnique.mockResolvedValue({
@@ -134,6 +198,13 @@ describe("schedule admin actions", () => {
     });
     expect(db.classSession.delete).toHaveBeenCalledWith({ where: { id: "session-1" } });
     expect(sendNotificationEmail).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns error if delete fails in db", async () => {
+    auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
+    db.classSession.delete.mockRejectedValue(new Error("db failing"));
+    const { deleteClassSession } = await import("./schedule-admin");
+    await expect(deleteClassSession("session-1")).resolves.toEqual({ error: "Failed to delete scheduled class." });
   });
 
   it("updates scheduled classes and notifies the new batch", async () => {
@@ -191,5 +262,33 @@ describe("schedule admin actions", () => {
     expect(sendNotificationEmail).toHaveBeenCalledTimes(3);
     expect(revalidatePath).toHaveBeenCalledWith("/admin/schedule");
     expect(revalidatePath).toHaveBeenCalledWith("/coordinator/schedule");
+  });
+
+  it("returns error if update fails in db", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.classSession.findUnique.mockResolvedValue({
+      id: "session-1",
+      batch: { students: [] },
+      subject: { name: "Physics" },
+      date: new Date("2026-05-15"),
+      startTime: new Date("2026-05-15T09:00"),
+      endTime: new Date("2026-05-15T10:00"),
+    });
+    db.classSession.update.mockRejectedValue(new Error("db failing"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { updateClassSession } = await import("./schedule-admin");
+    await expect(
+      updateClassSession("session-1", {
+        batchId: "batch-2",
+        subjectId: "su1",
+        facultyId: "f1",
+        date: "2026-05-15",
+        startTime: "09:00",
+        endTime: "10:00",
+      })
+    ).resolves.toEqual({ error: "Failed to update scheduled class." });
+
+    errorSpy.mockRestore();
   });
 });

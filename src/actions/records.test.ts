@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { auth, db } = vi.hoisted(() => ({
   auth: vi.fn(),
   db: {
-    student: { count: vi.fn() },
-    faculty: { count: vi.fn() },
+    student: { count: vi.fn(), findMany: vi.fn() },
+    faculty: { count: vi.fn(), findMany: vi.fn() },
+    attendance: { findMany: vi.fn() },
     batch: { count: vi.fn(), findMany: vi.fn() },
     auditLog: { count: vi.fn(), findMany: vi.fn(), create: vi.fn() },
   },
@@ -45,24 +46,64 @@ describe("records actions", () => {
     await expect(getRecordsStats()).rejects.toThrow("Unauthorized");
   });
 
-  it("logs an export request for admins", async () => {
+  it("logs an export request and generates CSV for students", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
-
+    db.student.findMany.mockResolvedValue([
+      { id: "s1", enrollmentTerm: "Fall 2026", user: { name: "Alice", email: "alice@test.com" }, course: { name: "CS" }, batch: { name: "A1" } }
+    ]);
     const { triggerDataExport } = await import("./records");
 
-    await expect(triggerDataExport("ATTENDANCE")).resolves.toEqual({
-      success: true,
-      message: "ATTENDANCE export started. Check back in a few moments.",
-    });
+    const result = await triggerDataExport("STUDENTS");
+    expect(result.success).toBe(true);
+    expect(result.csv).toContain("ID,Name,Email,EnrollmentTerm,Course,Batch");
+    expect(result.csv).toContain("s1,Alice,alice@test.com,Fall 2026,CS,A1");
 
     expect(db.auditLog.create).toHaveBeenCalledWith({
       data: {
         userId: "admin-1",
-        action: "EXPORT_ATTENDANCE",
+        action: "EXPORT_STUDENTS",
         entity: "DATABASE",
-        details: "User initiated a full ATTENDANCE export.",
+        details: "User generated a full STUDENTS CSV export. Lines: 1",
       },
     });
+  });
+
+  it("logs an export request and generates CSV for faculty", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.faculty.findMany.mockResolvedValue([
+      { id: "f1", specialization: "AI", user: { name: "Dr. Bob", email: "bob@test.com" }, subjects: [{ name: "Math" }, { name: "Physics" }] }
+    ]);
+    const { triggerDataExport } = await import("./records");
+
+    const result = await triggerDataExport("FACULTY");
+    expect(result.success).toBe(true);
+    expect(result.csv).toContain("ID,Name,Email,Specialization,Subjects");
+    expect(result.csv).toContain('Dr. Bob');
+    expect(result.csv).toContain('Math; Physics');
+  });
+
+  it("logs an export request and generates CSV for attendance", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.attendance.findMany.mockResolvedValue([
+      { status: "PRESENT", markedAt: new Date("2026-05-15T09:00:00Z"), session: { date: new Date("2026-05-15T00:00:00Z"), subject: { name: "Math" } }, student: { user: { name: "Alice" } } }
+    ]);
+    const { triggerDataExport } = await import("./records");
+
+    const result = await triggerDataExport("ATTENDANCE");
+    expect(result.success).toBe(true);
+    expect(result.csv).toContain("Date,Subject,StudentName,Status,MarkedAt");
+    expect(result.csv).toContain("Alice,PRESENT");
+  });
+
+  it("returns an error if export query fails", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.student.findMany.mockRejectedValue(new Error("db failing"));
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    const { triggerDataExport } = await import("./records");
+    await expect(triggerDataExport("STUDENTS")).resolves.toEqual({ error: "Failed to generate STUDENTS export." });
+    
+    errorSpy.mockRestore();
   });
 
   it("returns unauthorized when a non-admin triggers an export", async () => {

@@ -105,6 +105,25 @@ describe("auth actions", () => {
     });
   });
 
+  it("returns generic error if signIn returns error object", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+    signIn.mockResolvedValue({ error: "Some error" });
+    await expect(loginAction(createLoginForm("user@example.com", "Password123"))).resolves.toEqual({
+      error: "Invalid email or password. Please try again.",
+    });
+  });
+
+  it("throws the error if it is not an AuthError", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+    const standardError = new Error("Database offline");
+    signIn.mockRejectedValue(standardError);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(loginAction(createLoginForm("user@example.com", "Password123"))).rejects.toThrow("Database offline");
+    
+    errorSpy.mockRestore();
+  });
+
   it("logs out without redirecting", async () => {
     await logoutAction();
     expect(signOut).toHaveBeenCalledWith({ redirect: false });
@@ -125,6 +144,26 @@ describe("auth actions", () => {
       expect(sendNotificationEmail).toHaveBeenCalled();
     });
 
+    it("returns success silently when user is not found to prevent enumeration", async () => {
+      const form = new FormData();
+      form.set("email", "unknown@wish2skill.com");
+      mockDbAuth.user.findUnique.mockResolvedValue(null);
+      
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ success: true });
+      expect(sendNotificationEmail).not.toHaveBeenCalled();
+    });
+
+    it("returns error string if forgotPasswordAction encounters an exception", async () => {
+      const form = new FormData();
+      form.set("email", "error@wish2skill.com");
+      mockDbAuth.user.findUnique.mockRejectedValue(new Error("db failing"));
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ error: "Failed to dispatch reset sequence. Please contact support." });
+      
+      errorSpy.mockRestore();
+    });
+
     it("rejects token reset if passwords do not match", async () => {
       const form = new FormData();
       form.set("token", "xyz");
@@ -143,6 +182,30 @@ describe("auth actions", () => {
       
       await expect(resetPasswordAction(form)).resolves.toEqual({ success: true });
       expect(mockDbAuth.user.update).toHaveBeenCalled();
+    });
+
+    it("returns error if user not found with an otherwise valid token", async () => {
+      const form = new FormData();
+      form.set("token", "valid_token");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass1234");
+
+      mockDbAuth.user.findUnique.mockResolvedValue(null);
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "User not found or token invalid." });
+    });
+
+    it("returns error if token verification throws", async () => {
+      const jwt = await import("jsonwebtoken");
+      (jwt.default.verify as any).mockImplementationOnce(() => {
+        throw new Error("Expired");
+      });
+
+      const form = new FormData();
+      form.set("token", "expired_token");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass1234");
+
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Invalid or expired reset token. Please request a new one." });
     });
   });
 });
