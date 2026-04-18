@@ -45,6 +45,51 @@ describe("attendance actions", () => {
     vi.clearAllMocks();
   });
 
+  describe("auth guards and not-found handling", () => {
+    it("rejects unauthenticated and unauthorized access for all actions", async () => {
+      auth.mockResolvedValue(null);
+      await expect(getFacultySessions()).rejects.toThrow("Unauthorized");
+      await expect(getSessionStudents("s1")).rejects.toThrow("Unauthorized");
+      await expect(markAttendanceBulk("s1", [])).rejects.toThrow("Unauthorized");
+      await expect(getStudentAttendance()).rejects.toThrow("Unauthorized");
+      await expect(selfMarkAttendance("s1")).rejects.toThrow("Unauthorized");
+      await expect(getCoordinatorAttendanceOverview()).rejects.toThrow("Unauthorized");
+
+      // Wrong role tests
+      auth.mockResolvedValue({ user: { role: "STUDENT" } });
+      await expect(getFacultySessions()).rejects.toThrow("Unauthorized");
+      await expect(getSessionStudents("s1")).rejects.toThrow("Unauthorized");
+      await expect(markAttendanceBulk("s1", [])).rejects.toThrow("Unauthorized");
+      await expect(getCoordinatorAttendanceOverview()).rejects.toThrow("Unauthorized");
+
+      auth.mockResolvedValue({ user: { role: "FACULTY" } });
+      await expect(getStudentAttendance()).rejects.toThrow("Unauthorized");
+      await expect(selfMarkAttendance("s1")).rejects.toThrow("Unauthorized");
+    });
+
+    it("throws appropriate errors when entities are not found", async () => {
+      // getFacultySessions
+      auth.mockResolvedValue({ user: { id: "u1", role: "FACULTY" } });
+      db.faculty.findUnique.mockResolvedValue(null);
+      await expect(getFacultySessions()).rejects.toThrow("Faculty profile not found");
+
+      // getSessionStudents
+      auth.mockResolvedValue({ user: { id: "u1", role: "FACULTY" } });
+      db.classSession.findUnique.mockResolvedValue(null);
+      await expect(getSessionStudents("s1")).rejects.toThrow("Session not found");
+
+      // getStudentAttendance
+      auth.mockResolvedValue({ user: { id: "u1", role: "STUDENT" } });
+      db.student.findUnique.mockResolvedValue(null);
+      await expect(getStudentAttendance()).rejects.toThrow("Student profile not found");
+
+      // selfMarkAttendance
+      auth.mockResolvedValue({ user: { id: "u1", role: "STUDENT" } });
+      db.student.findUnique.mockResolvedValue(null);
+      await expect(selfMarkAttendance("s1")).rejects.toThrow("Student profile not found");
+    });
+  });
+
   it("returns faculty sessions for the signed-in faculty member", async () => {
     auth.mockResolvedValue({ user: { id: "faculty-user", role: "FACULTY" } });
     db.faculty.findUnique.mockResolvedValue({ id: "faculty-1" });

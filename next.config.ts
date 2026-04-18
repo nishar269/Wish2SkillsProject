@@ -1,6 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  env: {
+    // Used by the client-side PWA cleanup gate. Pick a build-time identifier that changes per deploy.
+    NEXT_PUBLIC_DEPLOY_ID:
+      process.env.NEXT_PUBLIC_DEPLOY_ID ??
+      process.env.VERCEL_GIT_COMMIT_SHA ??
+      process.env.GITHUB_SHA ??
+      process.env.RENDER_GIT_COMMIT ??
+      process.env.COMMIT_SHA ??
+      process.env.BUILD_ID ??
+      "dev",
+  },
   async headers() {
     return [
       {

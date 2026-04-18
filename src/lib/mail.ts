@@ -22,6 +22,7 @@ type MailTransport = {
     html: string;
     sender: MailSender;
   }) => Promise<MailDispatchResult>;
+  verify?: () => Promise<boolean>;
 };
 
 function getSender() {
@@ -74,6 +75,9 @@ function createResendTransport() {
         provider: "resend" as const,
       };
     },
+    async verify() {
+      return true;
+    }
   } satisfies MailTransport;
 }
 
@@ -119,11 +123,35 @@ function createSmtpTransport() {
         provider: "smtp" as const,
       };
     },
+    async verify() {
+      return await transporter.verify();
+    }
   } satisfies MailTransport;
 }
 
 function getTransport() {
   return createResendTransport() ?? createSmtpTransport();
+}
+
+export async function checkMailHealth() {
+  const deliveryMode = getDeliveryMode();
+  if (deliveryMode !== "live") {
+    return { status: "healthy", mode: deliveryMode, message: `Mail delivery is in ${deliveryMode} mode.` };
+  }
+
+  const transport = getTransport();
+  if (!transport) {
+    return { status: "unhealthy", mode: deliveryMode, error: "No transport configured." };
+  }
+
+  try {
+    if (transport.verify) {
+      await transport.verify();
+    }
+    return { status: "healthy", provider: transport.provider };
+  } catch (error) {
+    return { status: "unhealthy", provider: transport.provider, error: getErrorMessage(error) };
+  }
 }
 
 function getErrorMessage(error: unknown) {
@@ -214,24 +242,45 @@ export async function sendNotificationEmail(
     </div>
   `;
 
-  try {
-    const result = await transport.send({
-      to,
-      subject,
-      html,
-      sender,
-    });
+  const MAX_RETRIES = 3;
+  let attempt = 0;
 
-    console.log(`Email sent via ${result.provider}:`, result.id ?? "(no id)");
-    return { success: true, id: result.id, provider: result.provider };
-  } catch (error) {
-    const log = isRetryableEmailError(error) ? console.warn : console.error;
-    log(`Email delivery failed via ${transport.provider}:`, {
-      code: getErrorCode(error),
-      message: getErrorMessage(error),
-      to,
-      subject,
-    });
-    return;
+  while (attempt < MAX_RETRIES) {
+    try {
+      const result = await transport.send({
+        to,
+        subject,
+        html,
+        sender,
+      });
+
+      console.log(`[MAIL_SUCCESS] Email sent via ${result.provider} (Attempt ${attempt + 1}/${MAX_RETRIES}): ${result.id ?? "(no id)"} | To: ${to} | Subject: "${subject}"`);
+      return { success: true, id: result.id, provider: result.provider, attempt: attempt + 1 };
+    } catch (error) {
+      attempt++;
+      const isRetryable = isRetryableEmailError(error);
+      const code = getErrorCode(error);
+      const messageError = getErrorMessage(error);
+
+      if (attempt >= MAX_RETRIES || !isRetryable) {
+        console.error(`[MAIL_FAILED] Final failure via ${transport.provider} (Attempt ${attempt}/${MAX_RETRIES}):`, {
+          code,
+          error: messageError,
+          to,
+          subject,
+          isRetryable
+        });
+        return { success: false, error: messageError, provider: transport.provider };
+      }
+
+      const backoffMs = Math.pow(2, attempt) * 1000;
+      console.warn(`[MAIL_RETRY] Delivery error via ${transport.provider} (Attempt ${attempt}/${MAX_RETRIES}). Retrying in ${backoffMs}ms...`, {
+        code,
+        error: messageError,
+        to
+      });
+      
+      await new Promise(res => setTimeout(res, backoffMs));
+    }
   }
 }

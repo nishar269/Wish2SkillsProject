@@ -2,13 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { DashboardSidebar } from "@/components/shared/dashboard-sidebar";
 import { DashboardHeader } from "@/components/shared/dashboard-header";
-import { AIAssistant } from "@/components/shared/ai-assistant";
 import { getNavConfig } from "@/config/navigation";
 import { logoutAction } from "@/actions/auth";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Role } from "@/lib/permissions";
+
+const AIAssistant = dynamic(
+  () => import("./ai-assistant").then((m) => m.AIAssistant),
+  { ssr: false, loading: () => null }
+);
 
 interface DashboardShellProps {
   children: React.ReactNode;
@@ -31,7 +36,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-transparent">
+    <div className="flex min-h-svh overflow-hidden bg-transparent">
       <div className="hidden lg:flex">
         <DashboardSidebar
           items={navConfig.mainNav}

@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { authConfig } from "./auth.config";
 
+type JwtArgs = Parameters<typeof authConfig.callbacks.jwt>[0];
+type SessionArgs = Parameters<typeof authConfig.callbacks.session>[0];
+
 describe("authConfig", () => {
   it("stores user id and valid role on the JWT", async () => {
     const token = await authConfig.callbacks.jwt({
       token: {},
-      user: { id: "user-1", role: "ADMIN" },
+      user: { id: "user-1", role: "ADMIN" } as unknown as JwtArgs["user"],
       account: null,
       profile: undefined,
       trigger: "signIn",
@@ -20,7 +23,7 @@ describe("authConfig", () => {
   it("ignores invalid roles in the JWT callback", async () => {
     const token = await authConfig.callbacks.jwt({
       token: {},
-      user: { id: "user-1", role: "NOT_A_ROLE" },
+      user: { id: "user-1", role: "NOT_A_ROLE" } as unknown as JwtArgs["user"],
       account: null,
       profile: undefined,
       trigger: "signIn",
@@ -65,5 +68,57 @@ describe("authConfig", () => {
         request: { nextUrl: { pathname: "/admin" } } as never,
       })
     ).resolves.toBe(true);
+  });
+
+  it("handles jwt callback without user", async () => {
+    const token = { existing: "token" };
+    const result = await authConfig.callbacks.jwt({
+      token,
+      user: null,
+      account: null,
+      profile: undefined,
+      trigger: "signIn",
+      isNewUser: false,
+      session: undefined,
+    });
+    expect(result).toBe(token);
+    expect(result).not.toHaveProperty("id");
+  });
+
+  it("handles jwt callback with user missing role", async () => {
+    const token = await authConfig.callbacks.jwt({
+      token: {},
+      user: { id: "user-1" } as unknown as JwtArgs["user"],
+      account: null,
+      profile: undefined,
+      trigger: "signIn",
+      isNewUser: false,
+      session: undefined,
+    });
+    expect(token.id).toBe("user-1");
+    expect(token.role).toBeUndefined();
+  });
+
+  it("handles session callback with missing user or ID", async () => {
+    // Missing session.user
+    const session1 = await authConfig.callbacks.session({
+      session: {} as unknown as SessionArgs["session"],
+      token: { id: "user-1", role: "ADMIN" } as unknown as SessionArgs["token"],
+      user: undefined,
+      newSession: undefined,
+      trigger: undefined,
+    });
+    expect(session1.user).toBeUndefined();
+
+    // Missing token fields
+    const session2 = await authConfig.callbacks.session({
+      session: { user: {} } as unknown as SessionArgs["session"],
+      token: {} as unknown as SessionArgs["token"],
+      user: undefined,
+      newSession: undefined,
+      trigger: undefined,
+    });
+    expect(session2.user.id).toBeUndefined();
+    expect(session2.user.role).toBeUndefined();
   });
 });

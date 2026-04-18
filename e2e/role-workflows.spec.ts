@@ -25,7 +25,7 @@ async function loginAs(page: Page, credentials: { email: string; password: strin
 
 async function selectFirstAvailableOption(select: Locator) {
   const value = await select.locator("option").evaluateAll((options) => {
-    const available = options.find((option) => option.value && !option.disabled);
+    const available = (options as HTMLOptionElement[]).find((option) => option.value && !option.disabled);
     return available?.value ?? "";
   });
 

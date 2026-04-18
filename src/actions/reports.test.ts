@@ -92,4 +92,34 @@ describe("reports actions", () => {
       collectionEfficiency: 90,
     });
   });
+
+  it("throws for unauthorized users in getInstitutionalKPIs", async () => {
+    auth.mockResolvedValue(null);
+    await expect(getInstitutionalKPIs()).rejects.toThrow("Unauthorized");
+    
+    auth.mockResolvedValue({ user: { role: "STUDENT" } });
+    await expect(getInstitutionalKPIs()).rejects.toThrow("Unauthorized");
+  });
+
+  it("uses fallbacks for KPIs when data is zero", async () => {
+    auth.mockResolvedValue({ user: { role: "ADMIN" } });
+    db.attendance.count.mockResolvedValue(0);
+    db.result.aggregate.mockResolvedValue({ _avg: { marksObtained: null } });
+    db.forumPost.count.mockResolvedValue(0);
+    db.forumComment.count.mockResolvedValue(0);
+    db.feeRecord.aggregate.mockResolvedValue({ _sum: { amount: null } });
+
+    const res = await getInstitutionalKPIs();
+    expect(res).toMatchObject({
+        attendanceRate: 85,
+        institutionalScore: 78,
+        healthLabel: "Growing",
+        collectionEfficiency: 98
+    });
+  });
+
+  it("returns unauthorized for getAdminReportData when no session", async () => {
+      auth.mockResolvedValue(null);
+      await expect(getAdminReportData()).resolves.toEqual({ error: "Unauthorized" });
+  });
 });

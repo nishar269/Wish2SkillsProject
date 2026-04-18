@@ -28,22 +28,89 @@ export async function getRecordsStats() {
     };
 }
 
+function buildCSV(data: Array<Record<string, unknown>>): string {
+    if (data.length === 0) return "";
+    const headers = Object.keys(data[0]).join(",");
+    const rows = data.map(row => 
+        Object.values(row).map((value) => {
+            if (value === null || value === undefined) return '""';
+            const str = String(value);
+            return str.includes(',') || str.includes('"') || str.includes('\n') 
+                ? `"${str.replace(/"/g, '""')}"` 
+                : str;
+        }).join(",")
+    );
+    return [headers, ...rows].join("\n");
+}
+
 export async function triggerDataExport(type: "STUDENTS" | "FACULTY" | "ATTENDANCE") {
     const session = await auth();
     if (!session || session.user.role !== "ADMIN") return { error: "Unauthorized" };
 
-    // In a real system, this would generate a CSV and return a URL or stream.
-    // For now, we log the action to make it dynamic.
-    await db.auditLog.create({
-        data: {
-            userId: session.user.id,
-            action: `EXPORT_${type}`,
-            entity: "DATABASE",
-            details: `User initiated a full ${type} export.`
-        }
-    });
+    try {
+        let csvData = "";
 
-    return { success: true, message: `${type} export started. Check back in a few moments.` };
+        if (type === "STUDENTS") {
+            const students = await db.student.findMany({ include: { user: true, course: true, batch: true } });
+            const flatData = students.map(s => ({
+                ID: s.id,
+                Name: s.user.name,
+                Email: s.user.email,
+                EnrollmentNo: s.enrollmentNo ?? "N/A",
+                Course: s.course?.name || "N/A",
+                Batch: s.batch?.name || "N/A",
+            }));
+            csvData = buildCSV(flatData);
+        } else if (type === "FACULTY") {
+            const faculty = await db.faculty.findMany({
+                include: {
+                    user: true,
+                    facultyAssignments: {
+                        include: {
+                            subject: true,
+                        },
+                    },
+                },
+            });
+            const flatData = faculty.map(f => ({
+                ID: f.id,
+                Name: f.user.name,
+                Email: f.user.email,
+                Specialization: f.specialization || "N/A",
+                Subjects: Array.from(new Set(f.facultyAssignments.map((assignment) => assignment.subject.name))).join("; "),
+            }));
+            csvData = buildCSV(flatData);
+        } else if (type === "ATTENDANCE") {
+            const attendance = await db.attendance.findMany({ 
+                include: { 
+                    student: { include: { user: true } }, 
+                    session: { include: { subject: true } } 
+                } 
+            });
+            const flatData = attendance.map(a => ({
+                Date: a.session.date.toISOString().split("T")[0],
+                Subject: a.session.subject.name,
+                StudentName: a.student.user.name,
+                Status: a.status,
+                MarkedAt: a.markedAt ? a.markedAt.toISOString() : "N/A",
+            }));
+            csvData = buildCSV(flatData);
+        }
+
+        await db.auditLog.create({
+            data: {
+                userId: session.user.id,
+                action: `EXPORT_${type}`,
+                entity: "DATABASE",
+                details: `User generated a full ${type} CSV export. Lines: ${csvData ? csvData.split('\n').length - 1 : 0}`
+            }
+        });
+
+        return { success: true, csv: csvData, message: `${type} export generated successfully.` };
+    } catch (error) {
+        console.error("Data Export Error:", error);
+        return { error: `Failed to generate ${type} export.` };
+    }
 }
 
 export async function getArchiveInventory() {

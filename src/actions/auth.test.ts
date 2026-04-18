@@ -63,6 +63,9 @@ function createLoginForm(email: string, password: string) {
 describe("auth actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.NEXTAUTH_SECRET;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    delete process.env.URL;
   });
 
   it("logs in successfully with valid credentials", async () => {
@@ -96,6 +99,14 @@ describe("auth actions", () => {
     expect(signIn).not.toHaveBeenCalled();
   });
 
+  it("handles CredentialsSignin AuthError", async () => {
+      verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+      signIn.mockRejectedValue(new AuthError("CredentialsSignin"));
+      await expect(loginAction(createLoginForm("user@example.com", "Password123"))).resolves.toEqual({
+          error: "Invalid email or password"
+      });
+  });
+
   it("returns a fallback message when sign-in fails unexpectedly", async () => {
     verifyCredentials.mockResolvedValue({ id: "1", email: "admin@wish2skill.com", role: "ADMIN" });
     signIn.mockRejectedValue(new AuthError("Configuration"));
@@ -103,6 +114,25 @@ describe("auth actions", () => {
     await expect(loginAction(createLoginForm("admin@wish2skill.com", "Password123"))).resolves.toEqual({
       error: "Something went wrong. Please try again.",
     });
+  });
+
+  it("returns generic error if signIn returns error object", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+    signIn.mockResolvedValue({ error: "Some error" });
+    await expect(loginAction(createLoginForm("user@example.com", "Password123"))).resolves.toEqual({
+      error: "Invalid email or password. Please try again.",
+    });
+  });
+
+  it("throws the error if it is not an AuthError", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+    const standardError = new Error("Database offline");
+    signIn.mockRejectedValue(standardError);
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    await expect(loginAction(createLoginForm("user@example.com", "Password123"))).rejects.toThrow("Database offline");
+    
+    errorSpy.mockRestore();
   });
 
   it("logs out without redirecting", async () => {
@@ -116,18 +146,60 @@ describe("auth actions", () => {
       await expect(forgotPasswordAction(form)).resolves.toEqual({ error: "Email is required." });
     });
 
-    it("sends recovery email for valid user", async () => {
+    it("sends recovery email for valid user with various base URLs", async () => {
       const form = new FormData();
       form.set("email", "admin@wish2skill.com");
       mockDbAuth.user.findUnique.mockResolvedValue({ id: "123", email: "admin@wish2skill.com" });
       
-      await expect(forgotPasswordAction(form)).resolves.toEqual({ success: true });
-      expect(sendNotificationEmail).toHaveBeenCalled();
+      // Test NEXT_PUBLIC_APP_URL
+      process.env.NEXT_PUBLIC_APP_URL = "https://app.com";
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://app.com"));
+
+      // Test URL
+      delete process.env.NEXT_PUBLIC_APP_URL;
+      process.env.URL = "https://netlify.com";
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://netlify.com"));
+
+      // Test fallback
+      delete process.env.URL;
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://wish2skill.netlify.app"));
     });
 
-    it("rejects token reset if passwords do not match", async () => {
+    it("returns success silently when user is not found to prevent enumeration", async () => {
+      const form = new FormData();
+      form.set("email", "unknown@wish2skill.com");
+      mockDbAuth.user.findUnique.mockResolvedValue(null);
+      
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ success: true });
+      expect(sendNotificationEmail).not.toHaveBeenCalled();
+    });
+
+    it("returns error string if forgotPasswordAction encounters an exception", async () => {
+      const form = new FormData();
+      form.set("email", "error@wish2skill.com");
+      mockDbAuth.user.findUnique.mockRejectedValue(new Error("db failing"));
+      const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+      
+      await expect(forgotPasswordAction(form)).resolves.toEqual({ error: "Failed to dispatch reset sequence. Please contact support." });
+      
+      errorSpy.mockRestore();
+    });
+
+    it("rejects reset if token is missing", async () => {
+        const form = new FormData();
+        await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Reset token missing. Please use a valid link." });
+    });
+
+    it("rejects token reset if passwords do not match or too short", async () => {
       const form = new FormData();
       form.set("token", "xyz");
+      form.set("password", "short");
+      form.set("confirmPassword", "short");
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Password must be at least 8 characters." });
+
       form.set("password", "Pass1234");
       form.set("confirmPassword", "Pass9999");
       await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Passwords do not match." });
@@ -143,6 +215,30 @@ describe("auth actions", () => {
       
       await expect(resetPasswordAction(form)).resolves.toEqual({ success: true });
       expect(mockDbAuth.user.update).toHaveBeenCalled();
+    });
+
+    it("returns error if user not found with an otherwise valid token", async () => {
+      const form = new FormData();
+      form.set("token", "valid_token");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass1234");
+
+      mockDbAuth.user.findUnique.mockResolvedValue(null);
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "User not found or token invalid." });
+    });
+
+    it("returns error if token verification throws", async () => {
+      const jwt = await import("jsonwebtoken");
+      vi.mocked(jwt.default.verify).mockImplementationOnce(() => {
+        throw new Error("Expired");
+      });
+
+      const form = new FormData();
+      form.set("token", "expired_token");
+      form.set("password", "Pass1234");
+      form.set("confirmPassword", "Pass1234");
+
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Invalid or expired reset token. Please request a new one." });
     });
   });
 });

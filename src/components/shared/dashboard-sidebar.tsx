@@ -43,7 +43,7 @@ export function DashboardSidebar({
     <TooltipProvider>
       <aside
         className={cn(
-          "premium-dark-panel premium-grid relative z-40 m-3 flex h-[calc(100vh-1.5rem)] flex-col overflow-hidden transition-all duration-300",
+          "premium-dark-panel premium-grid relative z-40 m-3 flex h-[calc(100vh-1.5rem)] supports-[height:100svh]:h-[calc(100svh-1.5rem)] flex-col overflow-hidden transition-all duration-300",
           collapsed ? "w-24" : "w-72"
         )}
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -65,28 +65,6 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!("serviceWorker" in navigator)) {
-      return;
-    }
-
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((registration) => {
-        registration.unregister().catch(() => undefined);
-      });
-    });
-
-    if ("caches" in window) {
-      caches.keys().then((keys) => {
-        keys
-          .filter((key) => key.startsWith("wish2skill-"))
-          .forEach((key) => {
-            caches.delete(key).catch(() => undefined);
-          });
-      });
-    }
-  }, []);
 
   async function handleSubmit(formData: FormData) {
     setError(null);
