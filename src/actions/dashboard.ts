@@ -101,15 +101,11 @@ export async function getFacultyDashboardData() {
 
 export async function getAuthorityDashboardData() {
     const session = await auth();
-    console.log('DASHBOARD_ACCESS: User =', session?.user?.email, 'Role =', session?.user?.role);
-    
     if (!session || (session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR")) {
-        console.error('DASHBOARD_ACCESS: Unauthorized access attempt detected.');
         throw new Error("Unauthorized");
     }
 
     try {
-        console.log('DASHBOARD_DATA: Fetching aggregate counts...');
         const [studentCount, facultyCount, courseCount, recentLogs] = await Promise.all([
             db.student.count(),
             db.faculty.count(),
@@ -124,7 +120,6 @@ export async function getAuthorityDashboardData() {
             recentLogs
         };
     } catch (error) {
-        console.error('DASHBOARD_DATA: Database fetch failed:', error);
         throw error;
     }
 }
