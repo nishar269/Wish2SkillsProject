@@ -66,7 +66,7 @@ export function DashboardSidebar({
           <button
             type="button"
             onClick={() => setCollapsed(!collapsed)}
-            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-white/12 bg-white/6 text-[#d6c5aa] transition-all hover:border-[#c7a46a]/45 hover:bg-white/10 hover:text-white"
+            className="ml-auto flex h-8 w-8 items-center justify-center rounded-full border border-white/16 bg-white/9 text-[#e3d4bb] transition-all hover:border-[#c7a46a]/45 hover:bg-white/14 hover:text-white"
           >
             <ChevronLeft className={cn("h-4 w-4 transition-transform duration-300", collapsed && "rotate-180")} />
           </button>
@@ -85,14 +85,14 @@ export function DashboardSidebar({
                   className={cn(
                     "group relative flex items-center gap-3 rounded-2xl px-4 py-3 transition-all duration-200",
                     isActive
-                      ? "bg-[linear-gradient(135deg,rgba(199,164,106,0.22),rgba(199,164,106,0.08))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] ring-1 ring-[#c7a46a]/45"
-                      : "text-[#d6c5aa] hover:bg-white/8 hover:text-white"
+                      ? "bg-[linear-gradient(135deg,rgba(214,182,123,0.28),rgba(214,182,123,0.12))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] ring-1 ring-[#d7b67b]/50"
+                      : "text-[#e3d4bb] hover:bg-white/11 hover:text-white"
                   )}
                 >
                   <Icon
                     className={cn(
                       "h-5 w-5 shrink-0 transition-colors",
-                      isActive ? "text-[#f3d29b]" : "text-[#a28d68] group-hover:text-[#f3d29b]"
+                      isActive ? "text-[#f6d8a6]" : "text-[#b7a07a] group-hover:text-[#f6d8a6]"
                     )}
                   />
                   {!collapsed && <span className="truncate text-sm font-medium">{item.title}</span>}
@@ -119,7 +119,7 @@ export function DashboardSidebar({
         <div className="mt-auto border-t border-white/10 p-4">
           <div
             className={cn(
-              "flex items-center gap-3 rounded-[22px] border border-white/10 bg-white/6 p-3 transition-all",
+              "flex items-center gap-3 rounded-[22px] border border-white/12 bg-white/9 p-3 transition-all",
               collapsed && "justify-center border-none bg-transparent px-1"
             )}
           >
@@ -130,7 +130,7 @@ export function DashboardSidebar({
             </Avatar>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="mb-1 truncate text-sm font-semibold leading-none text-[#f6efe2]">{user.name}</p>
+                <p className="mb-1 truncate text-sm font-semibold leading-none text-[#fbf5ea]">{user.name}</p>
                 <p className="truncate text-[10px] font-semibold uppercase tracking-[0.24em] leading-none text-[#b89b6b]">
                   {user.role}
                 </p>

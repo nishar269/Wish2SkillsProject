@@ -43,7 +43,7 @@ export function DashboardHeader({ user, onMenuToggle, onLogout }: DashboardHeade
           <Menu className="h-5 w-5" />
         </Button>
 
-        <div className="group hidden w-full max-w-md items-center gap-3 rounded-full border border-[hsl(var(--border)/0.95)] bg-white/85 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] transition-all focus-within:border-[hsl(var(--surface-gold)/0.45)] md:flex">
+        <div className="group hidden w-full max-w-md items-center gap-3 rounded-full border border-[hsl(var(--border)/0.98)] bg-white/92 px-4 py-3 shadow-[0_14px_34px_rgba(20,28,45,0.07),inset_0_1px_0_rgba(255,255,255,0.82)] transition-all focus-within:border-[hsl(var(--surface-gold)/0.5)] md:flex">
           <Search className="h-4 w-4 text-[#8e7a58] transition-colors group-focus-within:text-[#af8545]" />
           <Input
             placeholder="Search campus records, students, resources..."
@@ -60,7 +60,7 @@ export function DashboardHeader({ user, onMenuToggle, onLogout }: DashboardHeade
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[hsl(var(--border)/0.9)] bg-white/80 text-[#5b4a34] transition-all outline-none hover:border-[hsl(var(--surface-gold)/0.45)] hover:text-[#af8545]"
+              className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[hsl(var(--border)/0.95)] bg-white/90 text-[#5b4a34] shadow-[0_10px_26px_rgba(20,28,45,0.06)] transition-all outline-none hover:border-[hsl(var(--surface-gold)/0.45)] hover:text-[#af8545]"
             >
               <Bell className="h-5 w-5" />
               <span className="absolute right-2.5 top-2.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-[#c7a46a] shadow-[0_0_12px_rgba(199,164,106,0.7)]" />
@@ -81,7 +81,7 @@ export function DashboardHeader({ user, onMenuToggle, onLogout }: DashboardHeade
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex items-center gap-3 rounded-full border border-transparent pl-3 pr-1.5 transition-all outline-none hover:border-[hsl(var(--border)/0.9)] hover:bg-white/55"
+              className="flex items-center gap-3 rounded-full border border-transparent pl-3 pr-1.5 transition-all outline-none hover:border-[hsl(var(--border)/0.9)] hover:bg-white/68"
             >
               <div className="hidden text-right sm:block">
                 <p className="mb-1 text-xs font-semibold leading-none text-slate-900">{user.name}</p>

@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   AreaChart, Area, PieChart, Pie, Cell 
 } from "recharts";
 import { 
@@ -78,24 +78,26 @@ export default function AuthorityDashboardClient({ stats }: { stats: { summary: 
             <CardTitle>Enrollment Velocity</CardTitle>
             <CardDescription>New student registrations over the last 6 months.</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={enrollmentData}>
-                <defs>
-                  <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#b78c46" stopOpacity={0.32}/>
-                    <stop offset="95%" stopColor="#b78c46" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2d7c8" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
-                <Tooltip 
-                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} 
-                />
-                <Area type="monotone" dataKey="count" stroke="#b78c46" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
-              </AreaChart>
-            </ResponsiveContainer>
+          <CardContent className="w-full pt-4">
+            <div className="w-full overflow-x-auto">
+              <div className="min-w-[720px]">
+                <AreaChart width={720} height={300} data={enrollmentData}>
+                  <defs>
+                    <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#b78c46" stopOpacity={0.32}/>
+                      <stop offset="95%" stopColor="#b78c46" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2d7c8" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                  <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12}} />
+                  <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} 
+                  />
+                  <Area type="monotone" dataKey="count" stroke="#b78c46" strokeWidth={3} fillOpacity={1} fill="url(#colorCount)" />
+                </AreaChart>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -105,23 +107,25 @@ export default function AuthorityDashboardClient({ stats }: { stats: { summary: 
             <CardTitle>Course Popularity</CardTitle>
             <CardDescription>Current student major distribution.</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] flex items-center justify-center">
-             <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                    <Pie
-                        data={enrollmentData}
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="count"
-                    >
-                        {enrollmentData.map((entry: {name: string, count: number}, index: number) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                </PieChart>
-             </ResponsiveContainer>
+          <CardContent className="flex items-center justify-center">
+             <div className="w-full overflow-x-auto">
+               <div className="mx-auto w-[320px]">
+                  <PieChart width={320} height={300}>
+                      <Pie
+                          data={enrollmentData}
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="count"
+                      >
+                          {enrollmentData.map((entry: {name: string, count: number}, index: number) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                      </Pie>
+                      <Tooltip />
+                  </PieChart>
+               </div>
+             </div>
           </CardContent>
         </Card>
       </div>
@@ -146,20 +150,22 @@ export default function AuthorityDashboardClient({ stats }: { stats: { summary: 
                 </div>
             </div>
          </CardHeader>
-         <CardContent className="h-[250px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-               <BarChart data={attendanceRate}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2d7c8" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} domain={[0, 100]} />
-                    <Tooltip 
-                        cursor={{fill: 'transparent'}}
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} 
-                    />
-                    <Bar dataKey="rate" fill="#22314f" radius={[10, 10, 0, 0]} barSize={40} />
-               </BarChart>
-            </ResponsiveContainer>
-         </CardContent>
+         <CardContent className="w-full">
+            <div className="w-full overflow-x-auto">
+              <div className="min-w-[720px]">
+                 <BarChart width={720} height={250} data={attendanceRate}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2d7c8" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                      <YAxis axisLine={false} tickLine={false} domain={[0, 100]} />
+                      <Tooltip 
+                          cursor={{fill: 'transparent'}}
+                          contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} 
+                      />
+                      <Bar dataKey="rate" fill="#22314f" radius={[10, 10, 0, 0]} barSize={40} />
+                 </BarChart>
+              </div>
+            </div>
+          </CardContent>
       </Card>
     </div>
   );

@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --background: 38 38% 96%;
-  --foreground: 223 31% 16%;
-  --card: 40 31% 98%;
-  --card-foreground: 223 31% 16%;
-  --popover: 42 32% 98%;
-  --popover-foreground: 223 31% 16%;
-  --primary: 222 35% 18%;
-  --primary-foreground: 40 38% 96%;
-  --secondary: 39 36% 90%;
-  --secondary-foreground: 223 31% 16%;
-  --muted: 37 27% 92%;
-  --muted-foreground: 220 12% 41%;
-  --accent: 39 45% 72%;
-  --accent-foreground: 223 31% 16%;
+  --background: 38 42% 97%;
+  --foreground: 223 30% 17%;
+  --card: 40 36% 99%;
+  --card-foreground: 223 30% 17%;
+  --popover: 40 38% 99%;
+  --popover-foreground: 223 30% 17%;
+  --primary: 221 33% 22%;
+  --primary-foreground: 40 40% 97%;
+  --secondary: 39 40% 92%;
+  --secondary-foreground: 223 30% 17%;
+  --muted: 38 29% 94%;
+  --muted-foreground: 220 12% 43%;
+  --accent: 39 52% 76%;
+  --accent-foreground: 223 30% 17%;
   --destructive: 0 64% 54%;
   --destructive-foreground: 0 0% 100%;
-  --border: 38 27% 83%;
-  --input: 40 23% 90%;
-  --ring: 39 48% 62%;
+  --border: 38 30% 85%;
+  --input: 40 28% 92%;
+  --ring: 39 54% 66%;
   --radius: 1.4rem;
-  --surface-strong: 221 38% 13%;
-  --surface-soft: 34 44% 93%;
-  --surface-gold: 38 46% 66%;
-  --surface-emerald: 169 35% 29%;
+  --surface-strong: 221 35% 17%;
+  --surface-soft: 36 52% 95%;
+  --surface-gold: 39 52% 70%;
+  --surface-emerald: 169 39% 33%;
 }
 
 .dark {
@@ -88,14 +88,15 @@
   }
 
   html {
-    color-scheme: light;
+    color-scheme: dark;
   }
 
   body {
     background:
-      radial-gradient(circle at top left, hsl(var(--surface-gold) / 0.2), transparent 26%),
-      radial-gradient(circle at top right, hsl(var(--surface-emerald) / 0.12), transparent 24%),
-      linear-gradient(180deg, #f8f2e8 0%, #f6f1e8 42%, #f3eee4 100%);
+      radial-gradient(circle at top left, rgba(214, 182, 123, 0.22), transparent 28%),
+      radial-gradient(circle at top right, rgba(64, 126, 109, 0.18), transparent 26%),
+      radial-gradient(circle at center top, rgba(255, 255, 255, 0.06), transparent 30%),
+      linear-gradient(180deg, #0b1525 0%, #101b2e 38%, #132135 100%);
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     margin: 0;
@@ -125,18 +126,19 @@
   }
 
   .premium-shell {
-    @apply rounded-[28px] border border-white/60 bg-white/70 shadow-[0_24px_80px_rgba(20,28,45,0.08)] backdrop-blur-xl;
+    @apply rounded-[28px] border border-white/72 bg-white/82 shadow-[0_28px_90px_rgba(20,28,45,0.1)] backdrop-blur-xl;
   }
 
   .premium-panel {
-    @apply rounded-[24px] border border-white/70 bg-white/75 shadow-[0_12px_40px_rgba(20,28,45,0.08)] backdrop-blur-xl;
+    @apply rounded-[24px] border border-white/78 bg-white/86 shadow-[0_16px_48px_rgba(20,28,45,0.09)] backdrop-blur-xl;
   }
 
   .premium-dark-panel {
     background:
-      radial-gradient(circle at top right, rgba(199, 164, 106, 0.16), transparent 30%),
-      linear-gradient(180deg, #172033 0%, #101826 100%);
-    @apply rounded-[28px] border border-white/8 text-white shadow-[0_26px_80px_rgba(10,18,34,0.34)];
+      radial-gradient(circle at top right, rgba(214, 182, 123, 0.22), transparent 34%),
+      radial-gradient(circle at top left, rgba(75, 144, 123, 0.12), transparent 28%),
+      linear-gradient(180deg, #22304a 0%, #18253a 100%);
+    @apply rounded-[28px] border border-white/12 text-white shadow-[0_26px_80px_rgba(10,18,34,0.3)];
   }
 
   .premium-kicker {
@@ -155,18 +157,18 @@
   }
 
   .premium-card {
-    @apply rounded-[24px] border border-[hsl(var(--border)/0.8)] bg-white/82 shadow-[0_18px_40px_rgba(20,28,45,0.06)] backdrop-blur-sm;
+    @apply rounded-[24px] border border-[hsl(var(--border)/0.84)] bg-white/90 shadow-[0_18px_44px_rgba(20,28,45,0.08)] backdrop-blur-sm;
   }
 
   .pleasant-card {
-    @apply rounded-[24px] border border-[hsl(var(--border)/0.8)] bg-white/80 shadow-[0_18px_40px_rgba(20,28,45,0.05)] backdrop-blur-sm;
+    @apply rounded-[24px] border border-[hsl(var(--border)/0.84)] bg-white/88 shadow-[0_18px_44px_rgba(20,28,45,0.07)] backdrop-blur-sm;
   }
 
   .premium-select-shell {
-    @apply rounded-[18px] border border-[hsl(var(--border)/0.8)] bg-white/75 px-4 py-3 shadow-[0_10px_24px_rgba(20,28,45,0.05)] backdrop-blur-sm;
+    @apply rounded-[18px] border border-[hsl(var(--border)/0.84)] bg-white/84 px-4 py-3 shadow-[0_12px_28px_rgba(20,28,45,0.06)] backdrop-blur-sm;
   }
 
   .premium-table-wrap {
-    @apply overflow-hidden rounded-[24px] border border-[hsl(var(--border)/0.8)] bg-white/84 shadow-[0_18px_40px_rgba(20,28,45,0.06)] backdrop-blur-sm;
+    @apply overflow-hidden rounded-[24px] border border-[hsl(var(--border)/0.84)] bg-white/90 shadow-[0_20px_48px_rgba(20,28,45,0.08)] backdrop-blur-sm;
   }
 }

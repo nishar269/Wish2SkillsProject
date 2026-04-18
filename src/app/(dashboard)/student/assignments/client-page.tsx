@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { FileText, Calendar, Send, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format, isAfter } from "date-fns";
@@ -21,6 +21,7 @@ export default function StudentAssignmentsClientPage({
 }) {
   const [selectedAssignment, setSelectedAssignment] = useState<StudentAssignment | null>(null);
   const [isPending, startTransition] = useTransition();
+  const selectedSubmission = selectedAssignment?.submissions[0];
 
   async function handleSubmission(formData: FormData) {
     if (!selectedAssignment) return;
@@ -114,38 +115,9 @@ export default function StudentAssignmentsClientPage({
                     )}
                     
                     {!submission || submission.status !== "GRADED" ? (
-                      <Dialog open={selectedAssignment?.id === a.id} onOpenChange={(open) => setSelectedAssignment(open ? a : null)}>
-                        <DialogTrigger asChild>
-                           <Button className="flex-1 bg-blue-600 hover:bg-blue-700">
-                                {submission ? "Update Work" : "Submit Work"}
-                           </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Submit: {a.title}</DialogTitle>
-                            </DialogHeader>
-                            <form action={handleSubmission} className="space-y-4 mt-4">
-                                <p className="text-sm text-muted-foreground bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg flex gap-2">
-                                    <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
-                                    Please provide a link to your hosted project or document (Google Drive, GitHub, etc.)
-                                </p>
-                                <div className="space-y-2">
-                                    <Label htmlFor="fileUrl">Submission Link</Label>
-                                    <Input 
-                                        id="fileUrl" 
-                                        name="fileUrl" 
-                                        placeholder="https://..." 
-                                        defaultValue={submission?.contentUrl || ""}
-                                        required 
-                                    />
-                                </div>
-                                <Button type="submit" disabled={isPending} className="w-full bg-blue-600 hover:bg-blue-700">
-                                    {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                                    Confirm Submission
-                                </Button>
-                            </form>
-                        </DialogContent>
-                      </Dialog>
+                      <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={() => setSelectedAssignment(a)}>
+                        {submission ? "Update Work" : "Submit Work"}
+                      </Button>
                     ) : (
                         <Button variant="secondary" size="sm" className="flex-1" disabled>
                             Submitted
@@ -158,6 +130,36 @@ export default function StudentAssignmentsClientPage({
           })
         )}
       </div>
+
+      <Dialog open={Boolean(selectedAssignment)} onOpenChange={(open) => !open && setSelectedAssignment(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Submit: {selectedAssignment?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedAssignment ? (
+            <form key={selectedAssignment.id} action={handleSubmission} className="space-y-4 mt-4">
+              <p className="text-sm text-muted-foreground bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg flex gap-2">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                Please provide a link to your hosted project or document (Google Drive, GitHub, etc.)
+              </p>
+              <div className="space-y-2">
+                <Label htmlFor="fileUrl">Submission Link</Label>
+                <Input
+                  id="fileUrl"
+                  name="fileUrl"
+                  placeholder="https://..."
+                  defaultValue={selectedSubmission?.contentUrl || ""}
+                  required
+                />
+              </div>
+              <Button type="submit" disabled={isPending} className="w-full bg-blue-600 hover:bg-blue-700">
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                Confirm Submission
+              </Button>
+            </form>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
