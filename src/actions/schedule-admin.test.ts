@@ -38,28 +38,31 @@ describe("schedule admin actions", () => {
       auth.mockResolvedValue(null);
       
       const { getClassSessions, createClassSession, updateClassSession, deleteClassSession } = await import("./schedule-admin");
+      const emptyPayload = {} as unknown as Parameters<typeof createClassSession>[0];
       
       await expect(getClassSessions("b1")).rejects.toThrow("Unauthorized");
-      await expect(createClassSession({} as any)).rejects.toThrow("Unauthorized");
-      await expect(updateClassSession("1", {} as any)).rejects.toThrow("Unauthorized");
+      await expect(createClassSession(emptyPayload)).rejects.toThrow("Unauthorized");
+      await expect(updateClassSession("1", emptyPayload)).rejects.toThrow("Unauthorized");
       await expect(deleteClassSession("1")).rejects.toThrow("Unauthorized");
 
       auth.mockResolvedValue({ user: { role: "STUDENT" } });
-      await expect(createClassSession({} as any)).rejects.toThrow("Unauthorized");
-      await expect(updateClassSession("1", {} as any)).rejects.toThrow("Unauthorized");
+      await expect(createClassSession(emptyPayload)).rejects.toThrow("Unauthorized");
+      await expect(updateClassSession("1", emptyPayload)).rejects.toThrow("Unauthorized");
       await expect(deleteClassSession("1")).rejects.toThrow("Unauthorized");
     });
 
     it("returns error if required fields are missing during creation", async () => {
       auth.mockResolvedValue({ user: { role: "ADMIN" } });
       const { createClassSession } = await import("./schedule-admin");
-      await expect(createClassSession({ batchId: "b1" } as any)).resolves.toEqual({ error: "Required fields are missing." });
+      const partialPayload = { batchId: "b1" } as unknown as Parameters<typeof createClassSession>[0];
+      await expect(createClassSession(partialPayload)).resolves.toEqual({ error: "Required fields are missing." });
     });
 
     it("returns error if required fields are missing during update", async () => {
       auth.mockResolvedValue({ user: { role: "ADMIN" } });
       const { updateClassSession } = await import("./schedule-admin");
-      await expect(updateClassSession("s1", { batchId: "b1" } as any)).resolves.toEqual({ error: "Required fields are missing." });
+      const partialPayload = { batchId: "b1" } as unknown as Parameters<typeof updateClassSession>[1];
+      await expect(updateClassSession("s1", partialPayload)).resolves.toEqual({ error: "Required fields are missing." });
     });
 
     it("returns error if class session is not found during update", async () => {

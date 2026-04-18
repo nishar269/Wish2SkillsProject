@@ -28,13 +28,13 @@ export async function getRecordsStats() {
     };
 }
 
-function buildCSV(data: any[]): string {
+function buildCSV(data: Array<Record<string, unknown>>): string {
     if (data.length === 0) return "";
     const headers = Object.keys(data[0]).join(",");
     const rows = data.map(row => 
-        Object.values(row).map(v => {
-            if (v === null || v === undefined) return '""';
-            const str = String(v);
+        Object.values(row).map((value) => {
+            if (value === null || value === undefined) return '""';
+            const str = String(value);
             return str.includes(',') || str.includes('"') || str.includes('\n') 
                 ? `"${str.replace(/"/g, '""')}"` 
                 : str;
@@ -56,19 +56,28 @@ export async function triggerDataExport(type: "STUDENTS" | "FACULTY" | "ATTENDAN
                 ID: s.id,
                 Name: s.user.name,
                 Email: s.user.email,
-                EnrollmentTerm: s.enrollmentTerm,
+                EnrollmentNo: s.enrollmentNo ?? "N/A",
                 Course: s.course?.name || "N/A",
                 Batch: s.batch?.name || "N/A",
             }));
             csvData = buildCSV(flatData);
         } else if (type === "FACULTY") {
-            const faculty = await db.faculty.findMany({ include: { user: true, subjects: true } });
+            const faculty = await db.faculty.findMany({
+                include: {
+                    user: true,
+                    facultyAssignments: {
+                        include: {
+                            subject: true,
+                        },
+                    },
+                },
+            });
             const flatData = faculty.map(f => ({
                 ID: f.id,
                 Name: f.user.name,
                 Email: f.user.email,
                 Specialization: f.specialization || "N/A",
-                Subjects: f.subjects.map(s => s.name).join("; "),
+                Subjects: Array.from(new Set(f.facultyAssignments.map((assignment) => assignment.subject.name))).join("; "),
             }));
             csvData = buildCSV(flatData);
         } else if (type === "ATTENDANCE") {

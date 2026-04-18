@@ -116,7 +116,7 @@ describe("mail helper", () => {
     process.env.SMTP_PASS = "password123";
 
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
-    const errObj = new Error("Temporarily rejected") as any;
+    const errObj: Error & { responseCode?: number } = new Error("Temporarily rejected");
     errObj.responseCode = 451;
     const err = vi.spyOn(console, "error").mockImplementation(() => {});
     sendMail.mockRejectedValue(errObj);

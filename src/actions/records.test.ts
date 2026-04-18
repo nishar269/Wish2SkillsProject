@@ -49,14 +49,14 @@ describe("records actions", () => {
   it("logs an export request and generates CSV for students", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.student.findMany.mockResolvedValue([
-      { id: "s1", enrollmentTerm: "Fall 2026", user: { name: "Alice", email: "alice@test.com" }, course: { name: "CS" }, batch: { name: "A1" } }
+      { id: "s1", enrollmentNo: "ENR001", user: { name: "Alice", email: "alice@test.com" }, course: { name: "CS" }, batch: { name: "A1" } }
     ]);
     const { triggerDataExport } = await import("./records");
 
     const result = await triggerDataExport("STUDENTS");
     expect(result.success).toBe(true);
-    expect(result.csv).toContain("ID,Name,Email,EnrollmentTerm,Course,Batch");
-    expect(result.csv).toContain("s1,Alice,alice@test.com,Fall 2026,CS,A1");
+    expect(result.csv).toContain("ID,Name,Email,EnrollmentNo,Course,Batch");
+    expect(result.csv).toContain("s1,Alice,alice@test.com,ENR001,CS,A1");
 
     expect(db.auditLog.create).toHaveBeenCalledWith({
       data: {
@@ -71,7 +71,12 @@ describe("records actions", () => {
   it("logs an export request and generates CSV for faculty", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.faculty.findMany.mockResolvedValue([
-      { id: "f1", specialization: "AI", user: { name: "Dr. Bob", email: "bob@test.com" }, subjects: [{ name: "Math" }, { name: "Physics" }] }
+      {
+        id: "f1",
+        specialization: "AI",
+        user: { name: "Dr. Bob", email: "bob@test.com" },
+        facultyAssignments: [{ subject: { name: "Math" } }, { subject: { name: "Physics" } }],
+      }
     ]);
     const { triggerDataExport } = await import("./records");
 

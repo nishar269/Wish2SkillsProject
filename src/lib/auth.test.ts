@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { nextAuth, credentialsProvider, compare, db, getCapturedAuthorize } = vi.hoisted(() => {
-  let capturedAuthorize: Function | undefined;
+  let capturedAuthorize: ((credentials: unknown) => Promise<unknown>) | undefined;
 
   return {
     nextAuth: vi.fn(() => ({
@@ -11,7 +11,7 @@ const { nextAuth, credentialsProvider, compare, db, getCapturedAuthorize } = vi.
       auth: vi.fn(),
     })),
     credentialsProvider: vi.fn((config) => {
-      capturedAuthorize = config?.authorize;
+      capturedAuthorize = config?.authorize as ((credentials: unknown) => Promise<unknown>) | undefined;
       return config;
     }),
     getCapturedAuthorize: () => capturedAuthorize,

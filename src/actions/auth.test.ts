@@ -196,7 +196,7 @@ describe("auth actions", () => {
 
     it("returns error if token verification throws", async () => {
       const jwt = await import("jsonwebtoken");
-      (jwt.default.verify as any).mockImplementationOnce(() => {
+      vi.mocked(jwt.default.verify).mockImplementationOnce(() => {
         throw new Error("Expired");
       });
 
