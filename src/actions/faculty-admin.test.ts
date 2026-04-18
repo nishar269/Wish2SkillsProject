@@ -25,6 +25,8 @@ vi.mock("bcryptjs", () => ({
   },
 }));
 
+import { createFaculty, deleteFaculty, getFaculty } from "./faculty-admin";
+
 describe("faculty admin actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -34,8 +36,6 @@ describe("faculty admin actions", () => {
     const faculty = [{ id: "faculty-1" }];
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.faculty.findMany.mockResolvedValue(faculty);
-
-    const { getFaculty } = await import("./faculty-admin");
 
     await expect(getFaculty()).resolves.toEqual(faculty);
     expect(db.faculty.findMany).toHaveBeenCalledWith({
@@ -54,15 +54,11 @@ describe("faculty admin actions", () => {
     auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
     db.faculty.findMany.mockResolvedValue(faculty);
 
-    const { getFaculty } = await import("./faculty-admin");
-
     await expect(getFaculty()).resolves.toEqual(faculty);
   });
 
   it("rejects faculty reads for unauthorized roles", async () => {
     auth.mockResolvedValue({ user: { id: "student-1", role: "STUDENT" } });
-
-    const { getFaculty } = await import("./faculty-admin");
 
     await expect(getFaculty()).rejects.toThrow("Unauthorized");
   });
@@ -82,8 +78,6 @@ describe("faculty admin actions", () => {
 
       await callback(tx);
     });
-
-    const { createFaculty } = await import("./faculty-admin");
 
     await expect(
       createFaculty({
@@ -105,8 +99,6 @@ describe("faculty admin actions", () => {
   it("rejects faculty creation when required fields are missing", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
 
-    const { createFaculty } = await import("./faculty-admin");
-
     await expect(
       createFaculty({ name: "", email: "ada@example.com", password: "Password123" })
     ).resolves.toEqual({ error: "Required fields are missing." });
@@ -120,8 +112,6 @@ describe("faculty admin actions", () => {
     hash.mockResolvedValue("hashed-password");
     db.$transaction.mockRejectedValue({ code: "P2002" });
 
-    const { createFaculty } = await import("./faculty-admin");
-
     await expect(
       createFaculty({ name: "Prof. Ada", email: "ada@example.com", password: "Password123" })
     ).resolves.toEqual({ error: "Email already exists." });
@@ -132,18 +122,52 @@ describe("faculty admin actions", () => {
     hash.mockResolvedValue("hashed-password");
     db.$transaction.mockRejectedValue(new Error("db error"));
 
-    const { createFaculty } = await import("./faculty-admin");
-
     await expect(
       createFaculty({ name: "Prof. Ada", email: "ada@example.com", password: "Password123" })
     ).resolves.toEqual({ error: "Failed to create faculty member." });
   });
 
+  it("rejects faculty creation for non-admin users", async () => {
+    auth.mockResolvedValue({ user: { id: "coord-1", role: "COORDINATOR" } });
+
+    await expect(
+      createFaculty({ name: "Prof. Ada", email: "ada@example.com", password: "Password123" })
+    ).rejects.toThrow("Unauthorized");
+  });
+
+  it("parses invalid experience values as 0", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    hash.mockResolvedValue("hashed-password");
+
+    const facultyCreate = vi.fn().mockResolvedValue({ id: "faculty-1" });
+    db.$transaction.mockImplementation(
+      async (
+        callback: (tx: {
+          user: { create: (args: unknown) => Promise<{ id: string }> };
+          faculty: { create: (args: unknown) => Promise<unknown> };
+        }) => Promise<void>
+      ) => {
+        await callback({
+          user: { create: vi.fn().mockResolvedValue({ id: "u1" }) },
+          faculty: { create: facultyCreate },
+        });
+      }
+    );
+
+    await expect(
+      createFaculty({ name: "A", email: "a@b.com", password: "Password123", experience: "invalid" })
+    ).resolves.toEqual({ success: true });
+
+    expect(facultyCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ experience: 0 }),
+      })
+    );
+  });
+
   it("deletes the linked user when a faculty member is removed", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.faculty.findUnique.mockResolvedValue({ userId: "user-1" });
-
-    const { deleteFaculty } = await import("./faculty-admin");
 
     await expect(deleteFaculty("faculty-1")).resolves.toEqual({ success: true });
     expect(db.user.delete).toHaveBeenCalledWith({ where: { id: "user-1" } });
@@ -154,8 +178,6 @@ describe("faculty admin actions", () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.faculty.findUnique.mockResolvedValue(null);
 
-    const { deleteFaculty } = await import("./faculty-admin");
-
     await expect(deleteFaculty("faculty-1")).resolves.toEqual({ success: true });
     expect(db.user.delete).not.toHaveBeenCalled();
     expect(revalidatePath).toHaveBeenCalledWith("/admin/faculty");
@@ -164,8 +186,6 @@ describe("faculty admin actions", () => {
   it("returns an error when faculty deletion fails", async () => {
     auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
     db.faculty.findUnique.mockRejectedValue(new Error("db error"));
-
-    const { deleteFaculty } = await import("./faculty-admin");
 
     await expect(deleteFaculty("faculty-1")).resolves.toEqual({ error: "Failed to delete faculty member." });
   });

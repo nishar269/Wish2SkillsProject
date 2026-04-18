@@ -83,6 +83,21 @@ describe("ai actions", () => {
       text: "Sorry, I'm having trouble processing your request right now. Please try again in a moment.",
     });
     expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
+  });
+
+  it("returns a graceful message when OpenRouter network request throws", async () => {
+    process.env.OPENROUTER_API_KEY = "openrouter-key";
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    fetchMock.mockRejectedValue(new Error("Network failure"));
+
+    const { chatWithCampusAI } = await import("./ai");
+
+    await expect(chatWithCampusAI("hello")).resolves.toEqual({
+      text: "Sorry, I'm having trouble processing your request right now. Please try again in a moment.",
+    });
+    expect(errorSpy).toHaveBeenCalled();
+    errorSpy.mockRestore();
   });
 
   it("returns model text when Gemini responds", async () => {

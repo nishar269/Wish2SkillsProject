@@ -46,7 +46,7 @@ describe("db singleton", () => {
   it("does not cache prisma client in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
     
-    const { db } = await import("./db");
+    const { db: _db } = await import("./db");
 
     expect(PrismaClient).toHaveBeenCalledTimes(1);
     expect((globalThis as typeof globalThis & { prisma?: unknown }).prisma).toBeUndefined();
