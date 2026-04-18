@@ -28,8 +28,15 @@ async function checkAdmin() {
   }
 }
 
+async function checkAdminOrCoordinator() {
+  const session = await auth();
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "COORDINATOR")) {
+    throw new Error("Unauthorized");
+  }
+}
+
 export async function getFaculty() {
-  await checkAdmin();
+  await checkAdminOrCoordinator();
   return await db.faculty.findMany({
     orderBy: { createdAt: "desc" },
     include: {

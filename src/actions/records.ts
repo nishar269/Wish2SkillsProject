@@ -45,3 +45,44 @@ export async function triggerDataExport(type: "STUDENTS" | "FACULTY" | "ATTENDAN
 
     return { success: true, message: `${type} export started. Check back in a few moments.` };
 }
+
+export async function getArchiveInventory() {
+    const session = await auth();
+    if (!session || (session.user.role !== "ADMIN" && session.user.role !== "RECORDS")) {
+        throw new Error("Unauthorized");
+    }
+
+    const [completedBatches, exportLogs] = await Promise.all([
+        db.batch.findMany({
+            where: { status: "COMPLETED" },
+            orderBy: { updatedAt: "desc" },
+            include: {
+                course: true,
+                _count: {
+                    select: {
+                        students: true,
+                        classSessions: true,
+                    },
+                },
+            },
+        }),
+        db.auditLog.findMany({
+            where: { action: { contains: "EXPORT" } },
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            include: {
+                user: {
+                    select: {
+                        name: true,
+                        role: true,
+                    },
+                },
+            },
+        }),
+    ]);
+
+    return {
+        completedBatches,
+        exportLogs,
+    };
+}

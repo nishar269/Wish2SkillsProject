@@ -5,7 +5,9 @@ import { auth } from "@/lib/auth";
 
 export async function getAdminReportData() {
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN") return { error: "Unauthorized" };
+  if (!session || !["ADMIN", "AUTHORITY", "RECORDS"].includes(session.user.role)) {
+    return { error: "Unauthorized" };
+  }
 
   const studentsCount = await db.student.count();
   const facultyCount = await db.faculty.count();
