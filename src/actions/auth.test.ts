@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { signIn, signOut, AuthError } = vi.hoisted(() => {
+const { signIn, signOut, verifyCredentials, AuthError } = vi.hoisted(() => {
   class MockAuthError extends Error {
     type: string;
 
@@ -13,6 +13,7 @@ const { signIn, signOut, AuthError } = vi.hoisted(() => {
   return {
     signIn: vi.fn(),
     signOut: vi.fn(),
+    verifyCredentials: vi.fn(),
     AuthError: MockAuthError,
   };
 });
@@ -20,6 +21,7 @@ const { signIn, signOut, AuthError } = vi.hoisted(() => {
 vi.mock("@/lib/auth", () => ({
   signIn,
   signOut,
+  verifyCredentials,
 }));
 
 vi.mock("next-auth", () => ({
@@ -64,6 +66,7 @@ describe("auth actions", () => {
   });
 
   it("logs in successfully with valid credentials", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "admin@wish2skill.com", role: "ADMIN" });
     signIn.mockResolvedValue({ ok: true });
 
     await expect(loginAction(createLoginForm("admin@wish2skill.com", "Password123"))).resolves.toEqual({
@@ -80,14 +83,25 @@ describe("auth actions", () => {
     await expect(loginAction(createLoginForm("bad-email", "123"))).resolves.toEqual({
       error: "Invalid email address",
     });
+    expect(verifyCredentials).not.toHaveBeenCalled();
     expect(signIn).not.toHaveBeenCalled();
   });
 
-  it("returns a friendly message when credentials sign-in fails", async () => {
-    signIn.mockRejectedValue(new AuthError("CredentialsSignin"));
+  it("returns a friendly message when credentials are invalid", async () => {
+    verifyCredentials.mockResolvedValue(null);
 
     await expect(loginAction(createLoginForm("admin@wish2skill.com", "wrongpass"))).resolves.toEqual({
       error: "Invalid email or password",
+    });
+    expect(signIn).not.toHaveBeenCalled();
+  });
+
+  it("returns a fallback message when sign-in fails unexpectedly", async () => {
+    verifyCredentials.mockResolvedValue({ id: "1", email: "admin@wish2skill.com", role: "ADMIN" });
+    signIn.mockRejectedValue(new AuthError("Configuration"));
+
+    await expect(loginAction(createLoginForm("admin@wish2skill.com", "Password123"))).resolves.toEqual({
+      error: "Something went wrong. Please try again.",
     });
   });
 
