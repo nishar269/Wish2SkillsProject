@@ -1,11 +1,10 @@
 "use server";
 
-import { signIn, signOut } from "@/lib/auth";
+import { signIn, signOut, verifyCredentials } from "@/lib/auth";
 import { loginSchema } from "@/lib/validations";
 import { AuthError } from "next-auth";
 
 export async function loginAction(formData: FormData) {
-  console.log("LOGIN_ACTION: Attempting login for", formData.get("email"));
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
@@ -16,6 +15,12 @@ export async function loginAction(formData: FormData) {
   }
 
   try {
+    const verifiedUser = await verifyCredentials(parsed.data.email, parsed.data.password);
+
+    if (!verifiedUser) {
+      return { error: "Invalid email or password" };
+    }
+
     const result = await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
@@ -28,15 +33,16 @@ export async function loginAction(formData: FormData) {
 
     return { success: true };
   } catch (error) {
-    console.error("LOGIN_ACTION_ERROR:", error);
     if (error instanceof AuthError) {
       switch (error.type) {
         case "CredentialsSignin":
           return { error: "Invalid email or password" };
         default:
+          console.error("LOGIN_ACTION_ERROR:", error);
           return { error: "Something went wrong. Please try again." };
       }
     }
+    console.error("LOGIN_ACTION_ERROR:", error);
     throw error;
   }
 }

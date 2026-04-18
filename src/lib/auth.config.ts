@@ -34,8 +34,6 @@ export const authConfig = {
         if (isRole(role)) {
           appToken.role = role;
         }
-
-        console.log('AUTH_JWT: Token initialized for', user.email, 'with role', appToken.role);
       }
       return appToken;
     },
@@ -50,8 +48,6 @@ export const authConfig = {
         if (isRole(appToken.role)) {
           appSession.user.role = appToken.role;
         }
-
-        console.log('AUTH_SESSION: Session ready for', appSession.user.email, 'with role', appSession.user.role);
       }
       return appSession;
     },
