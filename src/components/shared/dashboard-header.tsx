@@ -39,6 +39,7 @@ export function DashboardHeader({ user, onMenuToggle, onLogout }: DashboardHeade
           size="icon"
           className="h-10 w-10 text-[#5a4c38] lg:hidden"
           onClick={onMenuToggle}
+          aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
         </Button>

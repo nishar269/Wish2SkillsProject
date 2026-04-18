@@ -36,7 +36,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-transparent">
+    <div className="flex min-h-svh overflow-hidden bg-transparent">
       <div className="hidden lg:flex">
         <DashboardSidebar
           items={navConfig.mainNav}
