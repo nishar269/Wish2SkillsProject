@@ -31,5 +31,6 @@ describe("permissions helpers", () => {
     expect(ROLE_LABELS[Role.AUTHORITY]).toBe("Higher Authority");
     expect(ROLE_COLORS[Role.RECORDS]).toContain("cyan");
     expect(getDashboardPath(Role.AUTHORITY)).toBe("/authority");
+    expect(getDashboardPath("INVALID" as Role)).toBe("/student");
   });
 });

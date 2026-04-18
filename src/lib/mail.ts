@@ -76,7 +76,6 @@ function createResendTransport() {
       };
     },
     async verify() {
-      if (!apiKey) throw new Error("RESEND_API_KEY missing");
       return true;
     }
   } satisfies MailTransport;

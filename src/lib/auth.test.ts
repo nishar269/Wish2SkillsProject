@@ -99,6 +99,24 @@ describe("verifyCredentials", () => {
       data: { lastLoginAt: expect.any(Date) },
     });
   });
+
+  it("skips last login update if option is false or missing", async () => {
+    db.user.findUnique.mockResolvedValue({
+      id: "user-1",
+      email: "test@example.com",
+      status: "ACTIVE",
+      passwordHash: "stored",
+    });
+    compare.mockResolvedValue(true);
+
+    const { verifyCredentials } = await import("./auth");
+
+    await verifyCredentials("test@example.com", "Password123", { updateLastLogin: false });
+    expect(db.user.update).not.toHaveBeenCalled();
+
+    await verifyCredentials("test@example.com", "Password123");
+    expect(db.user.update).not.toHaveBeenCalled();
+  });
 });
 
 describe("Credentials Provider authorize", () => {

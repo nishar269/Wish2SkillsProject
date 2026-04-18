@@ -66,4 +66,56 @@ describe("authConfig", () => {
       })
     ).resolves.toBe(true);
   });
+
+  it("handles jwt callback without user", async () => {
+    const token = { existing: "token" };
+    const result = await authConfig.callbacks.jwt({
+      token,
+      user: null as any,
+      account: null,
+      profile: undefined,
+      trigger: "signIn",
+      isNewUser: false,
+      session: undefined,
+    });
+    expect(result).toBe(token);
+    expect(result).not.toHaveProperty("id");
+  });
+
+  it("handles jwt callback with user missing role", async () => {
+    const token = await authConfig.callbacks.jwt({
+      token: {},
+      user: { id: "user-1" } as any,
+      account: null,
+      profile: undefined,
+      trigger: "signIn",
+      isNewUser: false,
+      session: undefined,
+    });
+    expect(token.id).toBe("user-1");
+    expect(token.role).toBeUndefined();
+  });
+
+  it("handles session callback with missing user or ID", async () => {
+    // Missing session.user
+    const session1 = await authConfig.callbacks.session({
+      session: {} as any,
+      token: { id: "user-1", role: "ADMIN" },
+      user: undefined as any,
+      newSession: undefined,
+      trigger: undefined,
+    });
+    expect(session1.user).toBeUndefined();
+
+    // Missing token fields
+    const session2 = await authConfig.callbacks.session({
+      session: { user: {} } as any,
+      token: {},
+      user: undefined as any,
+      newSession: undefined,
+      trigger: undefined,
+    });
+    expect(session2.user.id).toBeUndefined();
+    expect(session2.user.role).toBeUndefined();
+  });
 });

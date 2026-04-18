@@ -63,6 +63,9 @@ function createLoginForm(email: string, password: string) {
 describe("auth actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    delete process.env.NEXTAUTH_SECRET;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    delete process.env.URL;
   });
 
   it("logs in successfully with valid credentials", async () => {
@@ -94,6 +97,14 @@ describe("auth actions", () => {
       error: "Invalid email or password",
     });
     expect(signIn).not.toHaveBeenCalled();
+  });
+
+  it("handles CredentialsSignin AuthError", async () => {
+      verifyCredentials.mockResolvedValue({ id: "1", email: "user@example.com", role: "USER" });
+      signIn.mockRejectedValue(new AuthError("CredentialsSignin"));
+      await expect(loginAction(createLoginForm("user@example.com", "Password123"))).resolves.toEqual({
+          error: "Invalid email or password"
+      });
   });
 
   it("returns a fallback message when sign-in fails unexpectedly", async () => {
@@ -135,13 +146,26 @@ describe("auth actions", () => {
       await expect(forgotPasswordAction(form)).resolves.toEqual({ error: "Email is required." });
     });
 
-    it("sends recovery email for valid user", async () => {
+    it("sends recovery email for valid user with various base URLs", async () => {
       const form = new FormData();
       form.set("email", "admin@wish2skill.com");
       mockDbAuth.user.findUnique.mockResolvedValue({ id: "123", email: "admin@wish2skill.com" });
       
-      await expect(forgotPasswordAction(form)).resolves.toEqual({ success: true });
-      expect(sendNotificationEmail).toHaveBeenCalled();
+      // Test NEXT_PUBLIC_APP_URL
+      process.env.NEXT_PUBLIC_APP_URL = "https://app.com";
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://app.com"));
+
+      // Test URL
+      delete process.env.NEXT_PUBLIC_APP_URL;
+      process.env.URL = "https://netlify.com";
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://netlify.com"));
+
+      // Test fallback
+      delete process.env.URL;
+      await forgotPasswordAction(form);
+      expect(sendNotificationEmail).toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.stringContaining("https://wish2skill.netlify.app"));
     });
 
     it("returns success silently when user is not found to prevent enumeration", async () => {
@@ -164,9 +188,18 @@ describe("auth actions", () => {
       errorSpy.mockRestore();
     });
 
-    it("rejects token reset if passwords do not match", async () => {
+    it("rejects reset if token is missing", async () => {
+        const form = new FormData();
+        await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Reset token missing. Please use a valid link." });
+    });
+
+    it("rejects token reset if passwords do not match or too short", async () => {
       const form = new FormData();
       form.set("token", "xyz");
+      form.set("password", "short");
+      form.set("confirmPassword", "short");
+      await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Password must be at least 8 characters." });
+
       form.set("password", "Pass1234");
       form.set("confirmPassword", "Pass9999");
       await expect(resetPasswordAction(form)).resolves.toEqual({ error: "Passwords do not match." });
