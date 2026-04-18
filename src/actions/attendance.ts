@@ -188,6 +188,89 @@ export async function selfMarkAttendance(sessionId: string, coords?: { lat: numb
     }
 }
 
+export async function getCoordinatorAttendanceOverview() {
+    const session = await auth();
+    if (!session || (session.user.role !== "COORDINATOR" && session.user.role !== "ADMIN")) {
+        throw new Error("Unauthorized");
+    }
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const [sessionsToday, activeBatches, attendanceMarkedToday, presentMarkedToday] = await Promise.all([
+        db.classSession.findMany({
+            where: {
+                date: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+            orderBy: [
+                { date: "asc" },
+                { startTime: "asc" },
+            ],
+            include: {
+                subject: true,
+                faculty: {
+                    include: {
+                        user: true,
+                    },
+                },
+                batch: {
+                    include: {
+                        _count: {
+                            select: { students: true },
+                        },
+                    },
+                },
+                _count: {
+                    select: { attendances: true },
+                },
+            },
+        }),
+        db.batch.findMany({
+            where: { status: "ACTIVE" },
+            orderBy: { name: "asc" },
+            include: {
+                course: true,
+                _count: {
+                    select: {
+                        students: true,
+                        classSessions: true,
+                    },
+                },
+            },
+        }),
+        db.attendance.count({
+            where: {
+                createdAt: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+        }),
+        db.attendance.count({
+            where: {
+                status: "PRESENT",
+                createdAt: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+        }),
+    ]);
+
+    return {
+        sessionsToday,
+        activeBatches,
+        attendanceMarkedToday,
+        presentMarkedToday,
+    };
+}
+
 function format(date: Date, pattern: string) {
     // Basic internal format helper
     const y = date.getFullYear();

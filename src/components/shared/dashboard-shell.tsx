@@ -54,7 +54,7 @@ export function DashboardShell({ children, user }: DashboardShellProps) {
       </Sheet>
 
       <div className="relative flex-1 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(199,164,106,0.14),transparent_24%),radial-gradient(circle_at_top_left,rgba(22,32,51,0.07),transparent_28%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(214,182,123,0.22),transparent_26%),radial-gradient(circle_at_top_left,rgba(96,134,120,0.1),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent_34%)]" />
         <div className="relative flex h-full flex-col overflow-hidden px-3 py-3 md:px-4">
           <DashboardHeader
             user={user}

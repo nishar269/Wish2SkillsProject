@@ -82,4 +82,72 @@ describe("announcements actions", () => {
       "https://campus.example.com/dashboard"
     );
   });
+
+  it("rejects announcement creation for non-admin users", async () => {
+    auth.mockResolvedValue({ user: { id: "student-1", role: "STUDENT" } });
+
+    const { createAnnouncement } = await import("./announcements");
+
+    await expect(
+      createAnnouncement({ title: "Hi", content: "Nope", type: "GENERAL" })
+    ).rejects.toThrow("Unauthorized");
+  });
+
+  it("maps GENERAL and ACADEMIC tones to notification types", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.user.findMany.mockResolvedValue([]);
+
+    const { createAnnouncement } = await import("./announcements");
+
+    await expect(createAnnouncement({ title: "General", content: "FYI", type: "GENERAL" })).resolves.toEqual({
+      success: true,
+    });
+    expect(db.notification.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ type: "INFO" }),
+      })
+    );
+
+    await expect(createAnnouncement({ title: "Academic", content: "Good news", type: "ACADEMIC" })).resolves.toEqual({
+      success: true,
+    });
+    expect(db.notification.create).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ type: "SUCCESS" }),
+      })
+    );
+  });
+
+  it("returns an error when announcement creation fails", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.notification.create.mockRejectedValue(new Error("db error"));
+
+    const { createAnnouncement } = await import("./announcements");
+
+    await expect(
+      createAnnouncement({ title: "Exam Notice", content: "Midterms start soon.", type: "URGENT" })
+    ).resolves.toEqual({ error: "Failed to post announcement." });
+    expect(sendNotificationEmail).not.toHaveBeenCalled();
+  });
+
+  it("deletes announcements and revalidates dashboards", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+
+    const { deleteAnnouncement } = await import("./announcements");
+
+    await expect(deleteAnnouncement("note-1")).resolves.toEqual({ success: true });
+    expect(db.notification.delete).toHaveBeenCalledWith({ where: { id: "note-1" } });
+    expect(revalidatePath).toHaveBeenCalledWith("/admin/announcements");
+    expect(revalidatePath).toHaveBeenCalledWith("/student/notifications");
+    expect(revalidatePath).toHaveBeenCalledWith("/student");
+  });
+
+  it("returns an error when announcement deletion fails", async () => {
+    auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
+    db.notification.delete.mockRejectedValue(new Error("db error"));
+
+    const { deleteAnnouncement } = await import("./announcements");
+
+    await expect(deleteAnnouncement("note-1")).resolves.toEqual({ error: "Failed to delete announcement." });
+  });
 });

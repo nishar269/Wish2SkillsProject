@@ -20,7 +20,7 @@ import {
 export default function Home() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-transparent font-sans text-slate-900">
-      <nav className="fixed top-0 z-50 flex h-22 w-full items-center justify-between border-b border-white/30 bg-[#f6f1e8]/78 px-6 backdrop-blur-xl md:px-12">
+      <nav className="fixed top-0 z-50 flex h-22 w-full items-center justify-between border-b border-white/40 bg-[#faf5ed]/84 px-6 backdrop-blur-xl md:px-12">
         <div className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#d5b482,#b78c46)] text-[#131b2c] shadow-[0_12px_30px_rgba(183,140,70,0.3)]">
             <GraduationCap className="h-6 w-6" />
@@ -55,7 +55,7 @@ export default function Home() {
 
       <main className="flex w-full flex-col items-center">
         <section className="relative w-full overflow-hidden px-6 pb-20 pt-36 md:px-10 md:pb-28 md:pt-40">
-          <div className="absolute inset-x-0 top-0 h-[78%] bg-[radial-gradient(circle_at_top_left,rgba(199,164,106,0.26),transparent_28%),radial-gradient(circle_at_top_right,rgba(12,20,36,0.18),transparent_30%)]" />
+          <div className="absolute inset-x-0 top-0 h-[78%] bg-[radial-gradient(circle_at_top_left,rgba(214,182,123,0.34),transparent_30%),radial-gradient(circle_at_top_right,rgba(255,255,255,0.22),transparent_26%),radial-gradient(circle_at_center_top,rgba(74,140,120,0.1),transparent_32%)]" />
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.12fr_0.88fr] lg:items-center">
             <div className="space-y-8">
               <div className="premium-kicker border-[#d6c5aa] bg-white/70 text-[#9d7b43]">
@@ -101,16 +101,16 @@ export default function Home() {
             </div>
 
             <div className="premium-dark-panel premium-grid relative overflow-hidden px-6 py-7 md:px-8 md:py-8">
-              <div className="absolute right-0 top-0 h-52 w-52 rounded-full bg-[#c7a46a]/18 blur-3xl" />
+              <div className="absolute right-0 top-0 h-52 w-52 rounded-full bg-[#d7b67b]/24 blur-3xl" />
               <div className="relative space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#c7a46a]">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#e0c38e]">
                       Executive Snapshot
                     </div>
                     <div className="premium-title pt-2 text-4xl text-white">Live Institute Pulse</div>
                   </div>
-                  <div className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#e7d9be]">
+                  <div className="rounded-full border border-white/14 bg-white/12 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#f0e2c7]">
                     secure sync
                   </div>
                 </div>
@@ -138,8 +138,8 @@ export default function Home() {
                       desc: "Role-aware guidance embedded directly inside the workspace.",
                     },
                   ].map((feature) => (
-                    <div key={feature.title} className="rounded-[22px] border border-white/8 bg-white/6 p-5">
-                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 text-[#f0d6a5]">
+                    <div key={feature.title} className="rounded-[22px] border border-white/12 bg-white/10 p-5">
+                      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/14 text-[#f3d9a8]">
                         <feature.icon className="h-5 w-5" />
                       </div>
                       <div className="text-base font-semibold text-white">{feature.title}</div>

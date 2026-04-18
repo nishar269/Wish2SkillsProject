@@ -54,11 +54,16 @@ export async function getCourses() {
 
 export async function createCourse(formData: FormData) {
   await checkAdmin();
+
+  const descriptionValue = formData.get("description");
   
   const rawData = {
     name: formData.get("name"),
     code: formData.get("code"),
-    description: formData.get("description"),
+    description:
+      typeof descriptionValue === "string" && descriptionValue.trim().length > 0
+        ? descriptionValue
+        : undefined,
     durationMonths: parseInt(formData.get("durationMonths") as string),
     status: formData.get("status") || "ACTIVE",
   };
